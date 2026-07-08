@@ -367,7 +367,7 @@
     btn.addEventListener('click', (e) => { state.currentTab = e.target.dataset.tab; initHome(); });
   });
 
-  function renderClassGrid() {
+ function renderClassGrid() {
     const grid = document.getElementById('class-grid'); grid.innerHTML = '';
     const gStats = getStats(state.currentGrade);
     document.getElementById('grade-stats').innerHTML = `${state.currentGrade}학년 총 ${gStats.total}명 &nbsp;|&nbsp; 결석 <span class="text-danger">${gStats.absent}</span> / 지각 ${gStats.late} / 조퇴 <span style="color:var(--primary)">${gStats.early}</span>`;
@@ -376,13 +376,19 @@
       const btn = document.createElement('div'); btn.className = 'class-btn';
       if(localStorage.getItem(`students_${state.currentGrade}_${i}`)) {
         const cStats = getStats(state.currentGrade, i);
-        btn.innerHTML = `<h3>${i}반</h3><div class="class-status">👥 ${cStats.total}명 (결석<span class="text-danger">${cStats.absent}</span>/지각${cStats.late})</div>`;
+        
+        // 👇 모바일 화면을 위해 강제로 두 줄로 나누고 폰트 크기를 조정한 부분입니다.
+        btn.innerHTML = `<h3>${i}반</h3>
+          <div class="class-status" style="display: block; line-height: 1.5; word-break: keep-all;">
+            👥 ${cStats.total}명<br>
+            <span style="font-size: 11.5px;">(결석 <span class="text-danger">${cStats.absent}</span> / 지각 ${cStats.late})</span>
+          </div>`;
+          
       } else { btn.innerHTML = `<h3>${i}반</h3><div class="class-status" style="color:#aaa">미등록</div>`; }
       btn.addEventListener('click', () => openAttendance(state.currentGrade, i));
       grid.appendChild(btn);
     }
   }
-
   // 비상연락망 렌더링 (꾹 누르면 통화)
   function renderEmergencyGrid() {
     const grid = document.getElementById('teacher-grid'); grid.innerHTML = '';
