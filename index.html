@@ -5,21 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>실시간 동기화 출석 명렬표</title>
   <style>
-    /* 🎨 디자인 시스템 */
+    /* 🎨 디자인 시스템 (5가지 색상 반영) */
     :root {
-      --primary: #007AFF;
-      --success: #34C759;
-      --warning: #FFD60A;
-      --danger: #FF3B30;
+      --primary: #007AFF; /* 조퇴 (파랑) */
+      --success: #34C759; /* 출석 (초록) */
+      --warning: #FFCC00; /* 지각 (노랑) */
+      --danger: #FF3B30;  /* 결석 (빨강) */
+      --default: #FFFFFF; /* 평소 (흰색) */
+      
       --bg: #F2F2F7;
       --card: #FFFFFF;
       --text-main: #1C1C1E;
       --text-sub: #8E8E93;
       --border: #C6C6C8;
-      
-      --state-0: #d4edda;
-      --state-1: #FFD60A;
-      --state-2: #FFE5E5;
     }
 
     body {
@@ -31,6 +29,7 @@
     #app {
       width: 100%; max-width: 430px; min-height: 100vh; background-color: var(--bg);
       position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.05); overflow-x: hidden;
+      padding-bottom: 120px; /* 로고와 겹치지 않게 여백 추가 */
     }
 
     .nav-bar {
@@ -43,52 +42,81 @@
     .nav-title { font-size: 17px; font-weight: 600; }
     .nav-btn { background: none; border: none; font-size: 20px; cursor: pointer; padding: 5px; color: var(--primary); }
 
-    .view { display: none; padding: 74px 16px 80px 16px; animation: fadeIn 0.3s ease; }
+    .view { display: none; padding: 74px 16px 20px 16px; animation: fadeIn 0.3s ease; }
     .view.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     .card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; }
-    select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; margin-bottom: 12px; background-color: var(--card); }
+    select, input[type="date"] { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; margin-bottom: 12px; background-color: var(--card); box-sizing: border-box; }
     textarea { width: 100%; height: 150px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; margin: 10px 0; font-size: 14px; resize: none; }
-    button.primary-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
+    button.primary-btn { width: 100%; padding: 14px; background: var(--text-main); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 10px;}
+    button.excel-btn { width: 100%; padding: 14px; background: var(--success); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 20px;}
 
     .segment-control { display: flex; background: #E3E3E8; border-radius: 8px; padding: 2px; margin-bottom: 12px; }
-    .segment-btn { flex: 1; padding: 8px 0; text-align: center; border: none; background: transparent; border-radius: 6px; font-size: 15px; font-weight: 500; cursor: pointer; }
+    .segment-btn { flex: 1; padding: 8px 0; text-align: center; border: none; background: transparent; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; }
     .segment-btn.active { background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
-    /* 📊 통계 배너 스타일 */
     .grade-stats { text-align: center; font-size: 14px; font-weight: 600; background: var(--card); padding: 10px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .stat-banner { display: flex; justify-content: space-between; background: var(--card); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 15px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .stat-banner { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
     .text-danger { color: var(--danger); }
+    
+    .date-wrap { margin-bottom: 16px; }
 
     .class-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .class-btn { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: left; cursor: pointer; }
     .class-btn h3 { margin: 0 0 8px 0; font-size: 18px; }
     .class-status { font-size: 13px; color: var(--text-sub); display: flex; align-items: center; gap: 6px; font-weight: 500; }
     .status-dot { width: 8px; height: 8px; border-radius: 50%; }
-    .dot-green { background: var(--success); }
-    .dot-gray { background: var(--border); }
 
     .student-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     .student-cell { 
-      background: var(--state-0); border-radius: 12px; padding: 16px 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; position: relative; 
-      /* 🚫 길게 눌렀을 때 텍스트 복사/돋보기 팝업 방지 */
+      border-radius: 12px; padding: 16px 4px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; position: relative; border: 1px solid var(--border);
       -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; -webkit-touch-callout: none;
+      transition: transform 0.1s, background-color 0.2s;
     }
     .student-cell.active-press { transform: scale(0.92); }
-    .student-num { font-size: 12px; color: var(--text-sub); pointer-events: none; }
-    .student-name { font-size: 15px; font-weight: 600; pointer-events: none; }
-    .absent-mark { position: absolute; top: -5px; right: -5px; font-size: 14px; display: none; pointer-events: none; }
-    .state-2 .absent-mark { display: block; }
-    
-    .state-0 { background: var(--state-0); }
-    .state-1 { background: var(--state-1); }
-    .state-2 { background: var(--state-2); }
+    .student-num { font-size: 11px; font-weight: bold; pointer-events: none; opacity: 0.7; margin-bottom: 2px;}
+    .student-name { font-size: 15px; font-weight: 700; pointer-events: none; }
+    .state-icon { position: absolute; top: -6px; right: -6px; font-size: 16px; display: none; pointer-events: none; background: white; border-radius: 50%; padding: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);}
 
-    .bottom-bar { position: fixed; bottom: 0; width: 100%; max-width: 430px; padding: 16px; background: rgba(242, 242, 247, 0.9); backdrop-filter: blur(10px); display: flex; gap: 12px; box-sizing: border-box; border-top: 1px solid var(--border); }
+    /* 🎨 5단계 상태 컬러 시스템 */
+    .state-0 { background: var(--default); color: var(--text-main); border-color: var(--border); }
+    .state-1 { background: var(--success); color: white; border-color: var(--success); }
+    .state-2 { background: var(--danger); color: white; border-color: var(--danger); }
+    .state-3 { background: var(--warning); color: black; border-color: var(--warning); }
+    .state-4 { background: var(--primary); color: white; border-color: var(--primary); }
+
+    .state-1 .state-icon { display: block; content: '✅'; }
+    .state-2 .state-icon { display: block; content: '❌'; }
+    .state-3 .state-icon { display: block; content: '⚠️'; }
+    .state-4 .state-icon { display: block; content: '🏃'; }
+
+    /* 비상연락망 그리드 */
+    .teacher-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .teacher-cell { background: var(--card); border-radius: 12px; padding: 16px; text-align: center; border: 1px solid var(--border); -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+    .teacher-cell.active-press { transform: scale(0.92); background: #E5E5EA; }
+    .teacher-title { font-size: 12px; color: var(--primary); font-weight: bold; margin-bottom: 4px; pointer-events: none; }
+    .teacher-name { font-size: 16px; font-weight: bold; pointer-events: none; }
+    .teacher-hint { font-size: 10px; color: var(--text-sub); margin-top: 6px; pointer-events: none; }
+
+    .bottom-bar { position: fixed; bottom: 0; width: 100%; max-width: 430px; padding: 16px; background: rgba(242, 242, 247, 0.9); backdrop-filter: blur(10px); display: flex; gap: 12px; box-sizing: border-box; border-top: 1px solid var(--border); z-index: 100; }
     .bottom-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; font-size: 16px; font-weight: 600; cursor: pointer; }
-    .btn-reset { background: #E5E5EA; color: var(--danger); }
-    .btn-save { background: var(--primary); color: white; }
+    .btn-reset { background: #E5E5EA; color: var(--text-main); }
+    .btn-save { background: var(--text-main); color: white; }
+
+    /* 🏫 하단 학교 로고 고정 */
+    .school-logo-container {
+      position: absolute; bottom: 20px; left: 0; width: 100%;
+      display: flex; justify-content: center; align-items: center; pointer-events: none; opacity: 0.3; z-index: 0;
+    }
+    .school-logo-container img { width: 150px; height: auto; filter: grayscale(100%); }
+
+    /* 기타 UI 요소 */
+    .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; z-index: 300; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+    .spinner { display: none; font-size: 14px; margin-right: 5px; }
+    .spinner.show { display: inline-block; animation: spin 1s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
 
     .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 150; display: none; opacity: 0; transition: opacity 0.3s; }
     .overlay.show { display: block; opacity: 1; }
@@ -98,13 +126,7 @@
     .sheet-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
     .contact-btn { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 16px; border-radius: 12px; text-decoration: none; color: var(--text-main); font-weight: 500; }
     .contact-btn.disabled { opacity: 0.5; pointer-events: none; }
-    .sheet-close { margin: 16px; padding: 16px; background: var(--card); text-align: center; border-radius: 12px; font-weight: 600; color: var(--primary); cursor: pointer; }
-
-    .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; z-index: 300; opacity: 0; transition: opacity 0.3s; }
-    .toast.show { opacity: 1; }
-    .spinner { display: none; font-size: 14px; margin-right: 5px; }
-    .spinner.show { display: inline-block; animation: spin 1s linear infinite; }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .sheet-close { margin: 16px; padding: 16px; background: var(--card); text-align: center; border-radius: 12px; font-weight: 600; color: var(--danger); cursor: pointer; }
   </style>
 </head>
 <body>
@@ -119,41 +141,86 @@
     </div>
   </nav>
 
+  <!-- 명단 등록 -->
   <div id="view-setup" class="view">
     <div class="card">
-      <h3 style="margin-top:0;">📋 등록할 학년/반 선택</h3>
-      <select id="setup-grade"><option value="1">1학년</option><option value="2">2학년</option></select>
-      <select id="setup-class">
-        <option value="1">1반</option><option value="2">2반</option><option value="3">3반</option><option value="4">4반</option>
-        <option value="5">5반</option><option value="6">6반</option><option value="7">7반</option><option value="8">8반</option>
+      <h3 style="margin-top:0;">📋 등록 유형 선택</h3>
+      <select id="setup-type">
+        <option value="student">학생 명단 등록</option>
+        <option value="teacher">비상연락망 등록</option>
       </select>
-      <h3>✍️ 엑셀 데이터 붙여넣기</h3>
-      <textarea id="excel-input" placeholder="엑셀 데이터를 복사해서 붙여넣으세요."></textarea>
-      <button class="primary-btn" id="btn-save-list">💾 이 반 명단 등록하기</button>
+      
+      <div id="student-setup-area">
+        <select id="setup-grade"><option value="1">1학년</option><option value="2">2학년</option></select>
+        <select id="setup-class">
+          <option value="1">1반</option><option value="2">2반</option><option value="3">3반</option><option value="4">4반</option>
+          <option value="5">5반</option><option value="6">6반</option><option value="7">7반</option><option value="8">8반</option>
+        </select>
+      </div>
+      
+      <h3 id="setup-title-text">✍️ 학생 엑셀 데이터 붙여넣기</h3>
+      <textarea id="excel-input" placeholder="엑셀 데이터를 복사해서 붙여넣으세요. (비상연락망일 경우: 이름, 전화번호 순서)"></textarea>
+      <button class="primary-btn" id="btn-save-list">💾 명단 등록하기</button>
     </div>
     <div class="card">
       <button class="bottom-btn btn-reset" id="btn-clear-all" style="padding:8px; font-size:12px; border-radius:6px; width:100%;">전체 클라우드 데이터 리셋</button>
     </div>
   </div>
 
+  <!-- 홈 화면 -->
   <div id="view-home" class="view">
     <div class="segment-control">
-      <button class="segment-btn active" data-grade="1">1학년</button>
-      <button class="segment-btn" data-grade="2">2학년</button>
+      <button class="segment-btn active" data-tab="1">1학년</button>
+      <button class="segment-btn" data-tab="2">2학년</button>
+      <button class="segment-btn" data-tab="emergency">비상연락망</button>
     </div>
-    <div class="grade-stats" id="grade-stats"></div>
-    <div class="class-grid" id="class-grid"></div>
+    
+    <!-- 학급 리스트 영역 -->
+    <div id="home-class-area">
+      <div class="grade-stats" id="grade-stats"></div>
+      <div class="class-grid" id="class-grid"></div>
+      <div style="margin-top: 30px;">
+        <button class="excel-btn" id="btn-export-excel">📊 누적 출결데이터 엑셀 다운로드</button>
+      </div>
+    </div>
+    
+    <!-- 비상연락망 리스트 영역 -->
+    <div id="home-emergency-area" style="display:none;">
+      <div class="grade-stats">👩‍🏫 교직원 비상연락망 (꾹 누르면 통화)</div>
+      <div class="teacher-grid" id="teacher-grid"></div>
+    </div>
   </div>
 
+  <!-- 명렬표 (출석체크) -->
   <div id="view-attendance" class="view" style="padding-bottom: 100px;">
+    <div class="date-wrap">
+      <input type="date" id="attendance-date" />
+    </div>
     <div class="stat-banner" id="class-stats"></div>
+    
+    <!-- 상태 설명 범례 -->
+    <div style="display:flex; justify-content:center; gap:10px; font-size:11px; margin-bottom:15px; color:var(--text-sub); font-weight:bold;">
+      <span>⬜ 평소</span>
+      <span style="color:var(--success);">🟩 출석</span>
+      <span style="color:var(--danger);">🟥 결석</span>
+      <span style="color:var(--warning);">🟨 지각</span>
+      <span style="color:var(--primary);">🟦 조퇴</span>
+    </div>
+
     <div class="student-grid" id="student-grid"></div>
+    
     <div class="bottom-bar">
       <button class="bottom-btn btn-reset" id="btn-reset">🔄 출결 초기화</button>
       <button class="bottom-btn btn-save" id="btn-save">💾 출결 저장하기</button>
     </div>
   </div>
 
+  <!-- 하단 학교 로고 (항상 렌더링) -->
+  <div class="school-logo-container">
+    <img src="images.png" alt="학교 로고" />
+  </div>
+
+  <!-- 팝업 및 오버레이 -->
   <div class="overlay" id="overlay"></div>
   <div class="action-sheet" id="action-sheet">
     <div class="sheet-header" id="sheet-name">연락처</div>
@@ -173,41 +240,41 @@
   const API_URL = "https://script.google.com/macros/s/AKfycbyuSV4SK0M1LwIcjXurfus76RP4a-X09ciRhA4gZKOHE4oGu1ZRxBOM6TfN205dojMwIw/exec";
   // ==========================================
 
-  const state = { currentGrade: 1, currentClass: null, students: [], attendance: {} };
-  const TODAY = new Date().toISOString().split('T')[0];
+  const state = { 
+    currentTab: '1', currentGrade: 1, currentClass: null, 
+    students: [], attendance: {}, 
+    selectedDate: new Date().toLocaleDateString('en-CA') // YYYY-MM-DD
+  };
 
   const views = { setup: document.getElementById('view-setup'), home: document.getElementById('view-home'), attendance: document.getElementById('view-attendance') };
   const navLeft = document.getElementById('nav-left'); const navTitle = document.getElementById('nav-title'); const navRight = document.getElementById('nav-right');
   const spinner = document.getElementById('loading-spinner');
+  
+  // 상태 매핑 (0:평소, 1:출석, 2:결석, 3:지각, 4:조퇴)
+  const statusIconMap = { 0: '', 1: '✅', 2: '❌', 3: '⚠️', 4: '🏃' };
+  const statusTextMap = { 0: '평소', 1: '출석', 2: '결석', 3: '지각', 4: '조퇴' };
 
   function showToast(msg) { const toast = document.getElementById('toast'); toast.textContent = msg; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2000); }
 
   function switchView(viewName) {
     Object.values(views).forEach(v => v.classList.remove('active')); views[viewName].classList.add('active');
-    if (viewName === 'setup') { navLeft.style.visibility = 'visible'; navLeft.textContent = '✕'; navTitle.textContent = '명단 등록/수정'; navRight.style.display = 'none'; }
-    else if (viewName === 'home') { navLeft.style.visibility = 'hidden'; navTitle.textContent = '📋 출석 체크'; navRight.style.display = 'block'; navRight.textContent = '⚙️ 명단등록'; }
+    if (viewName === 'setup') { navLeft.style.visibility = 'visible'; navLeft.textContent = '✕'; navTitle.textContent = '명단 등록'; navRight.style.display = 'none'; }
+    else if (viewName === 'home') { navLeft.style.visibility = 'hidden'; navTitle.textContent = '📋 출석 체크'; navRight.style.display = 'block'; navRight.textContent = '⚙️ 설정'; }
     else if (viewName === 'attendance') { navLeft.style.visibility = 'visible'; navLeft.textContent = '←'; navTitle.textContent = `${state.currentGrade}학년 ${state.currentClass}반`; navRight.style.display = 'none'; }
   }
 
-  // ☁️ [강력한 동기화] 브라우저 캐시를 무시하고 무조건 최신 데이터 로드
+  // ☁️ 데이터 로드 및 저장
   async function loadFromCloud() {
     if (!API_URL || API_URL.startsWith("여기에")) return;
     try {
       spinner.classList.add('show');
-      const url = new URL(API_URL);
-      url.searchParams.append('t', new Date().getTime()); // 캐시 방지용 타임스탬프
-      
+      const url = new URL(API_URL); url.searchParams.append('t', new Date().getTime());
       const res = await fetch(url.toString());
       const cloudData = await res.json();
-      if (cloudData) {
-        localStorage.clear();
-        Object.keys(cloudData).forEach(key => localStorage.setItem(key, JSON.stringify(cloudData[key])));
-      }
-    } catch (e) { console.error(e); showToast("⚠️ 로드 실패 (로컬 데이터 사용)"); }
-    finally { spinner.classList.remove('show'); }
+      if (cloudData) { localStorage.clear(); Object.keys(cloudData).forEach(key => localStorage.setItem(key, JSON.stringify(cloudData[key]))); }
+    } catch (e) { console.error(e); showToast("⚠️ 로컬 데이터 사용"); } finally { spinner.classList.remove('show'); }
   }
 
-  // 💾 [강력한 저장] text/plain 헤더를 사용해 확실하게 서버로 데이터 전송
   async function saveToCloud() {
     if (!API_URL || API_URL.startsWith("여기에")) return;
     try {
@@ -215,107 +282,156 @@
       const allData = {};
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
-        if (k.startsWith("students_") || k.startsWith("attendance_")) {
+        if (k.startsWith("students_") || k.startsWith("attendance_") || k === "teachers_list") {
           allData[k] = JSON.parse(localStorage.getItem(k));
         }
       }
-      await fetch(API_URL, { 
-        method: "POST", 
-        headers: { "Content-Type": "text/plain;charset=utf-8" }, 
-        body: JSON.stringify(allData) 
-      });
-      showToast("☁️ 데이터가 완벽하게 저장되었습니다!");
-    } catch (e) { console.error(e); showToast("❌ 저장 실패"); }
-    finally { spinner.classList.remove('show'); }
+      await fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(allData) });
+      showToast("☁️ 완벽하게 저장되었습니다!");
+    } catch (e) { showToast("❌ 저장 실패"); } finally { spinner.classList.remove('show'); }
   }
 
-  // 📊 통계 계산 함수 (총원 / 결석자 수)
-  function getStats(grade, classNum = null) {
-    let total = 0, absent = 0;
+  // 통계 계산 (결석, 지각, 조퇴 포함)
+  function getStats(grade, classNum = null, targetDate = state.selectedDate) {
+    let stats = { total: 0, present: 0, absent: 0, late: 0, early: 0 };
     const classes = classNum ? [classNum] : [1,2,3,4,5,6,7,8];
     classes.forEach(c => {
       const sData = localStorage.getItem(`students_${grade}_${c}`);
       if(sData) {
         const students = JSON.parse(sData);
-        total += students.length;
-        const aData = localStorage.getItem(`attendance_${grade}_${c}_${TODAY}`);
+        stats.total += students.length;
+        const aData = localStorage.getItem(`attendance_${grade}_${c}_${targetDate}`);
         const att = aData ? JSON.parse(aData) : {};
         students.forEach(s => {
-          if(att[s['일련번호']] === 2) absent++; // 2는 결석 상태
+          const st = att[s['일련번호']] || 0;
+          if(st === 1) stats.present++; else if(st === 2) stats.absent++; else if(st === 3) stats.late++; else if(st === 4) stats.early++;
         });
       }
     });
-    return { total, absent };
+    return stats;
   }
 
-  function parseExcelText(text) {
-    return text.trim().split('\n').map(line => {
-      const tokens = line.split('\t').map(t => t.trim());
-      return { '일련번호': tokens[0]||'', '이름': tokens[1]||'이름없음', '전화번호': tokens[2]||'', '추가전화번호': tokens[3]||'' };
-    });
-  }
+  // 명단 등록 화면 로직
+  document.getElementById('setup-type').addEventListener('change', (e) => {
+    const isStudent = e.target.value === 'student';
+    document.getElementById('student-setup-area').style.display = isStudent ? 'block' : 'none';
+    document.getElementById('setup-title-text').textContent = isStudent ? '✍️ 학생 엑셀 데이터 붙여넣기' : '✍️ 교직원 엑셀 데이터 붙여넣기';
+  });
 
   document.getElementById('btn-save-list').addEventListener('click', async () => {
-    const grade = document.getElementById('setup-grade').value; const classNum = document.getElementById('setup-class').value; const rawText = document.getElementById('excel-input').value;
+    const type = document.getElementById('setup-type').value;
+    const rawText = document.getElementById('excel-input').value;
     if (!rawText.trim()) return alert("데이터가 없습니다.");
-    const parsed = parseExcelText(rawText);
-    localStorage.setItem(`students_${grade}_${classNum}`, JSON.stringify(parsed));
+    
+    if (type === 'student') {
+      const grade = document.getElementById('setup-grade').value; const classNum = document.getElementById('setup-class').value;
+      const parsed = rawText.trim().split('\n').map(line => {
+        const t = line.split('\t').map(x => x.trim());
+        return { '일련번호': t[0]||'', '이름': t[1]||'이름없음', '전화번호': t[2]||'', '추가전화번호': t[3]||'' };
+      });
+      localStorage.setItem(`students_${grade}_${classNum}`, JSON.stringify(parsed));
+      state.currentTab = grade; state.currentGrade = parseInt(grade);
+    } else {
+      const parsed = rawText.trim().split('\n').map(line => {
+        const t = line.split('\t').map(x => x.trim());
+        return { '이름': t[0]||'이름없음', '전화번호': t[1]||'' };
+      });
+      localStorage.setItem(`teachers_list`, JSON.stringify(parsed));
+      state.currentTab = 'emergency';
+    }
     await saveToCloud();
-    document.getElementById('excel-input').value = ''; state.currentGrade = parseInt(grade);
-    initHome();
+    document.getElementById('excel-input').value = ''; initHome();
   });
 
-  document.getElementById('btn-clear-all').addEventListener('click', async () => {
-    if (confirm('모든 데이터를 삭제하시겠습니까?')) { localStorage.clear(); await saveToCloud(); location.reload(); }
-  });
+  document.getElementById('btn-clear-all').addEventListener('click', async () => { if (confirm('모든 데이터를 삭제하시겠습니까?')) { localStorage.clear(); await saveToCloud(); location.reload(); }});
 
-  function initHome() { switchView('home'); renderClassGrid(); }
+  // 홈 화면 렌더링
+  function initHome() {
+    switchView('home');
+    document.querySelectorAll('.segment-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.tab === state.currentTab);
+    });
+    if (state.currentTab === 'emergency') {
+      document.getElementById('home-class-area').style.display = 'none';
+      document.getElementById('home-emergency-area').style.display = 'block';
+      renderEmergencyGrid();
+    } else {
+      document.getElementById('home-class-area').style.display = 'block';
+      document.getElementById('home-emergency-area').style.display = 'none';
+      state.currentGrade = parseInt(state.currentTab);
+      renderClassGrid();
+    }
+  }
 
   document.querySelectorAll('.segment-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active')); e.target.classList.add('active');
-      state.currentGrade = parseInt(e.target.dataset.grade); renderClassGrid();
-    });
+    btn.addEventListener('click', (e) => { state.currentTab = e.target.dataset.tab; initHome(); });
   });
 
   function renderClassGrid() {
     const grid = document.getElementById('class-grid'); grid.innerHTML = '';
-    
-    // 학년별 통계 표시
     const gStats = getStats(state.currentGrade);
-    document.getElementById('grade-stats').innerHTML = `${state.currentGrade}학년 전체 인원 : ${gStats.total}명 &nbsp;|&nbsp; 결석 : <span class="text-danger">${gStats.absent}명</span>`;
+    document.getElementById('grade-stats').innerHTML = `${state.currentGrade}학년 총 ${gStats.total}명 &nbsp;|&nbsp; 결석 <span class="text-danger">${gStats.absent}</span> / 지각 ${gStats.late} / 조퇴 <span style="color:var(--primary)">${gStats.early}</span>`;
 
-    // 반별 그리드 및 통계 표시
     for (let i = 1; i <= 8; i++) {
       const btn = document.createElement('div'); btn.className = 'class-btn';
-      const localData = localStorage.getItem(`students_${state.currentGrade}_${i}`);
-      if(localData) {
+      if(localStorage.getItem(`students_${state.currentGrade}_${i}`)) {
         const cStats = getStats(state.currentGrade, i);
-        btn.innerHTML = `<h3>${i}반</h3><div class="class-status"><div class="status-dot dot-green"></div>총 ${cStats.total}명 (결석 <span class="text-danger">${cStats.absent}</span>명)</div>`;
-      } else {
-        btn.innerHTML = `<h3>${i}반</h3><div class="class-status"><div class="status-dot dot-gray"></div> 미등록</div>`;
-      }
+        btn.innerHTML = `<h3>${i}반</h3><div class="class-status">👥 ${cStats.total}명 (결석<span class="text-danger">${cStats.absent}</span>/지각${cStats.late})</div>`;
+      } else { btn.innerHTML = `<h3>${i}반</h3><div class="class-status" style="color:#aaa">미등록</div>`; }
       btn.addEventListener('click', () => openAttendance(state.currentGrade, i));
       grid.appendChild(btn);
     }
   }
 
-  async function openAttendance(grade, classNum) {
-    await loadFromCloud(); // 진입할 때 무조건 최신 데이터 원격 로드
-    const localData = localStorage.getItem(`students_${grade}_${classNum}`);
-    if (!localData) { alert("해당 반의 명단이 없습니다. [명단등록]을 먼저 진행해주세요."); return; }
-    state.currentGrade = grade; state.currentClass = classNum; state.students = JSON.parse(localData);
-    switchView('attendance');
-    const savedAtt = localStorage.getItem(`attendance_${grade}_${classNum}_${TODAY}`);
+  // 비상연락망 렌더링 (꾹 누르면 통화)
+  function renderEmergencyGrid() {
+    const grid = document.getElementById('teacher-grid'); grid.innerHTML = '';
+    const tData = localStorage.getItem('teachers_list');
+    if (!tData) { grid.innerHTML = '<div style="grid-column: span 2; text-align:center; padding: 20px;">등록된 비상연락망이 없습니다.</div>'; return; }
+    
+    const teachers = JSON.parse(tData);
+    teachers.forEach(t => {
+      const cell = document.createElement('div'); cell.className = 'teacher-cell';
+      cell.innerHTML = `<div class="teacher-title">교직원</div><div class="teacher-name">${t['이름']}</div><div class="teacher-hint">꾹 누르면 통화</div>`;
+      
+      let pressTimer; let isLongPress = false;
+      cell.addEventListener('pointerdown', () => {
+        isLongPress = false; cell.classList.add('active-press');
+        pressTimer = setTimeout(() => { isLongPress = true; if(t['전화번호']) window.location.href = `tel:${t['전화번호'].replace(/[^0-9]/g,'')}`; }, 800);
+      });
+      const cancel = () => { clearTimeout(pressTimer); cell.classList.remove('active-press'); };
+      cell.addEventListener('pointerup', cancel); cell.addEventListener('pointerleave', cancel); cell.addEventListener('pointercancel', cancel);
+      grid.appendChild(cell);
+    });
+  }
+
+  // 명렬표 진입 및 과거 날짜 처리
+  const dateInput = document.getElementById('attendance-date');
+  dateInput.addEventListener('change', (e) => {
+    state.selectedDate = e.target.value;
+    const savedAtt = localStorage.getItem(`attendance_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`);
     state.attendance = savedAtt ? JSON.parse(savedAtt) : {};
     renderAttendanceGrid();
+  });
+
+  async function openAttendance(grade, classNum) {
+    await loadFromCloud();
+    const localData = localStorage.getItem(`students_${grade}_${classNum}`);
+    if (!localData) { alert("명단이 없습니다."); return; }
+    state.currentGrade = grade; state.currentClass = classNum; state.students = JSON.parse(localData);
+    
+    // 날짜 초기화 (오늘)
+    state.selectedDate = new Date().toLocaleDateString('en-CA');
+    dateInput.value = state.selectedDate;
+    
+    const savedAtt = localStorage.getItem(`attendance_${grade}_${classNum}_${state.selectedDate}`);
+    state.attendance = savedAtt ? JSON.parse(savedAtt) : {};
+    switchView('attendance'); renderAttendanceGrid();
   }
 
   function renderAttendanceGrid() {
-    // 현재 반 통계 업데이트
-    const cStats = { total: state.students.length, absent: 0 };
-    state.students.forEach(s => { if(state.attendance[s['일련번호']] === 2) cStats.absent++; });
-    document.getElementById('class-stats').innerHTML = `<span>👥 등록된 인원: ${cStats.total}명</span> <span>결석: <span class="text-danger">${cStats.absent}명</span></span>`;
+    const cStats = getStats(state.currentGrade, state.currentClass, state.selectedDate);
+    document.getElementById('class-stats').innerHTML = `<span>총 ${cStats.total}명</span> <span>결석 <span class="text-danger">${cStats.absent}</span> | 지각 ${cStats.late} | 조퇴 <span style="color:var(--primary)">${cStats.early}</span></span>`;
 
     const grid = document.getElementById('student-grid'); grid.innerHTML = '';
     const totalCells = Math.ceil(state.students.length / 3) * 3;
@@ -325,32 +441,59 @@
       if (student && student['일련번호']) {
         const id = student['일련번호']; const status = state.attendance[id] || 0;
         cell.className = `student-cell state-${status}`;
-        cell.innerHTML = `<div class="student-num">${id}번</div><div class="student-name">${student['이름']}</div><div class="absent-mark">❌</div>`;
+        cell.innerHTML = `<div class="student-num">${id}번</div><div class="student-name">${student['이름']}</div><div class="state-icon">${statusIconMap[status]}</div>`;
         
         let pressTimer; let isLongPress = false;
         cell.addEventListener('pointerdown', (e) => { 
           isLongPress = false; cell.classList.add('active-press'); 
-          pressTimer = setTimeout(() => { isLongPress = true; showContactPopup(student); }, 1000); // 3초에서 1초로 단축하여 체감 속도 향상
+          pressTimer = setTimeout(() => { isLongPress = true; showContactPopup(student); }, 1000);
         });
         const cancel = () => { clearTimeout(pressTimer); cell.classList.remove('active-press'); };
         cell.addEventListener('pointerup', (e) => { 
           cancel(); 
-          if(!isLongPress) { state.attendance[id] = ((state.attendance[id]||0)+1)%3; renderAttendanceGrid(); } 
+          if(!isLongPress) { state.attendance[id] = (status + 1) % 5; renderAttendanceGrid(); } 
         });
         cell.addEventListener('pointerleave', cancel); cell.addEventListener('pointercancel', cancel);
-      } else { cell.style.background = 'transparent'; cell.style.boxShadow = 'none'; }
+      } else { cell.style.background = 'transparent'; cell.style.border = 'none'; cell.style.boxShadow = 'none'; }
       grid.appendChild(cell);
     }
   }
 
   document.getElementById('btn-save').addEventListener('click', async () => {
-    localStorage.setItem(`attendance_${state.currentGrade}_${state.currentClass}_${TODAY}`, JSON.stringify(state.attendance));
-    await saveToCloud();
-    renderClassGrid(); // 홈 화면 통계도 즉시 업데이트되도록 반영
+    localStorage.setItem(`attendance_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`, JSON.stringify(state.attendance));
+    await saveToCloud(); renderClassGrid();
   });
 
   document.getElementById('btn-reset').addEventListener('click', async () => {
-    if(confirm('이 반의 오늘 출결 데이터를 초기화하시겠습니까?')) { state.attendance = {}; localStorage.removeItem(`attendance_${state.currentGrade}_${state.currentClass}_${TODAY}`); await saveToCloud(); renderAttendanceGrid(); }
+    if(confirm('이 날짜의 출결 데이터를 초기화하시겠습니까?')) { state.attendance = {}; localStorage.removeItem(`attendance_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`); await saveToCloud(); renderAttendanceGrid(); }
+  });
+
+  // 엑셀 다운로드 로직
+  document.getElementById('btn-export-excel').addEventListener('click', () => {
+    let csv = '\uFEFF날짜,학년,반,번호,이름,출결상태\n'; // BOM 포함 (한글 깨짐 방지)
+    
+    for(let i=0; i<localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if(key.startsWith('attendance_')) {
+        const parts = key.split('_'); // [0]:attendance, [1]:grade, [2]:class, [3]:date
+        const grade = parts[1]; const classNum = parts[2]; const date = parts.slice(3).join('_');
+        
+        const students = JSON.parse(localStorage.getItem(`students_${grade}_${classNum}`) || "[]");
+        const attendance = JSON.parse(localStorage.getItem(key));
+        
+        students.forEach(s => {
+          const st = attendance[s['일련번호']] || 0;
+          if (st > 0) { // 평소(0)가 아닌 데이터만 출력
+            csv += `${date},${grade},${classNum},${s['일련번호']},${s['이름']},${statusTextMap[st]}\n`;
+          }
+        });
+      }
+    }
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a"); const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url); link.setAttribute("download", `출결누적데이터_${new Date().toLocaleDateString('en-CA')}.csv`);
+    link.style.visibility = 'hidden'; document.body.appendChild(link); link.click(); document.body.removeChild(link);
   });
 
   navLeft.addEventListener('click', () => initHome());
