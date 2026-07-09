@@ -3,18 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>실시간 동기화 출석 명렬표</title>
+  <title>프리미엄 출석 명렬표 V7</title>
   <style>
-    /* 🎨 디자인 시스템 */
+    /* 🎨 디자인 시스템 & 다크모드 변수 */
     :root {
       --primary: #007AFF; --success: #34C759; --warning: #FFCC00; --danger: #FF3B30; --default: #FFFFFF;
-      --bg: #F2F2F7; --card: #FFFFFF; --text-main: #1C1C1E; --text-sub: #8E8E93; --border: #C6C6C8;
+      --bg: #F2F2F7; --card: #FFFFFF; --text-main: #1C1C1E; --text-sub: #8E8E93; --border: #C6C6C8; --segment-bg: #E3E3E8;
+    }
+    body.dark-mode {
+      --bg: #1C1C1E; --card: #2C2C2E; --text-main: #FFFFFF; --text-sub: #8E8E93; --border: #3A3A3C; --default: #3A3A3C; --segment-bg: #1C1C1E;
     }
 
-    body { font-family: -apple-system, 'Noto Sans KR', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; display: flex; justify-content: center; -webkit-tap-highlight-color: transparent; }
+    body { font-family: -apple-system, 'Noto Sans KR', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; display: flex; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s, color 0.3s; }
     #app { width: 100%; max-width: 430px; min-height: 100vh; background-color: var(--bg); position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.05); overflow-x: hidden; padding-bottom: 120px; }
 
-    .nav-bar { position: fixed; top: 0; width: 100%; max-width: 430px; height: 54px; background: rgba(242, 242, 247, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; padding: 0 16px; box-sizing: border-box; z-index: 100; border-bottom: 1px solid var(--border); }
+    .nav-bar { position: fixed; top: 0; width: 100%; max-width: 430px; height: 54px; background: rgba(var(--bg), 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; padding: 0 16px; box-sizing: border-box; z-index: 100; border-bottom: 1px solid var(--border); transition: background 0.3s; }
     .nav-title { font-size: 17px; font-weight: 600; }
     .nav-btn { background: none; border: none; font-size: 20px; cursor: pointer; padding: 5px; color: var(--primary); }
 
@@ -22,36 +25,37 @@
     .view.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    .card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; }
-    select, input[type="date"], input[type="text"] { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; margin-bottom: 12px; background-color: var(--card); box-sizing: border-box; }
-    textarea { width: 100%; height: 150px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; margin: 10px 0; font-size: 14px; resize: none; }
-    button.primary-btn { width: 100%; padding: 14px; background: var(--text-main); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 10px;}
-    button.excel-btn { width: 100%; padding: 14px; background: var(--success); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 20px;}
+    .card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; transition: background-color 0.3s; }
+    select, input[type="date"], input[type="text"] { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; margin-bottom: 12px; background-color: var(--card); color: var(--text-main); box-sizing: border-box; }
+    textarea { width: 100%; height: 100px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; margin: 5px 0 15px 0; font-size: 14px; resize: none; background-color: var(--card); color: var(--text-main); }
+    button.primary-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 10px;}
+    button.excel-btn { width: 100%; padding: 14px; background: var(--success); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 10px;}
+    button.outline-btn { width: 100%; padding: 14px; background: transparent; color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 10px; }
 
-    .segment-control { display: flex; background: #E3E3E8; border-radius: 8px; padding: 2px; margin-bottom: 12px; }
-    .segment-btn { flex: 1; padding: 8px 0; text-align: center; border: none; background: transparent; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; }
-    .segment-btn.active { background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .segment-control { display: flex; background: var(--segment-bg); border-radius: 8px; padding: 2px; margin-bottom: 12px; }
+    .segment-btn { flex: 1; padding: 8px 0; text-align: center; border: none; background: transparent; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; color: var(--text-sub); }
+    .segment-btn.active { background: var(--card); color: var(--text-main); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
-    .grade-stats { text-align: center; font-size: 14px; font-weight: 600; background: var(--card); padding: 10px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .stat-banner { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .grade-stats, .stat-banner { text-align: center; font-size: 14px; font-weight: 600; background: var(--card); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
     .text-danger { color: var(--danger); }
-    .date-wrap { margin-bottom: 16px; }
+    
+    .toolbar { display: flex; gap: 8px; margin-bottom: 15px; }
+    .toolbar button { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text-main); font-size: 13px; font-weight: 600; cursor: pointer; }
 
     .class-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .class-btn { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: left; cursor: pointer; }
     .class-btn h3 { margin: 0 0 8px 0; font-size: 18px; }
-    .class-status { font-size: 13px; color: var(--text-sub); display: block; line-height: 1.5; word-break: keep-all; font-weight: 500; }
+    .class-status { font-size: 13px; color: var(--text-sub); line-height: 1.5; font-weight: 500; }
 
-    .student-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .student-cell { border-radius: 12px; padding: 12px 4px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; position: relative; border: 1px solid var(--border); -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; transition: transform 0.1s; min-height: 70px; display: flex; flex-direction: column; justify-content: center; align-items: center;}
+    .student-grid { display: grid; gap: 8px; }
+    .student-cell { border-radius: 12px; padding: 10px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; position: relative; border: 1px solid var(--border); -webkit-user-select: none; user-select: none; transition: transform 0.1s; min-height: 65px; display: flex; flex-direction: column; justify-content: center; align-items: center;}
     .student-cell.active-press { transform: scale(0.92); }
-    .student-num { font-size: 11px; font-weight: bold; pointer-events: none; opacity: 0.7; margin-bottom: 2px;}
-    .student-name { font-size: 15px; font-weight: 700; pointer-events: none; }
-    .state-icon { position: absolute; top: -6px; right: -6px; font-size: 16px; display: none; pointer-events: none; background: white; border-radius: 50%; padding: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);}
+    .student-num { font-size: 10px; font-weight: bold; pointer-events: none; opacity: 0.7; margin-bottom: 2px;}
+    .student-name { font-size: 14px; font-weight: 700; pointer-events: none; word-break: keep-all; }
     
-    /* 📝 특이사항(메모) 눈에 띄게 스타일 변경 */
-    .memo-text { font-size: 11px; color: #b45309; background: #fef3c7; border-radius: 4px; padding: 3px 6px; line-height: 1.2; word-break: keep-all; margin-top: 6px; pointer-events: none; width: 90%; box-sizing: border-box; font-weight: 600; }
-    .warning-text { font-size: 10px; color: var(--danger); font-weight: bold; margin-top: 2px; pointer-events: none; }
+    .state-icon { position: absolute; top: -6px; right: -6px; font-size: 14px; display: none; pointer-events: none; background: white; border-radius: 50%; padding: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);}
+    .memo-text { font-size: 10px; color: #b45309; background: #fef3c7; border-radius: 4px; padding: 2px 4px; margin-top: 4px; pointer-events: none; width: 95%; box-sizing: border-box; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+    .warning-text { font-size: 9px; color: var(--danger); font-weight: bold; margin-top: 2px; pointer-events: none; }
 
     .state-0 { background: var(--default); color: var(--text-main); border-color: var(--border); }
     .state-1 { background: var(--success); color: white; border-color: var(--success); }
@@ -59,40 +63,36 @@
     .state-3 { background: var(--warning); color: black; border-color: var(--warning); }
     .state-4 { background: var(--primary); color: white; border-color: var(--primary); }
 
-    .state-1 .state-icon { display: block; content: '✅'; } .state-2 .state-icon { display: block; content: '❌'; }
-    .state-3 .state-icon { display: block; content: '⚠️'; } .state-4 .state-icon { display: block; content: '🏃'; }
+    .state-1 .state-icon, .state-2 .state-icon, .state-3 .state-icon, .state-4 .state-icon { display: block; }
+    .state-1 .state-icon::after { content: '✅'; } .state-2 .state-icon::after { content: '❌'; }
+    .state-3 .state-icon::after { content: '⚠️'; } .state-4 .state-icon::after { content: '🏃'; }
 
-    .teacher-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .teacher-cell { background: var(--card); border-radius: 12px; padding: 16px; text-align: center; border: 1px solid var(--border); -webkit-user-select: none; user-select: none; }
-    .teacher-cell.active-press { transform: scale(0.92); background: #E5E5EA; }
-    .teacher-title { font-size: 12px; color: var(--primary); font-weight: bold; margin-bottom: 4px; pointer-events: none; }
-    .teacher-name { font-size: 16px; font-weight: bold; pointer-events: none; }
+    .dashboard-card { background: #FFF5F5; border: 1px solid #FFDCE0; border-radius: 12px; padding: 15px; margin-bottom: 20px; }
+    .dark-mode .dashboard-card { background: #3A1D1D; border-color: #5C2B2B; }
+    .dashboard-title { font-size: 14px; font-weight: bold; color: var(--danger); margin-bottom: 8px; }
+    .dashboard-list { font-size: 13px; color: var(--text-main); line-height: 1.6; }
 
-    .bottom-bar { position: fixed; bottom: 0; width: 100%; max-width: 430px; padding: 16px; background: rgba(242, 242, 247, 0.9); backdrop-filter: blur(10px); display: flex; gap: 12px; box-sizing: border-box; border-top: 1px solid var(--border); z-index: 100; }
+    .bottom-bar { position: fixed; bottom: 0; width: 100%; max-width: 430px; padding: 16px; background: rgba(var(--bg), 0.9); backdrop-filter: blur(10px); display: flex; gap: 12px; box-sizing: border-box; border-top: 1px solid var(--border); z-index: 100; transition: background 0.3s;}
     .bottom-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; font-size: 16px; font-weight: 600; cursor: pointer; }
-    .btn-reset { background: #E5E5EA; color: var(--text-main); } .btn-save { background: var(--text-main); color: white; }
-
-    .school-logo-container { position: absolute; bottom: 20px; left: 0; width: 100%; display: flex; justify-content: center; align-items: center; pointer-events: none; opacity: 0.3; z-index: 0; }
-    .school-logo-container img { width: 150px; height: auto; filter: grayscale(100%); }
+    .btn-reset { background: var(--segment-bg); color: var(--text-main); } .btn-save { background: var(--text-main); color: var(--bg); }
 
     .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; z-index: 300; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
     .toast.show { opacity: 1; }
     .spinner { display: none; font-size: 14px; margin-right: 5px; } .spinner.show { display: inline-block; animation: spin 1s linear infinite; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 150; display: none; opacity: 0; transition: opacity 0.3s; }
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 150; display: none; opacity: 0; transition: opacity 0.3s; }
     .overlay.show { display: block; opacity: 1; }
     .action-sheet { position: fixed; bottom: -100%; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--bg); border-radius: 16px 16px 0 0; z-index: 200; transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); padding-bottom:env(safe-area-inset-bottom); }
     .action-sheet.show { bottom: 0; }
     .sheet-header { padding: 16px; text-align: center; font-weight: 600; border-bottom: 1px solid var(--border); }
     .sheet-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
     .contact-btn { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 16px; border-radius: 12px; text-decoration: none; color: var(--text-main); font-weight: 500; }
-    .contact-btn.disabled { opacity: 0.5; pointer-events: none; }
-    .sheet-close { margin: 10px 16px 16px 16px; padding: 16px; background: var(--card); text-align: center; border-radius: 12px; font-weight: 600; color: var(--danger); cursor: pointer; }
-    
     .memo-area { display: flex; gap: 8px; margin-top: 10px; }
     .memo-area input { flex: 1; margin-bottom: 0; }
-    .memo-area button { padding: 0 16px; background: var(--text-main); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    .memo-area button { padding: 0 16px; background: var(--text-main); color: var(--bg); border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    
+    .label-title { font-size: 13px; font-weight: bold; color: var(--text-sub); margin-bottom: -4px; margin-top: 8px; }
   </style>
 </head>
 <body>
@@ -103,76 +103,139 @@
     <div class="nav-title" id="nav-title">출석 체크 명렬표</div>
     <div style="display:flex; align-items:center;">
       <span class="spinner" id="loading-spinner">🔄</span>
+      <button class="nav-btn" id="btn-theme-toggle" style="font-size: 16px; margin-right: 5px;">🌙</button>
       <button class="nav-btn" id="nav-right">⚙️</button>
     </div>
   </nav>
 
+  <!-- ⚙️ 설정(Setup) 뷰 -->
   <div id="view-setup" class="view">
     <div class="card">
-      <h3 style="margin-top:0;">📋 등록 유형 선택</h3>
+      <h3 style="margin-top:0;">📋 학생/비상연락망 명단 등록</h3>
       <select id="setup-type"><option value="student">학생 명단 등록</option><option value="teacher">비상연락망 등록</option></select>
       <div id="student-setup-area">
         <select id="setup-grade"><option value="1">1학년</option><option value="2">2학년</option></select>
         <select id="setup-class">
           <option value="1">1반</option><option value="2">2반</option><option value="3">3반</option><option value="4">4반</option>
-          <option value="5">5반</option><option value="6">6반</option><option value="7">7반</option><option value="8">8반</option>
+          <option value="5">5반</option><option value="6">6반</option>
         </select>
       </div>
-      <h3 id="setup-title-text">✍️ 학생 엑셀 데이터 붙여넣기</h3>
-      <textarea id="excel-input" placeholder="엑셀 데이터를 복사해서 붙여넣으세요. (비상연락망일 경우: 이름, 전화번호 순서)"></textarea>
-      <button class="primary-btn" id="btn-save-list">💾 명단 등록하기</button>
+      <textarea id="excel-input" placeholder="엑셀 복사/붙여넣기 (학번, 이름, 전화, 추가전화)"></textarea>
+      <button class="primary-btn" id="btn-save-list">💾 명단 등록</button>
     </div>
-    <div class="card"><button class="bottom-btn btn-reset" id="btn-clear-all" style="padding:8px; font-size:12px; border-radius:6px; width:100%;">전체 클라우드 데이터 리셋</button></div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">💬 학부모 안내 문자 템플릿</h3>
+      <div style="font-size:12px; color:var(--text-sub); margin-bottom:10px;">* {이름}, {사유}를 입력하면 자동으로 바뀝니다.</div>
+      <textarea id="sms-template" placeholder="예: 안녕하세요. 오늘 {이름} 학생이 {사유}하여 연락드렸습니다."></textarea>
+      <button class="outline-btn" id="btn-save-template">문자 템플릿 저장</button>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">📅 기간 설정 엑셀 다운로드</h3>
+      <input type="date" id="excel-start-date" />
+      <input type="date" id="excel-end-date" />
+      <button class="excel-btn" id="btn-export-period-excel">📥 기간별 전체 엑셀 다운로드</button>
+    </div>
+
+    <button class="outline-btn" id="btn-clear-all" style="color:var(--danger); border-color:var(--danger);">데이터 전체 초기화 (주의)</button>
   </div>
 
+  <!-- 🏠 메인(Home) 뷰 -->
   <div id="view-home" class="view">
-    <div class="segment-control">
-      <button class="segment-btn active" data-tab="1">1학년</button><button class="segment-btn" data-tab="2">2학년</button><button class="segment-btn" data-tab="emergency">비상연락망</button>
+    <input type="text" id="search-input" placeholder="🔍 학생 이름 검색..." style="border-radius: 20px; padding-left: 20px;" />
+    
+    <div class="dashboard-card" id="warning-dashboard" style="display:none;">
+      <div class="dashboard-title">🚨 누적 결석 3회 이상 요주의 학생</div>
+      <div class="dashboard-list" id="warning-list"></div>
     </div>
+
+    <div class="segment-control">
+      <button class="segment-btn active" data-tab="1">1학년</button>
+      <button class="segment-btn" data-tab="2">2학년</button>
+      <button class="segment-btn" data-tab="emergency">비상연락망</button>
+    </div>
+    
     <div id="home-class-area">
       <div class="grade-stats" id="grade-stats"></div>
       <div class="class-grid" id="class-grid"></div>
       <div style="margin-top: 30px;"><button class="excel-btn" id="btn-export-excel">📊 전체 누적 출결데이터 다운로드</button></div>
     </div>
     <div id="home-emergency-area" style="display:none;">
-      <div class="grade-stats">👩‍🏫 교직원 비상연락망 (꾹 누르면 통화)</div>
-      <div class="teacher-grid" id="teacher-grid"></div>
+      <div class="class-grid" id="teacher-grid"></div>
     </div>
   </div>
 
+  <!-- 📋 출석체크(Attendance) 뷰 -->
   <div id="view-attendance" class="view" style="padding-bottom: 100px;">
-    <!-- 📥 반별 다운로드 버튼 추가 -->
-    <div class="date-wrap" style="display: flex; gap: 8px;">
-      <input type="date" id="attendance-date" style="flex: 1; margin-bottom: 0;" />
-      <button class="excel-btn" id="btn-export-class-excel" style="margin-bottom: 0; padding: 0 16px; width: auto; font-size: 14px;">📥 반별 엑셀</button>
+    <div class="toolbar">
+      <input type="date" id="attendance-date" style="margin-bottom:0; flex:1;" />
+      <button id="btn-export-class-excel" style="flex:none; width:auto; background:var(--success); color:white; border:none;">📥 반별엑셀</button>
     </div>
+    
     <div class="stat-banner" id="class-stats"></div>
+    
+    <div class="toolbar" style="margin-bottom: 15px;">
+      <button id="btn-open-seat-modal">🔀 자리 배치 및 섞기</button>
+      <button id="btn-bulk-sms" style="color: var(--primary);">✉️ 미출석 단체문자</button>
+    </div>
+
     <div style="display:flex; justify-content:center; gap:10px; font-size:11px; margin-bottom:15px; color:var(--text-sub); font-weight:bold;">
       <span>⬜ 평소</span><span style="color:var(--success);">🟩 출석</span><span style="color:var(--danger);">🟥 결석</span><span style="color:var(--warning);">🟨 지각</span><span style="color:var(--primary);">🟦 조퇴</span>
     </div>
+    
     <div class="student-grid" id="student-grid"></div>
+    
     <div class="bottom-bar">
       <button class="bottom-btn btn-reset" id="btn-reset">🔄 출결 초기화</button>
       <button class="bottom-btn btn-save" id="btn-save">💾 출결 저장하기</button>
     </div>
   </div>
 
-  <div class="school-logo-container"><img src="images.png" alt="학교 로고" /></div>
-
+  <!-- 📱 공통 오버레이 및 액션 시트들 -->
   <div class="overlay" id="overlay"></div>
-  <div class="action-sheet" id="action-sheet">
+  
+  <!-- 연락처 팝업 -->
+  <div class="action-sheet" id="contact-sheet">
     <div class="sheet-header" id="sheet-name">연락처</div>
     <div class="sheet-body">
-      <a href="#" class="contact-btn" id="contact-self"><span>📱 본인전화</span><span id="contact-self-num">-</span></a>
-      <a href="#" class="contact-btn" id="contact-parent"><span>📞 추가연락처</span><span id="contact-parent-num">-</span></a>
+      <a href="#" class="contact-btn" id="contact-parent"><span>📞 학부모 연락처</span><span id="contact-parent-num">-</span></a>
       <a href="#" class="contact-btn" id="sms-parent" style="background:#E5F0FF; color:var(--primary); justify-content:center; font-weight:bold;">💬 학부모 문자 발송</a>
       <div class="memo-area">
-        <input type="text" id="student-memo-input" placeholder="특이사항 메모 (예: 질병, 늦잠)" />
+        <input type="text" id="student-memo-input" placeholder="특이사항 메모 (예: 질병)" />
         <button id="btn-save-memo">저장</button>
       </div>
     </div>
-    <div class="sheet-close" id="btn-close-sheet">닫기</div>
+    <div style="margin: 10px 16px 16px 16px; padding: 16px; text-align: center; font-weight: 600; color: var(--danger); cursor: pointer; border: 1px solid var(--danger); border-radius: 12px;" id="btn-close-contact-sheet">닫기</div>
   </div>
+
+  <!-- 자리 배치 설정 팝업 -->
+  <div class="action-sheet" id="seat-sheet">
+    <div class="sheet-header">🔀 교실 자리 배치 설정</div>
+    <div class="sheet-body">
+      <div class="label-title">자리 형태</div>
+      <select id="seat-layout-type">
+        <option value="single">한 줄로 앉기 (개별)</option>
+        <option value="pair">짝꿍으로 앉기 (2인 1조)</option>
+      </select>
+      
+      <div class="label-title">가로 칸(열) 수</div>
+      <select id="seat-cols">
+        <option value="2">2칸 (2분단)</option>
+        <option value="3">3칸 (3분단)</option>
+        <option value="4">4칸 (4분단)</option>
+        <option value="5">5칸 (5분단)</option>
+        <option value="6" selected>6칸 (6분단)</option>
+        <option value="7">7칸 (7분단)</option>
+        <option value="8">8칸 (8분단)</option>
+      </select>
+      
+      <div style="font-size:11px; color:var(--text-sub); margin-bottom:10px;">* 설정 후 아래 버튼을 누르면 학생들 자리가 랜덤으로 섞이며 배치됩니다.</div>
+      <button class="primary-btn" id="btn-execute-shuffle">🔀 랜덤 자리 섞기 및 적용</button>
+    </div>
+    <div style="margin: 10px 16px 16px 16px; padding: 16px; text-align: center; font-weight: 600; color: var(--danger); cursor: pointer; border: 1px solid var(--danger); border-radius: 12px;" id="btn-close-seat-sheet">닫기</div>
+  </div>
+
   <div class="toast" id="toast"></div>
 </div>
 
@@ -185,100 +248,115 @@
     currentTab: '1', currentGrade: 1, currentClass: null, 
     students: [], attendance: {}, memos: {},
     selectedDate: new Date().toLocaleDateString('en-CA'),
-    currentStudentId: null
+    currentStudentId: null,
+    isDarkMode: localStorage.getItem('darkMode') === 'true'
   };
 
   const views = { setup: document.getElementById('view-setup'), home: document.getElementById('view-home'), attendance: document.getElementById('view-attendance') };
   const navLeft = document.getElementById('nav-left'); const navTitle = document.getElementById('nav-title'); const navRight = document.getElementById('nav-right');
   const spinner = document.getElementById('loading-spinner');
   
-  const statusIconMap = { 0: '', 1: '✅', 2: '❌', 3: '⚠️', 4: '🏃' };
-  const statusTextMap = { 0: '평소', 1: '출석', 2: '결석', 3: '지각', 4: '조퇴' };
+  const statusMap = { 0: '평소', 1: '출석', 2: '결석', 3: '지각', 4: '조퇴' };
+
+  if(state.isDarkMode) { document.body.classList.add('dark-mode'); document.getElementById('btn-theme-toggle').textContent = '☀️'; }
+
+  document.getElementById('btn-theme-toggle').addEventListener('click', () => {
+    state.isDarkMode = !state.isDarkMode; document.body.classList.toggle('dark-mode', state.isDarkMode);
+    document.getElementById('btn-theme-toggle').textContent = state.isDarkMode ? '☀️' : '🌙';
+    localStorage.setItem('darkMode', state.isDarkMode);
+  });
 
   function showToast(msg) { const toast = document.getElementById('toast'); toast.textContent = msg; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2000); }
 
   function switchView(viewName) {
     Object.values(views).forEach(v => v.classList.remove('active')); views[viewName].classList.add('active');
-    if (viewName === 'setup') { navLeft.style.visibility = 'visible'; navLeft.textContent = '✕'; navTitle.textContent = '명단 등록'; navRight.style.display = 'none'; }
-    else if (viewName === 'home') { navLeft.style.visibility = 'hidden'; navTitle.textContent = '📋 출석 체크'; navRight.style.display = 'block'; navRight.textContent = '⚙️ 설정'; }
+    if (viewName === 'setup') { navLeft.style.visibility = 'visible'; navLeft.textContent = '✕'; navTitle.textContent = '설정 및 등록'; navRight.style.display = 'none'; }
+    else if (viewName === 'home') { navLeft.style.visibility = 'hidden'; navTitle.textContent = '📋 출석 체크'; navRight.style.display = 'block'; navRight.textContent = '⚙️'; updateDashboard(); }
     else if (viewName === 'attendance') { navLeft.style.visibility = 'visible'; navLeft.textContent = '←'; navTitle.textContent = `${state.currentGrade}학년 ${state.currentClass}반`; navRight.style.display = 'none'; }
   }
 
   async function loadFromCloud() {
     if (!API_URL || API_URL.startsWith("여기에")) return;
-    try {
-      spinner.classList.add('show');
-      const url = new URL(API_URL); url.searchParams.append('t', new Date().getTime());
-      const res = await fetch(url.toString());
-      const cloudData = await res.json();
-      if (cloudData) { localStorage.clear(); Object.keys(cloudData).forEach(key => localStorage.setItem(key, JSON.stringify(cloudData[key]))); }
-    } catch (e) { showToast("⚠️ 로컬 데이터 사용"); } finally { spinner.classList.remove('show'); }
+    try { spinner.classList.add('show'); const res = await fetch(`${API_URL}?t=${Date.now()}`); const data = await res.json();
+      if (data) { Object.keys(data).forEach(k => localStorage.setItem(k, JSON.stringify(data[k]))); }
+    } catch (e) { showToast("⚠️ 로컬 모드"); } finally { spinner.classList.remove('show'); }
   }
 
   async function saveToCloud() {
     if (!API_URL || API_URL.startsWith("여기에")) return;
-    try {
-      spinner.classList.add('show'); const allData = {};
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k.startsWith("students_") || k.startsWith("attendance_") || k.startsWith("memo_") || k === "teachers_list") allData[k] = JSON.parse(localStorage.getItem(k));
-      }
-      await fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(allData) });
-      showToast("☁️ 완벽하게 저장되었습니다!");
+    try { spinner.classList.add('show'); const all = {};
+      for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith("students_") || k.startsWith("attendance_") || k.startsWith("memo_") || k === "teachers_list") all[k] = JSON.parse(localStorage.getItem(k)); }
+      await fetch(API_URL, { method: "POST", body: JSON.stringify(all) }); showToast("☁️ 클라우드 저장 완료");
     } catch (e) { showToast("❌ 저장 실패"); } finally { spinner.classList.remove('show'); }
   }
 
-  function getStats(grade, classNum = null, targetDate = state.selectedDate) {
-    let stats = { total: 0, present: 0, absent: 0, late: 0, early: 0 };
-    const classes = classNum ? [classNum] : [1,2,3,4,5,6,7,8];
-    classes.forEach(c => {
-      const sData = localStorage.getItem(`students_${grade}_${c}`);
-      if(sData) {
-        const students = JSON.parse(sData); stats.total += students.length;
-        const aData = localStorage.getItem(`attendance_${grade}_${c}_${targetDate}`);
-        const att = aData ? JSON.parse(aData) : {};
-        students.forEach(s => { const st = att[s['일련번호']] || 0; if(st === 1) stats.present++; else if(st === 2) stats.absent++; else if(st === 3) stats.late++; else if(st === 4) stats.early++; });
-      }
-    }); return stats;
-  }
-
   function getStudentTotalAbsence(id) {
-    let absCount = 0;
+    let count = 0;
     for(let i=0; i<localStorage.length; i++) {
       const k = localStorage.key(i);
-      if(k.startsWith(`attendance_${state.currentGrade}_${state.currentClass}_`)) {
-        const att = JSON.parse(localStorage.getItem(k));
-        if(att[id] === 2) absCount++;
-      }
-    }
-    return absCount;
+      if(k.startsWith(`attendance_`)) { const att = JSON.parse(localStorage.getItem(k)); if(att[id] === 2) count++; }
+    } return count;
   }
 
-  document.getElementById('setup-type').addEventListener('change', (e) => {
-    const isStudent = e.target.value === 'student';
-    document.getElementById('student-setup-area').style.display = isStudent ? 'block' : 'none';
-    document.getElementById('setup-title-text').textContent = isStudent ? '✍️ 학생 엑셀 데이터 붙여넣기' : '✍️ 교직원 엑셀 데이터 붙여넣기';
+  function updateDashboard() {
+    const list = document.getElementById('warning-list'); list.innerHTML = ''; let hasWarning = false;
+    for(let i=0; i<localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if(k.startsWith('students_')) {
+        const parts = k.split('_'); const grade = parts[1]; const cNum = parts[2];
+        const stds = JSON.parse(localStorage.getItem(k));
+        stds.forEach(s => {
+          const abs = getStudentTotalAbsence(s['일련번호']);
+          if(abs >= 3) { hasWarning = true; list.innerHTML += `<div>• ${grade}학년 ${cNum}반 ${s['이름']} (결석 ${abs}회)</div>`; }
+        });
+      }
+    }
+    document.getElementById('warning-dashboard').style.display = hasWarning ? 'block' : 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', (e) => {
+    const val = e.target.value.trim();
+    if(!val) { initHome(); return; }
+    document.getElementById('home-class-area').style.display = 'block';
+    const grid = document.getElementById('class-grid'); grid.innerHTML = '';
+    
+    for(let i=0; i<localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if(k.startsWith('students_')) {
+        const parts = k.split('_'); const grade = parts[1]; const cNum = parts[2];
+        const stds = JSON.parse(localStorage.getItem(k));
+        stds.forEach(s => {
+          if(s['이름'].includes(val)) {
+            const btn = document.createElement('div'); btn.className = 'class-btn';
+            const abs = getStudentTotalAbsence(s['일련번호']);
+            btn.innerHTML = `<h3>${s['이름']}</h3><div class="class-status">${grade}학년 ${cNum}반 ${s['일련번호']}번<br>누적결석: <span class="text-danger">${abs}회</span></div>`;
+            btn.addEventListener('click', () => openAttendance(grade, cNum)); grid.appendChild(btn);
+          }
+        });
+      }
+    }
   });
 
   document.getElementById('btn-save-list').addEventListener('click', async () => {
-    const type = document.getElementById('setup-type').value; const rawText = document.getElementById('excel-input').value;
-    if (!rawText.trim()) return alert("데이터가 없습니다.");
+    const type = document.getElementById('setup-type').value; const raw = document.getElementById('excel-input').value;
+    if (!raw.trim()) return alert("데이터 없음");
     if (type === 'student') {
-      const grade = document.getElementById('setup-grade').value; const classNum = document.getElementById('setup-class').value;
-      const parsed = rawText.trim().split('\n').map(line => { const t = line.split('\t').map(x => x.trim()); return { '일련번호': t[0]||'', '이름': t[1]||'이름없음', '전화번호': t[2]||'', '추가전화번호': t[3]||'' }; });
-      localStorage.setItem(`students_${grade}_${classNum}`, JSON.stringify(parsed)); state.currentTab = grade; state.currentGrade = parseInt(grade);
+      const g = document.getElementById('setup-grade').value; const c = document.getElementById('setup-class').value;
+      const parsed = raw.trim().split('\n').map(line => { const t = line.split('\t').map(x=>x.trim()); return { '일련번호': t[0]||'', '이름': t[1]||'', '전화번호': t[2]||'', '추가전화번호': t[3]||'' }; });
+      localStorage.setItem(`students_${g}_${c}`, JSON.stringify(parsed));
     } else {
-      const parsed = rawText.trim().split('\n').map(line => { const t = line.split('\t').map(x => x.trim()); return { '이름': t[0]||'이름없음', '전화번호': t[1]||'' }; });
-      localStorage.setItem(`teachers_list`, JSON.stringify(parsed)); state.currentTab = 'emergency';
+      const parsed = raw.trim().split('\n').map(line => { const t = line.split('\t').map(x=>x.trim()); return { '이름': t[0]||'', '전화번호': t[1]||'' }; });
+      localStorage.setItem(`teachers_list`, JSON.stringify(parsed));
     }
-    await saveToCloud(); document.getElementById('excel-input').value = ''; initHome();
+    await saveToCloud(); document.getElementById('excel-input').value = ''; showToast('명단 저장됨');
   });
 
-  document.getElementById('btn-clear-all').addEventListener('click', async () => { if (confirm('모든 데이터를 삭제하시겠습니까?')) { localStorage.clear(); await saveToCloud(); location.reload(); }});
+  document.getElementById('btn-save-template').addEventListener('click', () => { localStorage.setItem('sms_template', document.getElementById('sms-template').value); showToast('템플릿 저장됨'); });
+  document.getElementById('sms-template').value = localStorage.getItem('sms_template') || '안녕하세요. 오늘 {이름} 학생이 {사유}하여 연락드렸습니다.';
 
   function initHome() {
     switchView('home'); document.querySelectorAll('.segment-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === state.currentTab));
-    if (state.currentTab === 'emergency') { document.getElementById('home-class-area').style.display = 'none'; document.getElementById('home-emergency-area').style.display = 'block'; renderEmergencyGrid(); } 
+    if (state.currentTab === 'emergency') { document.getElementById('home-class-area').style.display = 'none'; document.getElementById('home-emergency-area').style.display = 'block'; } 
     else { document.getElementById('home-class-area').style.display = 'block'; document.getElementById('home-emergency-area').style.display = 'none'; state.currentGrade = parseInt(state.currentTab); renderClassGrid(); }
   }
 
@@ -286,98 +364,140 @@
 
   function renderClassGrid() {
     const grid = document.getElementById('class-grid'); grid.innerHTML = '';
-    const gStats = getStats(state.currentGrade);
-    document.getElementById('grade-stats').innerHTML = `${state.currentGrade}학년 총 ${gStats.total}명 &nbsp;|&nbsp; 결석 <span class="text-danger">${gStats.absent}</span> / 지각 ${gStats.late} / 조퇴 <span style="color:var(--primary)">${gStats.early}</span>`;
-
-    for (let i = 1; i <= 8; i++) {
+    for (let i = 1; i <= 6; i++) {
       const btn = document.createElement('div'); btn.className = 'class-btn';
-      if(localStorage.getItem(`students_${state.currentGrade}_${i}`)) {
-        const cStats = getStats(state.currentGrade, i);
-        btn.innerHTML = `<h3>${i}반</h3><div class="class-status">👥 ${cStats.total}명<br><span style="font-size: 11.5px;">(결석 <span class="text-danger">${cStats.absent}</span> / 지각 ${cStats.late})</span></div>`;
-      } else { btn.innerHTML = `<h3>${i}반</h3><div class="class-status" style="color:#aaa">미등록</div>`; }
+      if(localStorage.getItem(`students_${state.currentGrade}_${i}`)) { btn.innerHTML = `<h3>${i}반</h3><div class="class-status" style="color:var(--primary)">입장하기</div>`; } 
+      else { btn.innerHTML = `<h3>${i}반</h3><div class="class-status" style="opacity:0.5">미등록</div>`; }
       btn.addEventListener('click', () => openAttendance(state.currentGrade, i)); grid.appendChild(btn);
     }
-  }
-
-  function renderEmergencyGrid() {
-    const grid = document.getElementById('teacher-grid'); grid.innerHTML = ''; const tData = localStorage.getItem('teachers_list');
-    if (!tData) { grid.innerHTML = '<div style="grid-column: span 2; text-align:center; padding: 20px;">등록된 비상연락망이 없습니다.</div>'; return; }
-    JSON.parse(tData).forEach(t => {
-      const cell = document.createElement('div'); cell.className = 'teacher-cell';
-      cell.innerHTML = `<div class="teacher-title">교직원</div><div class="teacher-name">${t['이름']}</div>`;
-      let pressTimer; let isLongPress = false;
-      cell.addEventListener('pointerdown', () => { isLongPress = false; cell.classList.add('active-press'); pressTimer = setTimeout(() => { isLongPress = true; if(t['전화번호']) window.location.href = `tel:${t['전화번호'].replace(/[^0-9]/g,'')}`; }, 800); });
-      const cancel = () => { clearTimeout(pressTimer); cell.classList.remove('active-press'); };
-      cell.addEventListener('pointerup', cancel); cell.addEventListener('pointerleave', cancel); cell.addEventListener('pointercancel', cancel); grid.appendChild(cell);
-    });
   }
 
   const dateInput = document.getElementById('attendance-date');
   dateInput.addEventListener('change', (e) => { state.selectedDate = e.target.value; reloadDayData(); });
 
+  async function openAttendance(grade, classNum) {
+    const localData = localStorage.getItem(`students_${grade}_${classNum}`);
+    if (!localData) { alert("명단이 없습니다."); return; }
+    state.currentGrade = grade; state.currentClass = classNum; state.students = JSON.parse(localData);
+    dateInput.value = state.selectedDate; reloadDayData(); switchView('attendance');
+  }
+
   function reloadDayData() {
-    const savedAtt = localStorage.getItem(`attendance_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`);
-    state.attendance = savedAtt ? JSON.parse(savedAtt) : {};
-    const savedMemo = localStorage.getItem(`memo_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`);
-    state.memos = savedMemo ? JSON.parse(savedMemo) : {};
+    state.attendance = JSON.parse(localStorage.getItem(`attendance_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`) || "{}");
+    state.memos = JSON.parse(localStorage.getItem(`memo_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`) || "{}");
     renderAttendanceGrid();
   }
 
-  async function openAttendance(grade, classNum) {
-    await loadFromCloud(); const localData = localStorage.getItem(`students_${grade}_${classNum}`);
-    if (!localData) { alert("명단이 없습니다."); return; }
-    state.currentGrade = grade; state.currentClass = classNum; state.students = JSON.parse(localData);
-    state.selectedDate = new Date().toLocaleDateString('en-CA'); dateInput.value = state.selectedDate;
-    reloadDayData(); switchView('attendance');
-  }
-
   function renderAttendanceGrid() {
-    const cStats = getStats(state.currentGrade, state.currentClass, state.selectedDate);
-    document.getElementById('class-stats').innerHTML = `<span>총 ${cStats.total}명</span> <span>결석 <span class="text-danger">${cStats.absent}</span> | 지각 ${cStats.late} | 조퇴 <span style="color:var(--primary)">${cStats.early}</span></span>`;
-
     const grid = document.getElementById('student-grid'); grid.innerHTML = '';
-    const totalCells = Math.ceil(state.students.length / 3) * 3;
+    let stats = { t: state.students.length, a:0, l:0, e:0 };
     
-    for (let i = 0; i < totalCells; i++) {
-      const student = state.students[i]; const cell = document.createElement('div');
-      if (student && student['일련번호']) {
-        const id = student['일련번호']; const status = state.attendance[id] || 0;
-        
-        const absCount = getStudentTotalAbsence(id);
-        const warningHTML = absCount >= 3 ? `<div class="warning-text">🚨결석 ${absCount}회</div>` : '';
-        const memoHTML = state.memos[id] ? `<div class="memo-text">${state.memos[id]}</div>` : '';
-
-        cell.className = `student-cell state-${status}`;
-        cell.innerHTML = `<div class="student-num">${id}번</div><div class="student-name">${student['이름']}</div>${warningHTML}${memoHTML}
-                          <div class="state-icon">${statusIconMap[status]}</div>`;
-        
-        let pressTimer; let isLongPress = false;
-        cell.addEventListener('pointerdown', (e) => { isLongPress = false; cell.classList.add('active-press'); pressTimer = setTimeout(() => { isLongPress = true; showContactPopup(student); }, 1000); });
-        const cancel = () => { clearTimeout(pressTimer); cell.classList.remove('active-press'); };
-        cell.addEventListener('pointerup', (e) => { cancel(); if(!isLongPress) { state.attendance[id] = (status + 1) % 5; renderAttendanceGrid(); } });
-        cell.addEventListener('pointerleave', cancel); cell.addEventListener('pointercancel', cancel);
-      } else { cell.style.background = 'transparent'; cell.style.border = 'none'; cell.style.boxShadow = 'none'; }
-      grid.appendChild(cell);
+    // 자리 배치 설정 불러오기 (기본값: 4칸 한줄)
+    const cols = parseInt(localStorage.getItem(`seat_cols_${state.currentGrade}_${state.currentClass}`) || 4);
+    const layout = localStorage.getItem(`seat_layout_${state.currentGrade}_${state.currentClass}`) || 'single';
+    
+    // CSS Grid 동적 렌더링 (짝꿍 모드 처리)
+    if (layout === 'pair') {
+      let tracks = [];
+      for (let i = 1; i <= cols; i++) {
+        tracks.push('1fr');
+        // 매 2칸마다 빈 여백(16px) 트랙 추가 (마지막 열 제외)
+        if (i % 2 === 0 && i < cols) tracks.push('16px');
+      }
+      grid.style.gridTemplateColumns = tracks.join(' ');
+    } else {
+      grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
     }
+
+    let currentVisualCol = 0;
+    
+    state.students.forEach(student => {
+      const id = student['일련번호']; const status = state.attendance[id] || 0;
+      if(status===2) stats.a++; else if(status===3) stats.l++; else if(status===4) stats.e++;
+      
+      const absCount = getStudentTotalAbsence(id);
+      const warningHTML = absCount >= 3 ? `<div class="warning-text">🚨결석 ${absCount}회</div>` : '';
+      const memoHTML = state.memos[id] ? `<div class="memo-text">${state.memos[id]}</div>` : '';
+
+      const cell = document.createElement('div'); cell.className = `student-cell state-${status}`;
+      cell.innerHTML = `<div class="student-num">${id}번</div><div class="student-name">${student['이름']}</div>${warningHTML}${memoHTML}<div class="state-icon"></div>`;
+      
+      let pressTimer; let isLongPress = false;
+      cell.addEventListener('pointerdown', () => { isLongPress = false; cell.classList.add('active-press'); pressTimer = setTimeout(() => { isLongPress = true; showContactPopup(student, status); }, 800); });
+      const cancel = () => { clearTimeout(pressTimer); cell.classList.remove('active-press'); };
+      cell.addEventListener('pointerup', () => { cancel(); if(!isLongPress) { state.attendance[id] = (status + 1) % 5; renderAttendanceGrid(); } });
+      cell.addEventListener('pointerleave', cancel); cell.addEventListener('pointercancel', cancel);
+      grid.appendChild(cell);
+
+      currentVisualCol++;
+      
+      // 짝꿍 모드일 경우, 2번째 셀마다 빈 div 삽입하여 복도(여백) 역할 수행
+      if (layout === 'pair' && currentVisualCol % 2 === 0 && currentVisualCol < cols) {
+          const spacer = document.createElement('div');
+          grid.appendChild(spacer);
+      }
+      if (currentVisualCol >= cols) currentVisualCol = 0;
+    });
+    
+    document.getElementById('class-stats').innerHTML = `<span>총 ${stats.t}명</span> <span>결석 <span class="text-danger">${stats.a}</span> | 지각 ${stats.l} | 조퇴 <span style="color:var(--primary)">${stats.e}</span></span>`;
   }
+
+  // 🔀 자리 배치 팝업 열기
+  document.getElementById('btn-open-seat-modal').addEventListener('click', () => {
+    // 저장된 설정 불러와서 세팅
+    const savedCols = localStorage.getItem(`seat_cols_${state.currentGrade}_${state.currentClass}`) || '4';
+    const savedLayout = localStorage.getItem(`seat_layout_${state.currentGrade}_${state.currentClass}`) || 'single';
+    document.getElementById('seat-cols').value = savedCols;
+    document.getElementById('seat-layout-type').value = savedLayout;
+    
+    document.getElementById('overlay').classList.add('show');
+    document.getElementById('seat-sheet').classList.add('show');
+  });
+
+  // 🔀 실제 랜덤 배치 실행
+  document.getElementById('btn-execute-shuffle').addEventListener('click', () => {
+    const layout = document.getElementById('seat-layout-type').value;
+    const cols = document.getElementById('seat-cols').value;
+    
+    localStorage.setItem(`seat_layout_${state.currentGrade}_${state.currentClass}`, layout);
+    localStorage.setItem(`seat_cols_${state.currentGrade}_${state.currentClass}`, cols);
+
+    // 학생 배열 섞기
+    state.students.sort(() => Math.random() - 0.5);
+    localStorage.setItem(`students_${state.currentGrade}_${state.currentClass}`, JSON.stringify(state.students));
+    
+    renderAttendanceGrid(); saveToCloud();
+    closeAllPopups();
+    showToast('새로운 자리로 배치되었습니다.');
+  });
+
+  // ✉️ 단체 문자 발송 기능
+  document.getElementById('btn-bulk-sms').addEventListener('click', () => {
+    let numbers = [];
+    state.students.forEach(s => {
+      const st = state.attendance[s['일련번호']] || 0;
+      if((st === 2 || st === 3 || st === 4) && s['추가전화번호']) numbers.push(s['추가전화번호'].replace(/[^0-9]/g,''));
+    });
+    if(numbers.length === 0) return alert('결석/지각/조퇴 처리된 학생 중 연락처가 있는 학생이 없습니다.');
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const bodyText = encodeURIComponent(`안녕하세요. ${state.currentGrade}학년 ${state.currentClass}반 담임입니다. 자녀의 출결 관련하여 확인 부탁드립니다.`);
+    const link = `sms:${numbers.join(',')}${isIOS ? '&' : '?'}body=${bodyText}`;
+    window.location.href = link;
+  });
 
   document.getElementById('btn-save').addEventListener('click', async () => {
     localStorage.setItem(`attendance_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`, JSON.stringify(state.attendance));
     localStorage.setItem(`memo_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`, JSON.stringify(state.memos));
-    await saveToCloud(); renderClassGrid();
+    await saveToCloud(); switchView('home');
   });
 
-  document.getElementById('btn-reset').addEventListener('click', async () => {
-    if(confirm('이 날짜의 출결 데이터를 초기화하시겠습니까?')) { 
-      state.attendance = {}; state.memos = {};
-      localStorage.removeItem(`attendance_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`); 
-      localStorage.removeItem(`memo_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`); 
-      await saveToCloud(); renderAttendanceGrid(); 
+  function exportExcel(mode = 'all') { 
+    let startD = "0000-00-00", endD = "9999-99-99";
+    if (mode === 'period') {
+      startD = document.getElementById('excel-start-date').value; endD = document.getElementById('excel-end-date').value;
+      if(!startD || !endD) return alert('시작일과 종료일을 선택하세요.');
     }
-  });
-
-  // 📊 엑셀 다운로드 통합 로직 (전체 & 반별)
-  function exportExcel(targetGrade = null, targetClass = null) {
+    
     let csv = '\uFEFF날짜,시간,학번,이름,출결사항,특이사항\n';
     const nowTime = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' });
 
@@ -386,79 +506,76 @@
       if(key.startsWith('attendance_')) {
         const parts = key.split('_'); const grade = parts[1]; const classNum = parts[2]; const date = parts.slice(3).join('_');
         
-        // 반별 다운로드를 요청했는데, 현재 데이터가 그 반이 아니면 건너뜀
-        if (targetGrade && targetClass) {
-          if (grade !== String(targetGrade) || classNum !== String(targetClass)) continue;
-        }
+        if (mode === 'class' && (grade !== String(state.currentGrade) || classNum !== String(state.currentClass))) continue;
+        if (mode === 'period' && (date < startD || date > endD)) continue;
 
-        const students = JSON.parse(localStorage.getItem(`students_${grade}_${classNum}`) || "[]");
-        const attendance = JSON.parse(localStorage.getItem(key));
-        const memos = JSON.parse(localStorage.getItem(`memo_${grade}_${classNum}_${date}`) || "{}");
+        const stds = JSON.parse(localStorage.getItem(`students_${grade}_${classNum}`) || "[]");
+        const att = JSON.parse(localStorage.getItem(key));
+        const mem = JSON.parse(localStorage.getItem(`memo_${grade}_${classNum}_${date}`) || "{}");
         
-        students.forEach(s => {
-          const st = attendance[s['일련번호']] || 0;
-          // 결석(2), 지각(3), 조퇴(4)인 학생만 엑셀에 기록 (출석, 평소 제외)
+        stds.forEach(s => {
+          const st = att[s['일련번호']] || 0;
           if (st === 2 || st === 3 || st === 4) { 
-            const memoStr = memos[s['일련번호']] ? memos[s['일련번호']].replace(/,/g, ' ') : '';
-            csv += `${date},${nowTime},${s['일련번호']},${s['이름']},${statusTextMap[st]},${memoStr}\n`;
+            const mStr = mem[s['일련번호']] ? mem[s['일련번호']].replace(/,/g, ' ') : '';
+            csv += `${date},${nowTime},${grade}학년 ${classNum}반 ${s['일련번호']},${s['이름']},${statusMap[st]},${mStr}\n`;
           }
         });
       }
     }
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); 
-    const link = document.createElement("a"); 
-    const url = URL.createObjectURL(blob);
-    
-    // 파일명 지정 (반별 다운로드인지 전체인지 구분)
-    let fileName = targetGrade && targetClass 
-      ? `${targetGrade}학년_${targetClass}반_출결데이터_${new Date().toLocaleDateString('en-CA')}.csv` 
-      : `전체_누적출결데이터_${new Date().toLocaleDateString('en-CA')}.csv`;
-      
-    link.setAttribute("href", url); link.setAttribute("download", fileName);
-    link.style.visibility = 'hidden'; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob); link.download = `출결데이터_${new Date().toLocaleDateString('en-CA')}.csv`;
+    link.click();
   }
 
-  // 홈 화면 전체 엑셀 버튼 이벤트
-  document.getElementById('btn-export-excel').addEventListener('click', () => exportExcel());
-  
-  // 출석체크 화면 반별 엑셀 버튼 이벤트
-  document.getElementById('btn-export-class-excel').addEventListener('click', () => {
-    exportExcel(state.currentGrade, state.currentClass);
-  });
+  document.getElementById('btn-export-excel').addEventListener('click', () => exportExcel('all'));
+  document.getElementById('btn-export-class-excel').addEventListener('click', () => exportExcel('class'));
+  document.getElementById('btn-export-period-excel').addEventListener('click', () => exportExcel('period'));
 
   navLeft.addEventListener('click', () => initHome());
   navRight.addEventListener('click', () => switchView('setup'));
 
-  document.getElementById('btn-save-memo').addEventListener('click', () => {
-    if(state.currentStudentId) {
-      const memoVal = document.getElementById('student-memo-input').value;
-      if (memoVal) state.memos[state.currentStudentId] = memoVal; else delete state.memos[state.currentStudentId];
-      renderAttendanceGrid(); showToast("메모가 임시 적용되었습니다. (출결 저장 필수)"); closePopup();
-    }
-  });
-
-  function showContactPopup(student) {
+  // 개별 연락처 팝업
+  function showContactPopup(student, status) {
     state.currentStudentId = student['일련번호'];
     document.getElementById('sheet-name').textContent = `${student['이름']} 학생`;
     
-    const setLink = (id, num) => { const el = document.getElementById(id); const sp = document.getElementById(id+'-num'); if(num){ el.href='tel:'+num.replace(/[^0-9]/g,''); el.classList.remove('disabled'); sp.textContent=num; }else{ el.href='#'; el.classList.add('disabled'); sp.textContent='없음';}};
-    setLink('contact-self', student['전화번호']); setLink('contact-parent', student['추가전화번호']);
+    const pNum = student['추가전화번호'] ? student['추가전화번호'].replace(/[^0-9]/g,'') : '';
+    const btn = document.getElementById('contact-parent');
+    if(pNum) { btn.href = `tel:${pNum}`; btn.style.opacity = 1; document.getElementById('contact-parent-num').textContent = pNum; }
+    else { btn.href = '#'; btn.style.opacity = 0.5; document.getElementById('contact-parent-num').textContent = '없음'; }
     
     const smsBtn = document.getElementById('sms-parent');
-    const parentPhone = student['추가전화번호'] ? student['추가전화번호'].replace(/[^0-9]/g,'') : '';
-    if(parentPhone) {
-      const smsBody = encodeURIComponent(`안녕하세요. ${state.currentGrade}학년 ${state.currentClass}반 담임입니다. 오늘 ${student['이름']} 학생 출결 관련하여 연락드렸습니다.`);
+    if(pNum) {
+      let tpl = localStorage.getItem('sms_template') || '안녕하세요. 오늘 {이름} 학생이 {사유}하여 연락드렸습니다.';
+      tpl = tpl.replace('{이름}', student['이름']).replace('{사유}', statusMap[status]||'결석');
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      smsBtn.href = `sms:${parentPhone}${isIOS ? '&' : '?'}body=${smsBody}`;
-      smsBtn.classList.remove('disabled');
-    } else { smsBtn.href = '#'; smsBtn.classList.add('disabled'); }
+      smsBtn.href = `sms:${pNum}${isIOS ? '&' : '?'}body=${encodeURIComponent(tpl)}`;
+      smsBtn.style.opacity = 1;
+    } else { smsBtn.href = '#'; smsBtn.style.opacity = 0.5; }
 
     document.getElementById('student-memo-input').value = state.memos[student['일련번호']] || '';
-    document.getElementById('overlay').classList.add('show'); document.getElementById('action-sheet').classList.add('show');
+    document.getElementById('overlay').classList.add('show'); 
+    document.getElementById('contact-sheet').classList.add('show');
   }
-  
-  function closePopup() { document.getElementById('overlay').classList.remove('show'); document.getElementById('action-sheet').classList.remove('show'); state.currentStudentId = null;}
-  document.getElementById('overlay').addEventListener('click', closePopup); document.getElementById('btn-close-sheet').addEventListener('click', closePopup);
+
+  document.getElementById('btn-save-memo').addEventListener('click', () => {
+    if(state.currentStudentId) {
+      const val = document.getElementById('student-memo-input').value;
+      if (val) state.memos[state.currentStudentId] = val; else delete state.memos[state.currentStudentId];
+      renderAttendanceGrid(); closeAllPopups();
+    }
+  });
+
+  // 모든 팝업 닫기 처리
+  function closeAllPopups() { 
+    document.getElementById('overlay').classList.remove('show'); 
+    document.getElementById('contact-sheet').classList.remove('show'); 
+    document.getElementById('seat-sheet').classList.remove('show');
+    state.currentStudentId = null;
+  }
+  document.getElementById('overlay').addEventListener('click', closeAllPopups); 
+  document.getElementById('btn-close-contact-sheet').addEventListener('click', closeAllPopups);
+  document.getElementById('btn-close-seat-sheet').addEventListener('click', closeAllPopups);
 
   async function initApp() { await loadFromCloud(); initHome(); }
   initApp();
