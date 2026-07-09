@@ -49,7 +49,8 @@
     .student-name { font-size: 15px; font-weight: 700; pointer-events: none; }
     .state-icon { position: absolute; top: -6px; right: -6px; font-size: 16px; display: none; pointer-events: none; background: white; border-radius: 50%; padding: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);}
     
-    .memo-text { font-size: 10px; color: var(--text-sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 90%; margin-top: 4px; pointer-events: none;}
+    /* 📝 특이사항(메모) 눈에 띄게 스타일 변경 */
+    .memo-text { font-size: 11px; color: #b45309; background: #fef3c7; border-radius: 4px; padding: 3px 6px; line-height: 1.2; word-break: keep-all; margin-top: 6px; pointer-events: none; width: 90%; box-sizing: border-box; font-weight: 600; }
     .warning-text { font-size: 10px; color: var(--danger); font-weight: bold; margin-top: 2px; pointer-events: none; }
 
     .state-0 { background: var(--default); color: var(--text-main); border-color: var(--border); }
@@ -131,7 +132,7 @@
     <div id="home-class-area">
       <div class="grade-stats" id="grade-stats"></div>
       <div class="class-grid" id="class-grid"></div>
-      <div style="margin-top: 30px;"><button class="excel-btn" id="btn-export-excel">📊 누적 출결데이터 엑셀 다운로드</button></div>
+      <div style="margin-top: 30px;"><button class="excel-btn" id="btn-export-excel">📊 전체 누적 출결데이터 다운로드</button></div>
     </div>
     <div id="home-emergency-area" style="display:none;">
       <div class="grade-stats">👩‍🏫 교직원 비상연락망 (꾹 누르면 통화)</div>
@@ -140,7 +141,11 @@
   </div>
 
   <div id="view-attendance" class="view" style="padding-bottom: 100px;">
-    <div class="date-wrap"><input type="date" id="attendance-date" /></div>
+    <!-- 📥 반별 다운로드 버튼 추가 -->
+    <div class="date-wrap" style="display: flex; gap: 8px;">
+      <input type="date" id="attendance-date" style="flex: 1; margin-bottom: 0;" />
+      <button class="excel-btn" id="btn-export-class-excel" style="margin-bottom: 0; padding: 0 16px; width: auto; font-size: 14px;">📥 반별 엑셀</button>
+    </div>
     <div class="stat-banner" id="class-stats"></div>
     <div style="display:flex; justify-content:center; gap:10px; font-size:11px; margin-bottom:15px; color:var(--text-sub); font-weight:bold;">
       <span>⬜ 평소</span><span style="color:var(--success);">🟩 출석</span><span style="color:var(--danger);">🟥 결석</span><span style="color:var(--warning);">🟨 지각</span><span style="color:var(--primary);">🟦 조퇴</span>
@@ -237,14 +242,13 @@
     }); return stats;
   }
 
-  // 🚨 학생별 누적 결석 횟수 계산 함수
   function getStudentTotalAbsence(id) {
     let absCount = 0;
     for(let i=0; i<localStorage.length; i++) {
       const k = localStorage.key(i);
       if(k.startsWith(`attendance_${state.currentGrade}_${state.currentClass}_`)) {
         const att = JSON.parse(localStorage.getItem(k));
-        if(att[id] === 2) absCount++; // 2는 결석
+        if(att[id] === 2) absCount++;
       }
     }
     return absCount;
@@ -339,10 +343,9 @@
       if (student && student['일련번호']) {
         const id = student['일련번호']; const status = state.attendance[id] || 0;
         
-        // 🚨 경고 및 📝 메모 렌더링
         const absCount = getStudentTotalAbsence(id);
         const warningHTML = absCount >= 3 ? `<div class="warning-text">🚨결석 ${absCount}회</div>` : '';
-        const memoHTML = state.memos[id] ? `<div class="memo-text">💬 ${state.memos[id]}</div>` : '';
+        const memoHTML = state.memos[id] ? `<div class="memo-text">${state.memos[id]}</div>` : '';
 
         cell.className = `student-cell state-${status}`;
         cell.innerHTML = `<div class="student-num">${id}번</div><div class="student-name">${student['이름']}</div>${warningHTML}${memoHTML}
@@ -373,34 +376,59 @@
     }
   });
 
-  document.getElementById('btn-export-excel').addEventListener('click', () => {
-    let csv = '\uFEFF날짜,학년,반,번호,이름,출결상태,특이사항(메모)\n';
+  // 📊 엑셀 다운로드 통합 로직 (전체 & 반별)
+  function exportExcel(targetGrade = null, targetClass = null) {
+    let csv = '\uFEFF날짜,시간,학번,이름,출결사항,특이사항\n';
+    const nowTime = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' });
+
     for(let i=0; i<localStorage.length; i++) {
       const key = localStorage.key(i);
       if(key.startsWith('attendance_')) {
         const parts = key.split('_'); const grade = parts[1]; const classNum = parts[2]; const date = parts.slice(3).join('_');
+        
+        // 반별 다운로드를 요청했는데, 현재 데이터가 그 반이 아니면 건너뜀
+        if (targetGrade && targetClass) {
+          if (grade !== String(targetGrade) || classNum !== String(targetClass)) continue;
+        }
+
         const students = JSON.parse(localStorage.getItem(`students_${grade}_${classNum}`) || "[]");
         const attendance = JSON.parse(localStorage.getItem(key));
         const memos = JSON.parse(localStorage.getItem(`memo_${grade}_${classNum}_${date}`) || "{}");
         
         students.forEach(s => {
           const st = attendance[s['일련번호']] || 0;
-          if (st > 0 || memos[s['일련번호']]) { 
+          // 결석(2), 지각(3), 조퇴(4)인 학생만 엑셀에 기록 (출석, 평소 제외)
+          if (st === 2 || st === 3 || st === 4) { 
             const memoStr = memos[s['일련번호']] ? memos[s['일련번호']].replace(/,/g, ' ') : '';
-            csv += `${date},${grade},${classNum},${s['일련번호']},${s['이름']},${statusTextMap[st]},${memoStr}\n`;
+            csv += `${date},${nowTime},${s['일련번호']},${s['이름']},${statusTextMap[st]},${memoStr}\n`;
           }
         });
       }
     }
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url); link.setAttribute("download", `출결누적데이터_${new Date().toLocaleDateString('en-CA')}.csv`);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); 
+    const link = document.createElement("a"); 
+    const url = URL.createObjectURL(blob);
+    
+    // 파일명 지정 (반별 다운로드인지 전체인지 구분)
+    let fileName = targetGrade && targetClass 
+      ? `${targetGrade}학년_${targetClass}반_출결데이터_${new Date().toLocaleDateString('en-CA')}.csv` 
+      : `전체_누적출결데이터_${new Date().toLocaleDateString('en-CA')}.csv`;
+      
+    link.setAttribute("href", url); link.setAttribute("download", fileName);
     link.style.visibility = 'hidden'; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+  }
+
+  // 홈 화면 전체 엑셀 버튼 이벤트
+  document.getElementById('btn-export-excel').addEventListener('click', () => exportExcel());
+  
+  // 출석체크 화면 반별 엑셀 버튼 이벤트
+  document.getElementById('btn-export-class-excel').addEventListener('click', () => {
+    exportExcel(state.currentGrade, state.currentClass);
   });
 
   navLeft.addEventListener('click', () => initHome());
   navRight.addEventListener('click', () => switchView('setup'));
 
-  // 📝 메모 저장 버튼
   document.getElementById('btn-save-memo').addEventListener('click', () => {
     if(state.currentStudentId) {
       const memoVal = document.getElementById('student-memo-input').value;
@@ -416,7 +444,6 @@
     const setLink = (id, num) => { const el = document.getElementById(id); const sp = document.getElementById(id+'-num'); if(num){ el.href='tel:'+num.replace(/[^0-9]/g,''); el.classList.remove('disabled'); sp.textContent=num; }else{ el.href='#'; el.classList.add('disabled'); sp.textContent='없음';}};
     setLink('contact-self', student['전화번호']); setLink('contact-parent', student['추가전화번호']);
     
-    // ✉️ 학부모 문자 발송 (OS 호환성을 위해 ?body= 사용)
     const smsBtn = document.getElementById('sms-parent');
     const parentPhone = student['추가전화번호'] ? student['추가전화번호'].replace(/[^0-9]/g,'') : '';
     if(parentPhone) {
