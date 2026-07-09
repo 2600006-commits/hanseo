@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>프리미엄 출석 명렬표 V9 (안정화 버전)</title>
+  <title>프리미엄 출석 명렬표 V10 (한서고등학교)</title>
   <style>
     /* 🎨 디자인 시스템 & 다크모드 변수 */
     :root {
@@ -15,13 +15,13 @@
     }
 
     body { font-family: -apple-system, 'Noto Sans KR', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; display: flex; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s, color 0.3s; }
-    #app { width: 100%; max-width: 430px; min-height: 100vh; background-color: var(--bg); position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.05); overflow-x: hidden; padding-bottom: 120px; }
+    #app { width: 100%; max-width: 430px; min-height: 100vh; background-color: var(--bg); position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.05); overflow-x: hidden; padding-bottom: 120px; display: flex; flex-direction: column; }
 
     .nav-bar { position: fixed; top: 0; width: 100%; max-width: 430px; height: 54px; background: rgba(var(--bg), 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; padding: 0 16px; box-sizing: border-box; z-index: 100; border-bottom: 1px solid var(--border); transition: background 0.3s; }
     .nav-title { font-size: 17px; font-weight: 600; }
     .nav-btn { background: none; border: none; font-size: 20px; cursor: pointer; padding: 5px; color: var(--primary); }
 
-    .view { display: none; padding: 74px 16px 20px 16px; animation: fadeIn 0.3s ease; }
+    .view { display: none; padding: 74px 16px 20px 16px; animation: fadeIn 0.3s ease; flex: 1; }
     .view.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -36,7 +36,7 @@
     .segment-btn { flex: 1; padding: 8px 0; text-align: center; border: none; background: transparent; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; color: var(--text-sub); }
     .segment-btn.active { background: var(--card); color: var(--text-main); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
-    .grade-stats, .stat-banner { text-align: center; font-size: 14px; font-weight: 600; background: var(--card); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+    .grade-stats, .stat-banner { text-align: center; font-size: 13px; font-weight: 600; background: var(--card); padding: 12px 14px; border-radius: 8px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); }
     .text-danger { color: var(--danger); }
     .text-success { color: var(--success); }
     .text-warning { color: var(--warning); }
@@ -45,12 +45,13 @@
     .toolbar { display: flex; gap: 8px; margin-bottom: 15px; }
     .toolbar button { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text-main); font-size: 13px; font-weight: 600; cursor: pointer; }
 
-    .class-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-    .class-btn { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-    .class-btn-info { flex: 1; }
-    .class-btn h3 { margin: 0 0 8px 0; font-size: 18px; }
-    .class-status { font-size: 13px; color: var(--text-sub); line-height: 1.5; font-weight: 500; }
-    .class-stats-box { background: var(--bg); padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; text-align: right; line-height: 1.6; }
+    /* 📦 1열에 2반씩 정렬하도록 그리드 대폭 수정 */
+    .class-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .class-btn { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 125px; box-sizing: border-box; }
+    .class-btn-info { width: 100%; }
+    .class-btn h3 { margin: 0 0 4px 0; font-size: 16px; font-weight: 700; }
+    .class-status { font-size: 12px; color: var(--text-sub); line-height: 1.4; font-weight: 500; margin-bottom: 8px; }
+    .class-stats-box { background: var(--bg); padding: 6px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; text-align: left; line-height: 1.5; width: 100%; box-sizing: border-box; }
 
     .student-grid { display: grid; gap: 8px; }
     .student-cell { border-radius: 12px; padding: 10px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; position: relative; border: 1px solid var(--border); -webkit-user-select: none; user-select: none; transition: transform 0.1s; min-height: 65px; display: flex; flex-direction: column; justify-content: center; align-items: center;}
@@ -81,6 +82,9 @@
     .bottom-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; font-size: 16px; font-weight: 600; cursor: pointer; }
     .btn-reset { background: var(--segment-bg); color: var(--text-main); } .btn-save { background: var(--text-main); color: var(--bg); }
 
+    /* 🏫 한서고등학교 로고 스타일 */
+    .school-logo-footer { text-align: center; padding: 30px 0; font-size: 14px; font-weight: 700; color: var(--text-sub); letter-spacing: 1.5px; opacity: 0.8; margin-top: auto; }
+
     .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; z-index: 300; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
     .toast.show { opacity: 1; }
     .spinner { display: none; font-size: 14px; margin-right: 5px; } .spinner.show { display: inline-block; animation: spin 1s linear infinite; }
@@ -98,6 +102,20 @@
     .memo-area button { padding: 0 16px; background: var(--text-main); color: var(--bg); border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
     
     .label-title { font-size: 13px; font-weight: bold; color: var(--text-sub); margin-bottom: -4px; margin-top: 8px; }
+
+    /* 🖨️ 인쇄 전용 CSS (프린트 모드 최적화 설정) */
+    @media print {
+      body { background: white !important; color: black !important; }
+      #app { max-width: 100% !important; box-shadow: none !important; padding-bottom: 0 !important; }
+      .nav-bar, .toolbar, .bottom-bar, .segment-control, .school-logo-footer, .excel-btn, #class-stats { display: none !important; }
+      .view { padding: 0 !important; }
+      .student-grid { grid-template-columns: repeat(6, 1fr) !important; gap: 5px !important; }
+      .student-cell { border: 1px solid #000 !important; background: white !important; color: black !important; min-height: 75px !important; box-shadow: none !important; }
+      .state-1 { background: #e2e8f0 !important; } /* 출석은 연한 무채색 처리 */
+      .state-2 { border: 2px dashed #ff0000 !important; } /* 결석은 점선 강조 */
+      .state-icon, .warning-text { display: none !important; }
+      .memo-text { border: 1px solid #ccc !important; background: transparent !important; color: black !important; }
+    }
   </style>
 </head>
 <body>
@@ -166,13 +184,22 @@
       <div class="toolbar" style="margin-bottom: 10px;">
         <input type="date" id="home-date" style="margin-bottom:0; flex:1; text-align:center; font-weight:bold;" />
       </div>
+
+      <!-- 📊 1번 요구사항: 메인 화면 학년 전체 통계 출결 현황판 -->
+      <div class="grade-stats" id="grade-total-stats-banner">
+        <span>학년현황: <strong>-명</strong></span>
+        <span>출석 - | 결석 - | 지각 - | 조퇴 -</span>
+      </div>
       
       <div class="class-grid" id="class-grid"></div>
-      <div style="margin-top: 30px;"><button class="excel-btn" id="btn-export-excel">📊 전체 누적 출결데이터 다운로드</button></div>
+      <div style="margin-top: 20px;"><button class="excel-btn" id="btn-export-excel">📊 전체 누적 출결데이터 다운로드</button></div>
     </div>
     <div id="home-emergency-area" style="display:none;">
       <div class="class-grid" id="teacher-grid"></div>
     </div>
+
+    <!-- 🏫 2번 요구사항: 한서고등학교 하단 로고 표시 -->
+    <div class="school-logo-footer">🏫 한서고등학교</div>
   </div>
 
   <!-- 📋 출석체크(Attendance) 뷰 -->
@@ -182,12 +209,13 @@
       <button id="btn-export-class-excel" style="flex:none; width:auto; background:var(--success); color:white; border:none;">📥 반별엑셀</button>
     </div>
     
-    <!-- 전체 인원수 및 출결 현황 배너 -->
     <div class="stat-banner" id="class-stats"></div>
     
+    <!-- 🖨️ 4번 요구사항: '인쇄' 버튼 추가 구성 -->
     <div class="toolbar" style="margin-bottom: 15px;">
-      <button id="btn-open-seat-modal">🔀 자리 배치 / 섞기</button>
-      <button id="btn-bulk-sms" style="color: var(--primary);">✉️ 미출석 단체문자</button>
+      <button id="btn-open-seat-modal">🔀 자리 배치/섞기</button>
+      <button id="btn-print-seats" style="background: #5856D6; color: white; border: none;">🖨️ 자리 인쇄</button>
+      <button id="btn-bulk-sms" style="color: var(--primary); flex: 0.8;">✉️ 단체문자</button>
     </div>
 
     <div style="display:flex; justify-content:center; gap:10px; font-size:11px; margin-bottom:15px; color:var(--text-sub); font-weight:bold;">
@@ -241,7 +269,6 @@
         <option value="8">8칸 (8분단)</option>
       </select>
       
-      <div style="font-size:11px; color:var(--text-sub); margin-bottom:10px;">* 원하는 배치 방식을 선택하세요.</div>
       <button class="primary-btn" id="btn-execute-shuffle">🔀 랜덤 자리 섞기</button>
       <button class="outline-btn" id="btn-execute-sort" style="margin-bottom:0;">🔢 출석 번호순으로 배치</button>
     </div>
@@ -270,7 +297,6 @@
   
   const statusMap = { 0: '평소', 1: '출석', 2: '결석', 3: '지각', 4: '조퇴' };
 
-  // 초기 날짜 세팅
   document.getElementById('home-date').value = state.selectedDate;
   document.getElementById('attendance-date').value = state.selectedDate;
 
@@ -291,20 +317,14 @@
     else if (viewName === 'attendance') { navLeft.style.visibility = 'visible'; navLeft.textContent = '←'; navTitle.textContent = `${state.currentGrade}학년 ${state.currentClass}반`; navRight.style.display = 'none'; }
   }
 
-  // 데이터 안전 파싱 가드 함수 (이중 문자열화 자가 치유)
   function safeParse(key, defaultVal = null) {
     try {
       let val = localStorage.getItem(key);
       if (!val) return defaultVal;
       let parsed = JSON.parse(val);
-      if (typeof parsed === 'string') {
-        parsed = JSON.parse(parsed); // 한 번 더 풀기
-      }
+      if (typeof parsed === 'string') parsed = JSON.parse(parsed);
       return parsed;
-    } catch (e) {
-      console.error("데이터 파싱 에러 복구 중:", e);
-      return defaultVal;
-    }
+    } catch (e) { return defaultVal; }
   }
 
   async function loadFromCloud() {
@@ -316,11 +336,8 @@
       if (data) { 
         Object.keys(data).forEach(k => {
           let val = data[k];
-          if (typeof val === 'object' && val !== null) {
-            localStorage.setItem(k, JSON.stringify(val));
-          } else if (typeof val === 'string') {
-            localStorage.setItem(k, val);
-          }
+          if (typeof val === 'object' && val !== null) localStorage.setItem(k, JSON.stringify(val));
+          else if (typeof val === 'string') localStorage.setItem(k, val);
         }); 
       }
     } catch (e) { showToast("⚠️ 로컬 모드"); } finally { spinner.classList.remove('show'); }
@@ -376,6 +393,7 @@
     if(!val) { initHome(); return; }
     document.getElementById('home-class-area').style.display = 'block';
     const grid = document.getElementById('class-grid'); grid.innerHTML = '';
+    grid.style.gridTemplateColumns = '1fr'; // 검색모드에서는 1줄로 표시
     
     for(let i=0; i<localStorage.length; i++) {
       const k = localStorage.key(i);
@@ -386,8 +404,9 @@
           stds.forEach(s => {
             if(s['이름'] && s['이름'].includes(val)) {
               const btn = document.createElement('div'); btn.className = 'class-btn';
+              btn.style.minHeight = 'auto';
               const abs = getStudentTotalAbsence(s['일련번호']);
-              btn.innerHTML = `<div class="class-btn-info"><h3>${s['이름']}</h3><div class="class-status">${grade}학년 ${cNum}반 ${s['일련번호']}번<br>누적결석: <span class="text-danger">${abs}회</span></div></div>`;
+              btn.innerHTML = `<div class="class-btn-info"><h3>${s['이름']}</h3><div class="class-status">${grade}학년 ${cNum}반 ${s['일련번호']}번 | 누적결석: <span class="text-danger">${abs}회</span></div></div>`;
               btn.addEventListener('click', () => openAttendance(grade, cNum)); grid.appendChild(btn);
             }
           });
@@ -427,12 +446,16 @@
 
   document.querySelectorAll('.segment-btn').forEach(btn => btn.addEventListener('click', (e) => { state.currentTab = e.target.dataset.tab; initHome(); }));
 
-  // 메인 화면 반 리스트 (1반 ~ 8반) 렌더링 함수 (Try-Catch 완벽 적용)
+  // 메인 화면 1열에 2반씩 배치 및 학년 전체 대시보드 통계 기능 활성화
   function renderClassGrid() {
     const grid = document.getElementById('class-grid'); 
     if(!grid) return;
     grid.innerHTML = '';
+    grid.style.gridTemplateColumns = 'repeat(2, 1fr)'; // 2열 고정
     
+    // 학년 통합 통계 변수
+    let gradeStats = { total: 0, p: 0, a: 0, l: 0, e: 0, n: 0 };
+
     for (let i = 1; i <= 8; i++) {
       const btn = document.createElement('div'); btn.className = 'class-btn';
       const stds = safeParse(`students_${state.currentGrade}_${i}`, null);
@@ -448,16 +471,21 @@
           }
         });
 
+        // 학년 전체 누적 데이터 합산
+        gradeStats.total += stats.t;
+        gradeStats.p += stats.p; gradeStats.a += stats.a;
+        gradeStats.l += stats.l; gradeStats.e += stats.e; gradeStats.n += stats.n;
+
         btn.innerHTML = `
           <div class="class-btn-info">
             <h3>${i}반</h3>
-            <div class="class-status" style="color:var(--primary)">입장하여 출석체크</div>
+            <div class="class-status" style="color:var(--primary)">입장 체크 ➔</div>
           </div>
           <div class="class-stats-box">
-            총 ${stats.t}명<br>
+            총 <strong>${stats.t}명</strong><br>
             <span class="text-success">출석 ${stats.p}</span> | <span class="text-danger">결석 ${stats.a}</span><br>
             <span class="text-warning">지각 ${stats.l}</span> | <span class="text-primary">조퇴 ${stats.e}</span><br>
-            <span style="color:var(--text-sub); font-size:11px;">미입력 ${stats.n}명</span>
+            <span style="color:var(--text-sub); font-size:10px;">미입력 ${stats.n}명</span>
           </div>
         `; 
       } 
@@ -468,6 +496,18 @@
       btn.addEventListener('click', () => openAttendance(state.currentGrade, i)); 
       grid.appendChild(btn);
     }
+
+    // 📊 1번 요구사항: 학년 총 현황판 화면 반영
+    document.getElementById('grade-total-stats-banner').innerHTML = `
+      <span><strong>${state.currentGrade}학년 총계:</strong> <strong>${gradeStats.total}명</strong></span>
+      <span>
+        <span class="text-success">출석 ${gradeStats.p}</span> | 
+        <span class="text-danger">결석 ${gradeStats.a}</span> | 
+        <span class="text-warning">지각 ${gradeStats.l}</span> | 
+        <span class="text-primary">조퇴 ${gradeStats.e}</span>
+        <span style="color:var(--text-sub); font-size:11px; margin-left:4px;">(미입력 ${gradeStats.n})</span>
+      </span>
+    `;
   }
 
   const dateInput = document.getElementById('attendance-date');
@@ -496,7 +536,7 @@
     grid.innerHTML = '';
     let stats = { t: state.students.length, p:0, a:0, l:0, e:0 };
     
-    const cols = parseInt(localStorage.getItem(`seat_cols_${state.currentGrade}_${state.currentClass}`) || 4);
+    const cols = parseInt(localStorage.getItem(`seat_cols_${state.currentGrade}_${state.currentClass}`) || 6);
     const layout = localStorage.getItem(`seat_layout_${state.currentGrade}_${state.currentClass}`) || 'single';
     
     if (layout === 'pair') {
@@ -566,6 +606,11 @@
     renderAttendanceGrid(); saveToCloud(); closeAllPopups(); showToast('번호순으로 재배치되었습니다.');
   });
 
+  // 🖨️ 4번 요구사항: 자리 배치 완료 후 인쇄 스크립트 연결
+  document.getElementById('btn-print-seats').addEventListener('click', () => {
+    window.print();
+  });
+
   document.getElementById('btn-bulk-sms').addEventListener('click', () => {
     let numbers = [];
     state.students.forEach(s => {
@@ -575,7 +620,7 @@
     if(numbers.length === 0) return alert('결석/지각/조퇴 처리된 학생 중 학부모 연락처가 있는 학생이 없습니다.');
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     const bodyText = encodeURIComponent(`안녕하세요. ${state.currentGrade}학년 ${state.currentClass}반 담임입니다. 자녀의 출결 관련하여 확인 부탁드립니다.`);
-    window.location.href = `sms:${numbers.join(',')}${isIOS ? '&' : '?'}body=${bodyText}`;
+    window.location.href = `sms:${numbers.join(',')}${isIOS ? '&' : '}body=${bodyText}`;
   });
 
   document.getElementById('btn-save').addEventListener('click', async () => {
