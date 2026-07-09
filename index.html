@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>프리미엄 출석 명렬표 V7</title>
+  <title>프리미엄 출석 명렬표 V8</title>
   <style>
     /* 🎨 디자인 시스템 & 다크모드 변수 */
     :root {
@@ -38,14 +38,19 @@
 
     .grade-stats, .stat-banner { text-align: center; font-size: 14px; font-weight: 600; background: var(--card); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
     .text-danger { color: var(--danger); }
+    .text-success { color: var(--success); }
+    .text-warning { color: var(--warning); }
+    .text-primary { color: var(--primary); }
     
     .toolbar { display: flex; gap: 8px; margin-bottom: 15px; }
     .toolbar button { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text-main); font-size: 13px; font-weight: 600; cursor: pointer; }
 
-    .class-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .class-btn { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: left; cursor: pointer; }
+    .class-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .class-btn { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .class-btn-info { flex: 1; }
     .class-btn h3 { margin: 0 0 8px 0; font-size: 18px; }
     .class-status { font-size: 13px; color: var(--text-sub); line-height: 1.5; font-weight: 500; }
+    .class-stats-box { background: var(--bg); padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; text-align: right; line-height: 1.6; }
 
     .student-grid { display: grid; gap: 8px; }
     .student-cell { border-radius: 12px; padding: 10px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; position: relative; border: 1px solid var(--border); -webkit-user-select: none; user-select: none; transition: transform 0.1s; min-height: 65px; display: flex; flex-direction: column; justify-content: center; align-items: center;}
@@ -67,7 +72,7 @@
     .state-1 .state-icon::after { content: '✅'; } .state-2 .state-icon::after { content: '❌'; }
     .state-3 .state-icon::after { content: '⚠️'; } .state-4 .state-icon::after { content: '🏃'; }
 
-    .dashboard-card { background: #FFF5F5; border: 1px solid #FFDCE0; border-radius: 12px; padding: 15px; margin-bottom: 20px; }
+    .dashboard-card { background: #FFF5F5; border: 1px solid #FFDCE0; border-radius: 12px; padding: 15px; margin-bottom: 15px; }
     .dark-mode .dashboard-card { background: #3A1D1D; border-color: #5C2B2B; }
     .dashboard-title { font-size: 14px; font-weight: bold; color: var(--danger); margin-bottom: 8px; }
     .dashboard-list { font-size: 13px; color: var(--text-main); line-height: 1.6; }
@@ -117,10 +122,10 @@
         <select id="setup-grade"><option value="1">1학년</option><option value="2">2학년</option></select>
         <select id="setup-class">
           <option value="1">1반</option><option value="2">2반</option><option value="3">3반</option><option value="4">4반</option>
-          <option value="5">5반</option><option value="6">6반</option>
+          <option value="5">5반</option><option value="6">6반</option><option value="7">7반</option><option value="8">8반</option>
         </select>
       </div>
-      <textarea id="excel-input" placeholder="엑셀 복사/붙여넣기 (학번, 이름, 전화, 추가전화)"></textarea>
+      <textarea id="excel-input" placeholder="엑셀 복사/붙여넣기 (학번, 이름, 학생전화, 학부모전화)"></textarea>
       <button class="primary-btn" id="btn-save-list">💾 명단 등록</button>
     </div>
 
@@ -157,7 +162,11 @@
     </div>
     
     <div id="home-class-area">
-      <div class="grade-stats" id="grade-stats"></div>
+      <!-- 메인 화면용 날짜 선택기 -->
+      <div class="toolbar" style="margin-bottom: 10px;">
+        <input type="date" id="home-date" style="margin-bottom:0; flex:1; text-align:center; font-weight:bold;" />
+      </div>
+      
       <div class="class-grid" id="class-grid"></div>
       <div style="margin-top: 30px;"><button class="excel-btn" id="btn-export-excel">📊 전체 누적 출결데이터 다운로드</button></div>
     </div>
@@ -173,15 +182,16 @@
       <button id="btn-export-class-excel" style="flex:none; width:auto; background:var(--success); color:white; border:none;">📥 반별엑셀</button>
     </div>
     
+    <!-- 전체 인원수 및 출결 현황 배너 (기존 양식 복구) -->
     <div class="stat-banner" id="class-stats"></div>
     
     <div class="toolbar" style="margin-bottom: 15px;">
-      <button id="btn-open-seat-modal">🔀 자리 배치 및 섞기</button>
+      <button id="btn-open-seat-modal">🔀 자리 배치 / 섞기</button>
       <button id="btn-bulk-sms" style="color: var(--primary);">✉️ 미출석 단체문자</button>
     </div>
 
     <div style="display:flex; justify-content:center; gap:10px; font-size:11px; margin-bottom:15px; color:var(--text-sub); font-weight:bold;">
-      <span>⬜ 평소</span><span style="color:var(--success);">🟩 출석</span><span style="color:var(--danger);">🟥 결석</span><span style="color:var(--warning);">🟨 지각</span><span style="color:var(--primary);">🟦 조퇴</span>
+      <span>⬜ 평소</span><span class="text-success">🟩 출석</span><span class="text-danger">🟥 결석</span><span class="text-warning">🟨 지각</span><span class="text-primary">🟦 조퇴</span>
     </div>
     
     <div class="student-grid" id="student-grid"></div>
@@ -199,6 +209,8 @@
   <div class="action-sheet" id="contact-sheet">
     <div class="sheet-header" id="sheet-name">연락처</div>
     <div class="sheet-body">
+      <!-- 학생 전화번호 복구 -->
+      <a href="#" class="contact-btn" id="contact-student"><span>📱 학생 연락처</span><span id="contact-student-num">-</span></a>
       <a href="#" class="contact-btn" id="contact-parent"><span>📞 학부모 연락처</span><span id="contact-parent-num">-</span></a>
       <a href="#" class="contact-btn" id="sms-parent" style="background:#E5F0FF; color:var(--primary); justify-content:center; font-weight:bold;">💬 학부모 문자 발송</a>
       <div class="memo-area">
@@ -230,8 +242,9 @@
         <option value="8">8칸 (8분단)</option>
       </select>
       
-      <div style="font-size:11px; color:var(--text-sub); margin-bottom:10px;">* 설정 후 아래 버튼을 누르면 학생들 자리가 랜덤으로 섞이며 배치됩니다.</div>
-      <button class="primary-btn" id="btn-execute-shuffle">🔀 랜덤 자리 섞기 및 적용</button>
+      <div style="font-size:11px; color:var(--text-sub); margin-bottom:10px;">* 원하는 배치 방식을 선택하세요.</div>
+      <button class="primary-btn" id="btn-execute-shuffle">🔀 랜덤 자리 섞기</button>
+      <button class="outline-btn" id="btn-execute-sort" style="margin-bottom:0;">🔢 출석 번호순으로 배치</button>
     </div>
     <div style="margin: 10px 16px 16px 16px; padding: 16px; text-align: center; font-weight: 600; color: var(--danger); cursor: pointer; border: 1px solid var(--danger); border-radius: 12px;" id="btn-close-seat-sheet">닫기</div>
   </div>
@@ -257,6 +270,10 @@
   const spinner = document.getElementById('loading-spinner');
   
   const statusMap = { 0: '평소', 1: '출석', 2: '결석', 3: '지각', 4: '조퇴' };
+
+  // 초기 날짜 세팅
+  document.getElementById('home-date').value = state.selectedDate;
+  document.getElementById('attendance-date').value = state.selectedDate;
 
   if(state.isDarkMode) { document.body.classList.add('dark-mode'); document.getElementById('btn-theme-toggle').textContent = '☀️'; }
 
@@ -285,7 +302,7 @@
   async function saveToCloud() {
     if (!API_URL || API_URL.startsWith("여기에")) return;
     try { spinner.classList.add('show'); const all = {};
-      for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith("students_") || k.startsWith("attendance_") || k.startsWith("memo_") || k === "teachers_list") all[k] = JSON.parse(localStorage.getItem(k)); }
+      for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith("students_") || k.startsWith("attendance_") || k.startsWith("memo_") || k === "teachers_list" || k.startsWith("seat_")) all[k] = localStorage.getItem(k); }
       await fetch(API_URL, { method: "POST", body: JSON.stringify(all) }); showToast("☁️ 클라우드 저장 완료");
     } catch (e) { showToast("❌ 저장 실패"); } finally { spinner.classList.remove('show'); }
   }
@@ -329,7 +346,7 @@
           if(s['이름'].includes(val)) {
             const btn = document.createElement('div'); btn.className = 'class-btn';
             const abs = getStudentTotalAbsence(s['일련번호']);
-            btn.innerHTML = `<h3>${s['이름']}</h3><div class="class-status">${grade}학년 ${cNum}반 ${s['일련번호']}번<br>누적결석: <span class="text-danger">${abs}회</span></div>`;
+            btn.innerHTML = `<div class="class-btn-info"><h3>${s['이름']}</h3><div class="class-status">${grade}학년 ${cNum}반 ${s['일련번호']}번<br>누적결석: <span class="text-danger">${abs}회</span></div></div>`;
             btn.addEventListener('click', () => openAttendance(grade, cNum)); grid.appendChild(btn);
           }
         });
@@ -354,6 +371,13 @@
   document.getElementById('btn-save-template').addEventListener('click', () => { localStorage.setItem('sms_template', document.getElementById('sms-template').value); showToast('템플릿 저장됨'); });
   document.getElementById('sms-template').value = localStorage.getItem('sms_template') || '안녕하세요. 오늘 {이름} 학생이 {사유}하여 연락드렸습니다.';
 
+  // 홈 화면 날짜 변경 이벤트
+  document.getElementById('home-date').addEventListener('change', (e) => { 
+    state.selectedDate = e.target.value; 
+    document.getElementById('attendance-date').value = state.selectedDate; 
+    renderClassGrid(); 
+  });
+
   function initHome() {
     switchView('home'); document.querySelectorAll('.segment-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === state.currentTab));
     if (state.currentTab === 'emergency') { document.getElementById('home-class-area').style.display = 'none'; document.getElementById('home-emergency-area').style.display = 'block'; } 
@@ -362,22 +386,54 @@
 
   document.querySelectorAll('.segment-btn').forEach(btn => btn.addEventListener('click', (e) => { state.currentTab = e.target.dataset.tab; initHome(); }));
 
+  // 메인 화면 반 리스트 (1반 ~ 8반) 통계 대시보드
   function renderClassGrid() {
     const grid = document.getElementById('class-grid'); grid.innerHTML = '';
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= 8; i++) {
       const btn = document.createElement('div'); btn.className = 'class-btn';
-      if(localStorage.getItem(`students_${state.currentGrade}_${i}`)) { btn.innerHTML = `<h3>${i}반</h3><div class="class-status" style="color:var(--primary)">입장하기</div>`; } 
-      else { btn.innerHTML = `<h3>${i}반</h3><div class="class-status" style="opacity:0.5">미등록</div>`; }
+      const localData = localStorage.getItem(`students_${state.currentGrade}_${i}`);
+      
+      if(localData) { 
+        const stds = JSON.parse(localData);
+        const att = JSON.parse(localStorage.getItem(`attendance_${state.currentGrade}_${i}_${state.selectedDate}`) || "{}");
+        let stats = { t: stds.length, p: 0, a: 0, l: 0, e: 0, n: 0 };
+        
+        stds.forEach(s => {
+          const st = att[s['일련번호']] || 0;
+          if(st === 1) stats.p++; else if(st === 2) stats.a++; else if(st === 3) stats.l++; else if(st === 4) stats.e++; else stats.n++;
+        });
+
+        btn.innerHTML = `
+          <div class="class-btn-info">
+            <h3>${i}반</h3>
+            <div class="class-status" style="color:var(--primary)">입장하여 출석체크</div>
+          </div>
+          <div class="class-stats-box">
+            총 ${stats.t}명<br>
+            <span class="text-success">출석 ${stats.p}</span> | <span class="text-danger">결석 ${stats.a}</span><br>
+            <span class="text-warning">지각 ${stats.l}</span> | <span class="text-primary">조퇴 ${stats.e}</span><br>
+            <span style="color:var(--text-sub); font-size:11px;">미입력 ${stats.n}명</span>
+          </div>
+        `; 
+      } 
+      else { 
+        btn.innerHTML = `<div class="class-btn-info"><h3>${i}반</h3><div class="class-status" style="opacity:0.5">명단 미등록</div></div>`; 
+      }
+      
       btn.addEventListener('click', () => openAttendance(state.currentGrade, i)); grid.appendChild(btn);
     }
   }
 
   const dateInput = document.getElementById('attendance-date');
-  dateInput.addEventListener('change', (e) => { state.selectedDate = e.target.value; reloadDayData(); });
+  dateInput.addEventListener('change', (e) => { 
+    state.selectedDate = e.target.value; 
+    document.getElementById('home-date').value = state.selectedDate; 
+    reloadDayData(); 
+  });
 
   async function openAttendance(grade, classNum) {
     const localData = localStorage.getItem(`students_${grade}_${classNum}`);
-    if (!localData) { alert("명단이 없습니다."); return; }
+    if (!localData) { alert("명단이 없습니다. [설정]에서 엑셀을 등록해주세요."); return; }
     state.currentGrade = grade; state.currentClass = classNum; state.students = JSON.parse(localData);
     dateInput.value = state.selectedDate; reloadDayData(); switchView('attendance');
   }
@@ -390,7 +446,7 @@
 
   function renderAttendanceGrid() {
     const grid = document.getElementById('student-grid'); grid.innerHTML = '';
-    let stats = { t: state.students.length, a:0, l:0, e:0 };
+    let stats = { t: state.students.length, p:0, a:0, l:0, e:0 };
     
     // 자리 배치 설정 불러오기 (기본값: 4칸 한줄)
     const cols = parseInt(localStorage.getItem(`seat_cols_${state.currentGrade}_${state.currentClass}`) || 4);
@@ -413,7 +469,7 @@
     
     state.students.forEach(student => {
       const id = student['일련번호']; const status = state.attendance[id] || 0;
-      if(status===2) stats.a++; else if(status===3) stats.l++; else if(status===4) stats.e++;
+      if(status===1) stats.p++; else if(status===2) stats.a++; else if(status===3) stats.l++; else if(status===4) stats.e++;
       
       const absCount = getStudentTotalAbsence(id);
       const warningHTML = absCount >= 3 ? `<div class="warning-text">🚨결석 ${absCount}회</div>` : '';
@@ -439,12 +495,12 @@
       if (currentVisualCol >= cols) currentVisualCol = 0;
     });
     
-    document.getElementById('class-stats').innerHTML = `<span>총 ${stats.t}명</span> <span>결석 <span class="text-danger">${stats.a}</span> | 지각 ${stats.l} | 조퇴 <span style="color:var(--primary)">${stats.e}</span></span>`;
+    // 전체 인원수 정보 배너 복구
+    document.getElementById('class-stats').innerHTML = `<span>총 인원: <strong>${stats.t}명</strong></span> <span><span class="text-success">출석 ${stats.p}</span> | <span class="text-danger">결석 ${stats.a}</span> | <span class="text-warning">지각 ${stats.l}</span> | <span class="text-primary">조퇴 ${stats.e}</span></span>`;
   }
 
   // 🔀 자리 배치 팝업 열기
   document.getElementById('btn-open-seat-modal').addEventListener('click', () => {
-    // 저장된 설정 불러와서 세팅
     const savedCols = localStorage.getItem(`seat_cols_${state.currentGrade}_${state.currentClass}`) || '4';
     const savedLayout = localStorage.getItem(`seat_layout_${state.currentGrade}_${state.currentClass}`) || 'single';
     document.getElementById('seat-cols').value = savedCols;
@@ -462,13 +518,24 @@
     localStorage.setItem(`seat_layout_${state.currentGrade}_${state.currentClass}`, layout);
     localStorage.setItem(`seat_cols_${state.currentGrade}_${state.currentClass}`, cols);
 
-    // 학생 배열 섞기
-    state.students.sort(() => Math.random() - 0.5);
+    state.students.sort(() => Math.random() - 0.5); // 무작위 섞기
     localStorage.setItem(`students_${state.currentGrade}_${state.currentClass}`, JSON.stringify(state.students));
     
-    renderAttendanceGrid(); saveToCloud();
-    closeAllPopups();
-    showToast('새로운 자리로 배치되었습니다.');
+    renderAttendanceGrid(); saveToCloud(); closeAllPopups(); showToast('새로운 자리로 배치되었습니다.');
+  });
+
+  // 🔢 출석 번호순 배치 실행
+  document.getElementById('btn-execute-sort').addEventListener('click', () => {
+    const layout = document.getElementById('seat-layout-type').value;
+    const cols = document.getElementById('seat-cols').value;
+    
+    localStorage.setItem(`seat_layout_${state.currentGrade}_${state.currentClass}`, layout);
+    localStorage.setItem(`seat_cols_${state.currentGrade}_${state.currentClass}`, cols);
+
+    state.students.sort((a, b) => parseInt(a['일련번호']) - parseInt(b['일련번호'])); // 번호순 정렬
+    localStorage.setItem(`students_${state.currentGrade}_${state.currentClass}`, JSON.stringify(state.students));
+    
+    renderAttendanceGrid(); saveToCloud(); closeAllPopups(); showToast('번호순으로 재배치되었습니다.');
   });
 
   // ✉️ 단체 문자 발송 기능
@@ -478,7 +545,7 @@
       const st = state.attendance[s['일련번호']] || 0;
       if((st === 2 || st === 3 || st === 4) && s['추가전화번호']) numbers.push(s['추가전화번호'].replace(/[^0-9]/g,''));
     });
-    if(numbers.length === 0) return alert('결석/지각/조퇴 처리된 학생 중 연락처가 있는 학생이 없습니다.');
+    if(numbers.length === 0) return alert('결석/지각/조퇴 처리된 학생 중 학부모 연락처가 있는 학생이 없습니다.');
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     const bodyText = encodeURIComponent(`안녕하세요. ${state.currentGrade}학년 ${state.currentClass}반 담임입니다. 자녀의 출결 관련하여 확인 부탁드립니다.`);
     const link = `sms:${numbers.join(',')}${isIOS ? '&' : '?'}body=${bodyText}`;
@@ -539,10 +606,17 @@
     state.currentStudentId = student['일련번호'];
     document.getElementById('sheet-name').textContent = `${student['이름']} 학생`;
     
+    // 학생 번호 복구
+    const sNum = student['전화번호'] ? student['전화번호'].replace(/[^0-9]/g,'') : '';
+    const sBtn = document.getElementById('contact-student');
+    if(sNum) { sBtn.href = `tel:${sNum}`; sBtn.style.opacity = 1; document.getElementById('contact-student-num').textContent = sNum; }
+    else { sBtn.href = '#'; sBtn.style.opacity = 0.5; document.getElementById('contact-student-num').textContent = '없음'; }
+
+    // 학부모 번호 (추가전화번호)
     const pNum = student['추가전화번호'] ? student['추가전화번호'].replace(/[^0-9]/g,'') : '';
-    const btn = document.getElementById('contact-parent');
-    if(pNum) { btn.href = `tel:${pNum}`; btn.style.opacity = 1; document.getElementById('contact-parent-num').textContent = pNum; }
-    else { btn.href = '#'; btn.style.opacity = 0.5; document.getElementById('contact-parent-num').textContent = '없음'; }
+    const pBtn = document.getElementById('contact-parent');
+    if(pNum) { pBtn.href = `tel:${pNum}`; pBtn.style.opacity = 1; document.getElementById('contact-parent-num').textContent = pNum; }
+    else { pBtn.href = '#'; pBtn.style.opacity = 0.5; document.getElementById('contact-parent-num').textContent = '없음'; }
     
     const smsBtn = document.getElementById('sms-parent');
     if(pNum) {
