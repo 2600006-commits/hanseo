@@ -285,7 +285,7 @@
 </div>
 <script>
   // 🔗 앱 설정 및 상태 관리
-  const API_URL = "https://script.google.com/macros/s/AKfycbyuSV4SK0M1LwIcjXurfus76RP4a-X09ciRhA4gZKOHE4oGu1ZRxBOM6TfN205dojMwIw/exec";
+  const API_URL = "여기에_복사한_구글_웹앱_URL을_넣으세요";
   
   const state = { 
     currentTab: '1', currentGrade: 1, currentClass: null, 
@@ -427,7 +427,6 @@
     document.getElementById('warning-dashboard').style.display = hasWarning ? 'block' : 'none'; 
   }
 
-  // 출결 앱 이벤트 리스너 설정
   document.getElementById('search-input').addEventListener('input', (e) => { 
     const val = e.target.value.trim(); 
     if(!val) { initHome(); return; } 
@@ -730,9 +729,57 @@
   document.getElementById('btn-close-contact-sheet').addEventListener('click', closeAllPopups); 
   document.getElementById('btn-close-seat-sheet').addEventListener('click', closeAllPopups);
 
+  // ==========================================
+  // 🔊 오디오(사운드) 시스템 
+  // ==========================================
+  let audioCtx;
+  // BGM 설정 (원하시는 mp3 주소가 있다면 아래 주소를 변경하시면 됩니다)
+  const bgm = new Audio('https://ia801407.us.archive.org/21/items/cdk-sunday/cdk-sunday.mp3'); 
+  bgm.loop = true;
+  bgm.volume = 0.3;
+
+  function initAudio() {
+    if (!audioCtx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AudioContext();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playJumpSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    
+    osc.type = 'square'; // 고전 게임 느낌의 사운드
+    osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.1);
+    
+    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+    
+    osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+  }
+
+  function playGameOverSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(250, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.5);
+    
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+    
+    osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+  }
 
   // ==========================================
-  // 🏆 랭킹(Leaderboard) 시스템 & 게임 로직
+  // 🏆 랭킹 & 미니게임 로직 
   // ==========================================
   let currentPlayerName = '';
 
@@ -802,6 +849,31 @@
     const savedName = localStorage.getItem('penguin_player_name');
     if(savedName) document.getElementById('player-name-input').value = savedName;
     
+    // 👑 관리자 랭킹 초기화 버튼 동적 생성
+    let adminBtn = document.getElementById('btn-admin-reset');
+    if (!adminBtn) {
+      adminBtn = document.createElement('button');
+      adminBtn.id = 'btn-admin-reset';
+      adminBtn.innerHTML = '👑 관리자 (랭킹 초기화)';
+      adminBtn.style.cssText = 'margin-top: 15px; background: #FF3B30; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; width: 100%; max-width: 300px; display: block; margin-left: auto; margin-right: auto;';
+      
+      adminBtn.addEventListener('click', () => {
+        const pwd = prompt('관리자 비밀번호를 입력하세요 (4자리):');
+        if (pwd === '1234') {
+          localStorage.removeItem('penguin_leaderboard');
+          saveToCloud();
+          renderLeaderboard();
+          alert('🏆 랭킹이 성공적으로 초기화되었습니다!');
+        } else if (pwd !== null) {
+          alert('❌ 비밀번호가 일치하지 않습니다.');
+        }
+      });
+      
+      // 로비 컨텐츠의 가장 아래에 버튼 추가
+      const lobbyContainer = document.querySelector('#game-lobby .lobby-content') || document.getElementById('game-lobby');
+      lobbyContainer.appendChild(adminBtn);
+    }
+
     renderLeaderboard();
   }
 
@@ -817,6 +889,12 @@
     
     document.getElementById('game-lobby').style.display = 'none';
     document.getElementById('game-play-area').style.display = 'flex';
+    
+    // 사운드 초기화 및 배경음악 재생
+    initAudio();
+    bgm.currentTime = 0;
+    bgm.play().catch(e => console.log("BGM 재생 실패 (브라우저 정책)", e));
+    
     startMiniGame();
   });
 
@@ -845,6 +923,7 @@
 
   function stopMiniGame() {
     gameRunning = false;
+    bgm.pause(); // 멈출 때 BGM 정지
     if (gameAnimationId) {
       cancelAnimationFrame(gameAnimationId);
       gameAnimationId = null;
@@ -855,6 +934,7 @@
     if (!penguin.jumping && gameRunning) {
       penguin.vy = -7.5;
       penguin.jumping = true;
+      playJumpSound(); // 점프 사운드 재생
     }
   }
 
@@ -868,15 +948,17 @@
   canvas.addEventListener('touchstart', (e) => { e.preventDefault(); handleJump(); });
   canvas.addEventListener('mousedown', () => { handleJump(); });
 
-  function drawPenguin(x, y, frame, isDead) {
-    ctx.fillStyle = '#1C1C1E'; ctx.fillRect(x + 4, y, 16, 26);
-    ctx.fillStyle = '#FFFFFF'; ctx.fillRect(x + 8, y + 8, 10, 16);
+  function drawPenguin(x, y, frame, isDead, isNight) {
+    ctx.fillStyle = isNight ? '#E5E5EA' : '#1C1C1E'; 
+    ctx.fillRect(x + 4, y, 16, 26);
+    ctx.fillStyle = isNight ? '#1C1C1E' : '#FFFFFF'; 
+    ctx.fillRect(x + 8, y + 8, 10, 16);
     ctx.fillStyle = '#FF9500'; ctx.fillRect(x + 18, y + 6, 4, 3);
     
     if (isDead) {
       ctx.strokeStyle = '#FF3B30'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x+12, y+4); ctx.lineTo(x+16, y+8); ctx.moveTo(x+16, y+4); ctx.lineTo(x+12, y+8); ctx.stroke();
     } else {
-      ctx.fillStyle = '#000000'; ctx.fillRect(x + 14, y + 4, 2, 3);
+      ctx.fillStyle = isNight ? '#FFFFFF' : '#000000'; ctx.fillRect(x + 14, y + 4, 2, 3);
     }
     if (!penguin.jumping && !isDead) { 
       ctx.fillStyle = '#FF9500'; if (frame % 20 < 10) { ctx.fillRect(x + 5, y + 26, 4, 3); } else { ctx.fillRect(x + 14, y + 26, 4, 3); }
@@ -885,67 +967,103 @@
     }
   }
 
-  function drawSeal(x, y, w, h) { 
-    ctx.fillStyle = '#8E8E93'; ctx.fillRect(x, y + h - 14, w, 14); ctx.fillRect(x + w - 6, y + h - 20, 8, 10); ctx.fillStyle = '#3A3A3C'; ctx.fillRect(x + w - 3, y + h - 18, 2, 2); ctx.fillStyle = '#555555'; ctx.fillRect(x + 2, y + h - 4, 6, 4); 
+  function drawSeal(x, y, w, h, isNight) { 
+    ctx.fillStyle = isNight ? '#D1D1D6' : '#8E8E93'; 
+    ctx.fillRect(x, y + h - 14, w, 14); 
+    ctx.fillRect(x + w - 6, y + h - 20, 8, 10); 
+    ctx.fillStyle = isNight ? '#FFFFFF' : '#3A3A3C'; 
+    ctx.fillRect(x + w - 3, y + h - 18, 2, 2); 
+    ctx.fillStyle = isNight ? '#AEAEB2' : '#555555'; 
+    ctx.fillRect(x + 2, y + h - 4, 6, 4); 
   }
 
-  function drawSeagull(x, y, frame) {
-    ctx.strokeStyle = '#3A3A3C'; ctx.lineWidth = 2; ctx.beginPath();
+  function drawSeagull(x, y, frame, isNight) {
+    ctx.strokeStyle = isNight ? '#F2F2F7' : '#3A3A3C'; 
+    ctx.lineWidth = 2; ctx.beginPath();
     if (frame % 30 < 15) { ctx.moveTo(x, y); ctx.lineTo(x + 10, y + 6); ctx.lineTo(x + 20, y); } else { ctx.moveTo(x, y + 6); ctx.lineTo(x + 10, y); ctx.lineTo(x + 20, y + 6); }
     ctx.stroke(); ctx.fillStyle = '#FFCC00'; ctx.fillRect(x + 8, y + 2, 3, 2);
+  }
+
+  function drawPolarBear(x, y, w, h, isNight) {
+    ctx.fillStyle = isNight ? '#FFFFFF' : '#F2F2F7'; 
+    ctx.fillRect(x, y+10, w, h-10); 
+    ctx.fillRect(x+w-12, y, 12, 12); 
+    ctx.fillStyle = isNight ? '#FF3B30' : '#1C1C1E'; 
+    ctx.fillRect(x+w-4, y+3, 2, 2); 
+  }
+
+  function drawIceSpike(x, y, w, h, isNight) {
+    ctx.fillStyle = isNight ? '#00FFFF' : '#00BFFF'; 
+    ctx.beginPath();
+    ctx.moveTo(x, y+h);
+    ctx.lineTo(x + w/2, y);
+    ctx.lineTo(x + w, y+h);
+    ctx.fill();
   }
 
   function gameLoop() {
     if (!gameRunning) return;
 
+    let isNight = score > 1500;
+    
     let skyColor = '#E0F7FA';
     if (score > 1500) skyColor = '#1A3A4B'; else if (score > 800) skyColor = '#4A7C96';
     ctx.fillStyle = skyColor; ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = '#B2EBF2';
+    ctx.fillStyle = isNight ? '#2A5A6B' : '#B2EBF2'; 
     environment.clouds.forEach(c => { c.x -= 0.3; if(c.x + c.w < 0) c.x = canvas.width + 20; ctx.fillRect(c.x, c.y, c.w, 12); ctx.fillRect(c.x + 5, c.y - 4, c.w - 10, 16); });
 
-    ctx.fillStyle = '#80DEEA';
+    ctx.fillStyle = isNight ? '#164356' : '#80DEEA'; 
     environment.icebergs.forEach(b => { b.x -= 0.7; if(b.x + b.w < 0) b.x = canvas.width + Math.random()*50; ctx.beginPath(); ctx.moveTo(b.x, 166); ctx.lineTo(b.x + b.w/2, 166 - b.h); ctx.lineTo(b.x + b.w, 166); ctx.fill(); });
 
-    ctx.fillStyle = '#E0F2F1'; ctx.fillRect(0, 166, canvas.width, 34);
-    ctx.fillStyle = '#B2DFDB'; ctx.fillRect(0, 166, canvas.width, 3);
+    ctx.fillStyle = isNight ? '#2B4A54' : '#E0F2F1'; ctx.fillRect(0, 166, canvas.width, 34);
+    ctx.fillStyle = isNight ? '#395E69' : '#B2DFDB'; ctx.fillRect(0, 166, canvas.width, 3);
 
     penguin.frame++;
     if (penguin.jumping) { penguin.vy += 0.38; penguin.y += penguin.vy; if (penguin.y >= 140) { penguin.y = 140; penguin.jumping = false; penguin.vy = 0; } }
 
     spawnTimer++;
-    let spawnRate = Math.max(55, 100 - Math.floor(score / 40));
+    let spawnRate = Math.max(55, 100 - Math.floor(score / 80));
+    
     if (spawnTimer > spawnRate) {
       let rand = Math.random();
-      if (rand > 0.45) { let w = Math.random() > 0.5 ? 26 : 38; obstacles.push({ type: 'seal', x: canvas.width, y: 140, w: w, h: 20 }); } 
-      else { obstacles.push({ type: 'seagull', x: canvas.width, y: 85 + Math.random()*30, w: 20, h: 10 }); }
+      if (rand > 0.7) obstacles.push({ type: 'seal', x: canvas.width, y: 140, w: Math.random() > 0.5 ? 26 : 38, h: 20 }); 
+      else if (rand > 0.45) obstacles.push({ type: 'seagull', x: canvas.width, y: 85 + Math.random()*30, w: 20, h: 10 }); 
+      else if (rand > 0.2) obstacles.push({ type: 'polarbear', x: canvas.width, y: 130, w: 45, h: 30 }); 
+      else obstacles.push({ type: 'icespike', x: canvas.width, y: 145, w: 15, h: 15 }); 
       spawnTimer = 0;
     }
 
     let gameOver = false;
-    let speed = 3.2 + (score / 350);
+    let speed = 3.2 + (score / 700);
 
     for (let i = obstacles.length - 1; i >= 0; i--) {
       let obs = obstacles[i];
       obs.x -= speed;
 
-      if (obs.type === 'seal') drawSeal(obs.x, obs.y, obs.w, obs.h); 
-      else if (obs.type === 'seagull') drawSeagull(obs.x, obs.y, penguin.frame);
+      if (obs.type === 'seal') drawSeal(obs.x, obs.y, obs.w, obs.h, isNight); 
+      else if (obs.type === 'seagull') drawSeagull(obs.x, obs.y, penguin.frame, isNight);
+      else if (obs.type === 'polarbear') drawPolarBear(obs.x, obs.y, obs.w, obs.h, isNight);
+      else if (obs.type === 'icespike') drawIceSpike(obs.x, obs.y, obs.w, obs.h, isNight);
 
       if (obs.x < penguin.x + penguin.w - 3 && obs.x + obs.w > penguin.x + 3 &&
           obs.y < penguin.y + penguin.h - 2 && obs.y + obs.h > penguin.y + 2) {
         gameOver = true;
       }
 
-      if (obs.x + obs.w < 0) { obstacles.splice(i, 1); score += 100; }
+      if (obs.x + obs.w < 0) { obstacles.splice(i, 1); score += 50; } 
     }
 
-    score += 1;
-    ctx.fillStyle = '#005F73'; ctx.font = 'bold 13px sans-serif'; ctx.fillText(`SCORE: ${Math.floor(score)}`, 15, 25);
+    score += 0.5;
+    ctx.fillStyle = isNight ? '#E0F7FA' : '#005F73'; 
+    ctx.font = 'bold 13px sans-serif'; 
+    ctx.fillText(`SCORE: ${Math.floor(score)}`, 15, 25);
 
     if (gameOver) {
-      drawPenguin(penguin.x, penguin.y, penguin.frame, true);
+      bgm.pause();           // BGM 정지
+      playGameOverSound();   // 게임오버 사운드 재생
+      
+      drawPenguin(penguin.x, penguin.y, penguin.frame, true, isNight);
       ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0,0,canvas.width,canvas.height);
       ctx.fillStyle = '#FFFFFF'; ctx.font = 'bold 20px sans-serif'; ctx.textAlign = 'center';
       ctx.fillText('🎮 GAME OVER', canvas.width/2, 90);
@@ -969,7 +1087,7 @@
       return;
     }
 
-    drawPenguin(penguin.x, penguin.y, penguin.frame, false);
+    drawPenguin(penguin.x, penguin.y, penguin.frame, false, isNight);
     gameAnimationId = requestAnimationFrame(gameLoop);
   }
 
