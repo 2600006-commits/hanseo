@@ -284,7 +284,9 @@
   <div class="toast" id="toast"></div>
 </div>
 <script>
-  // 🔗 앱 설정 및 상태 관리
+  // ==========================================
+  // 🔗 앱 설정 및 상태 관리 (기존 로직 유지)
+  // ==========================================
   const API_URL = "https://script.google.com/macros/s/AKfycbyuSV4SK0M1LwIcjXurfus76RP4a-X09ciRhA4gZKOHE4oGu1ZRxBOM6TfN205dojMwIw/exec";
   
   const state = { 
@@ -335,7 +337,7 @@
     
     if (viewName === 'game') {
       navLeft.style.visibility = 'visible'; navLeft.textContent = '←'; 
-      navTitle.textContent = '쉬는시간 미니게임'; navRight.style.display = 'none';
+      navTitle.textContent = '쉬는시간 오락실'; navRight.style.display = 'none';
       openGameLobby(); 
     } else {
       stopMiniGame(); 
@@ -452,6 +454,7 @@
     } 
   });
   
+  // (중략 - 기존 엑셀, 명단 등록 로직 등 동일)
   document.getElementById('btn-save-list').addEventListener('click', async () => { 
     const type = document.getElementById('setup-type').value; 
     const raw = document.getElementById('excel-input').value; 
@@ -471,42 +474,31 @@
       }); 
       localStorage.setItem(`teachers_list`, JSON.stringify(parsed)); 
     } 
-    await saveToCloud(); 
-    document.getElementById('excel-input').value = ''; 
-    showToast('명단 저장됨'); initHome(); 
+    await saveToCloud(); document.getElementById('excel-input').value = ''; showToast('명단 저장됨'); initHome(); 
   });
   
   document.getElementById('btn-save-template').addEventListener('click', () => { 
-    localStorage.setItem('sms_template', document.getElementById('sms-template').value); 
-    showToast('템플릿 저장됨'); 
+    localStorage.setItem('sms_template', document.getElementById('sms-template').value); showToast('템플릿 저장됨'); 
   }); 
   
   document.getElementById('sms-template').value = localStorage.getItem('sms_template') || '안녕하세요. 오늘 {이름} 학생이 {사유}하여 연락드렸습니다.';
   
   document.getElementById('home-date').addEventListener('change', (e) => { 
-    state.selectedDate = e.target.value; 
-    document.getElementById('attendance-date').value = state.selectedDate; 
-    renderClassGrid(); 
+    state.selectedDate = e.target.value; document.getElementById('attendance-date').value = state.selectedDate; renderClassGrid(); 
   });
   
   function initHome() { 
     switchView('home'); 
     document.querySelectorAll('.segment-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === state.currentTab)); 
     if (state.currentTab === 'emergency') { 
-      document.getElementById('home-class-area').style.display = 'none'; 
-      document.getElementById('home-emergency-area').style.display = 'block'; 
+      document.getElementById('home-class-area').style.display = 'none'; document.getElementById('home-emergency-area').style.display = 'block'; 
     } else { 
-      document.getElementById('home-class-area').style.display = 'block'; 
-      document.getElementById('home-emergency-area').style.display = 'none'; 
-      document.getElementById('grade-total-stats-banner').style.display = 'flex'; 
-      state.currentGrade = parseInt(state.currentTab); 
-      renderClassGrid(); 
+      document.getElementById('home-class-area').style.display = 'block'; document.getElementById('home-emergency-area').style.display = 'none'; 
+      document.getElementById('grade-total-stats-banner').style.display = 'flex'; state.currentGrade = parseInt(state.currentTab); renderClassGrid(); 
     } 
   }
   
-  document.querySelectorAll('.segment-btn').forEach(btn => btn.addEventListener('click', (e) => { 
-    state.currentTab = e.target.dataset.tab; initHome(); 
-  }));
+  document.querySelectorAll('.segment-btn').forEach(btn => btn.addEventListener('click', (e) => { state.currentTab = e.target.dataset.tab; initHome(); }));
   
   function renderClassGrid() { 
     const grid = document.getElementById('class-grid'); 
@@ -535,11 +527,7 @@
   }
   
   const dateInput = document.getElementById('attendance-date'); 
-  dateInput.addEventListener('change', (e) => { 
-    state.selectedDate = e.target.value; 
-    document.getElementById('home-date').value = state.selectedDate; 
-    reloadDayData(); 
-  });
+  dateInput.addEventListener('change', (e) => { state.selectedDate = e.target.value; document.getElementById('home-date').value = state.selectedDate; reloadDayData(); });
   
   async function openAttendance(grade, classNum) { 
     const stds = safeParse(`students_${grade}_${classNum}`, null); 
@@ -550,23 +538,18 @@
   
   function reloadDayData() { 
     state.attendance = safeParse(`attendance_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`, {}); 
-    state.memos = safeParse(`memo_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`, {}); 
-    renderAttendanceGrid(); 
+    state.memos = safeParse(`memo_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`, {}); renderAttendanceGrid(); 
   }
   
   function renderAttendanceGrid() { 
-    const grid = document.getElementById('student-grid'); 
-    if(!grid) return; grid.innerHTML = ''; 
+    const grid = document.getElementById('student-grid'); if(!grid) return; grid.innerHTML = ''; 
     let stats = { t: state.students.length, p:0, a:0, l:0, e:0 }; 
     const cols = parseInt(localStorage.getItem(`seat_cols_${state.currentGrade}_${state.currentClass}`) || 6); 
     const layout = localStorage.getItem(`seat_layout_${state.currentGrade}_${state.currentClass}`) || 'single'; 
     if (layout === 'pair') { 
-      let tracks = []; 
-      for (let i = 1; i <= cols; i++) { tracks.push('1fr'); if (i % 2 === 0 && i < cols) tracks.push('16px'); } 
+      let tracks = []; for (let i = 1; i <= cols; i++) { tracks.push('1fr'); if (i % 2 === 0 && i < cols) tracks.push('16px'); } 
       grid.style.gridTemplateColumns = tracks.join(' '); 
-    } else { 
-      grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`; 
-    } 
+    } else { grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`; } 
     let currentVisualCol = 0; 
     state.students.forEach(student => { 
       const id = student['일련번호']; const status = state.attendance[id] || 0; 
@@ -596,553 +579,584 @@
     document.getElementById('seat-layout-type').value = localStorage.getItem(`seat_layout_${state.currentGrade}_${state.currentClass}`) || 'single'; 
     document.getElementById('overlay').classList.add('show'); document.getElementById('seat-sheet').classList.add('show'); 
   });
-  
   document.getElementById('btn-execute-shuffle').addEventListener('click', () => { 
-    const layout = document.getElementById('seat-layout-type').value; 
-    const cols = document.getElementById('seat-cols').value; 
-    localStorage.setItem(`seat_layout_${state.currentGrade}_${state.currentClass}`, layout); 
-    localStorage.setItem(`seat_cols_${state.currentGrade}_${state.currentClass}`, cols); 
-    state.students.sort(() => Math.random() - 0.5); 
-    localStorage.setItem(`students_${state.currentGrade}_${state.currentClass}`, JSON.stringify(state.students)); 
+    const layout = document.getElementById('seat-layout-type').value; const cols = document.getElementById('seat-cols').value; 
+    localStorage.setItem(`seat_layout_${state.currentGrade}_${state.currentClass}`, layout); localStorage.setItem(`seat_cols_${state.currentGrade}_${state.currentClass}`, cols); 
+    state.students.sort(() => Math.random() - 0.5); localStorage.setItem(`students_${state.currentGrade}_${state.currentClass}`, JSON.stringify(state.students)); 
     renderAttendanceGrid(); saveToCloud(); closeAllPopups(); showToast('새로운 자리로 배치되었습니다.'); 
   });
-  
   document.getElementById('btn-execute-sort').addEventListener('click', () => { 
-    const layout = document.getElementById('seat-layout-type').value; 
-    const cols = document.getElementById('seat-cols').value; 
-    localStorage.setItem(`seat_layout_${state.currentGrade}_${state.currentClass}`, layout); 
-    localStorage.setItem(`seat_cols_${state.currentGrade}_${state.currentClass}`, cols); 
-    state.students.sort((a, b) => parseInt(a['일련번호']) - parseInt(b['일련번호'])); 
-    localStorage.setItem(`students_${state.currentGrade}_${state.currentClass}`, JSON.stringify(state.students)); 
+    const layout = document.getElementById('seat-layout-type').value; const cols = document.getElementById('seat-cols').value; 
+    localStorage.setItem(`seat_layout_${state.currentGrade}_${state.currentClass}`, layout); localStorage.setItem(`seat_cols_${state.currentGrade}_${state.currentClass}`, cols); 
+    state.students.sort((a, b) => parseInt(a['일련번호']) - parseInt(b['일련번호'])); localStorage.setItem(`students_${state.currentGrade}_${state.currentClass}`, JSON.stringify(state.students)); 
     renderAttendanceGrid(); saveToCloud(); closeAllPopups(); showToast('번호순으로 재배치되었습니다.'); 
   });
-  
   document.getElementById('btn-print-seats').addEventListener('click', () => { window.print(); });
-  
   document.getElementById('btn-bulk-sms').addEventListener('click', () => { 
-    let numbers = []; 
-    state.students.forEach(s => { 
-      const st = state.attendance[s['일련번호']] || 0; 
-      if((st === 2 || st === 3 || st === 4) && s['추가전화번호']) numbers.push(s['추가전화번호'].replace(/[^0-9]/g,'')); 
-    }); 
-    if(numbers.length === 0) return alert('결석/지각/조퇴 처리된 학생 중 학부모 연락처가 있는 학생이 없습니다.'); 
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent); 
+    let numbers = []; state.students.forEach(s => { const st = state.attendance[s['일련번호']] || 0; if((st === 2 || st === 3 || st === 4) && s['추가전화번호']) numbers.push(s['추가전화번호'].replace(/[^0-9]/g,'')); }); 
+    if(numbers.length === 0) return alert('연락처가 없습니다.'); const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent); 
     const bodyText = encodeURIComponent(`안녕하세요. ${state.currentGrade}학년 ${state.currentClass}반 담임입니다. 자녀의 출결 관련하여 확인 부탁드립니다.`); 
     window.location.href = `sms:${numbers.join(',')}${isIOS ? '&' : '?'}body=${bodyText}`; 
   });
-  
-  document.getElementById('btn-reset').addEventListener('click', () => { 
-    if(confirm('이 반의 출결 상태를 모두 "평소"로 초기화하시겠습니까?')) { 
-      state.students.forEach(s => state.attendance[s['일련번호']] = 0); 
-      renderAttendanceGrid(); 
-    } 
-  });
-  
-  document.getElementById('btn-save').addEventListener('click', async () => { 
-    localStorage.setItem(`attendance_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`, JSON.stringify(state.attendance)); 
-    localStorage.setItem(`memo_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`, JSON.stringify(state.memos)); 
-    await saveToCloud(); initHome(); 
-  });
+  document.getElementById('btn-reset').addEventListener('click', () => { if(confirm('이 반의 출결 상태를 모두 "평소"로 초기화하시겠습니까?')) { state.students.forEach(s => state.attendance[s['일련번호']] = 0); renderAttendanceGrid(); } });
+  document.getElementById('btn-save').addEventListener('click', async () => { localStorage.setItem(`attendance_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`, JSON.stringify(state.attendance)); localStorage.setItem(`memo_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`, JSON.stringify(state.memos)); await saveToCloud(); initHome(); });
   
   function exportExcel(mode = 'all') { 
     let startD = "0000-00-00", endD = "9999-99-99"; 
-    if (mode === 'period') { 
-      startD = document.getElementById('excel-start-date').value; endD = document.getElementById('excel-end-date').value; 
-      if(!startD || !endD) return alert('시작일과 종료일을 선택하세요.'); 
-    } 
-    let csv = '\uFEFF날짜,시간,학번,이름,출결사항,특이사항\n'; 
-    const nowTime = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' }); 
+    if (mode === 'period') { startD = document.getElementById('excel-start-date').value; endD = document.getElementById('excel-end-date').value; if(!startD || !endD) return alert('시작일과 종료일을 선택하세요.'); } 
+    let csv = '\uFEFF날짜,시간,학번,이름,출결사항,특이사항\n'; const nowTime = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' }); 
     for(let i=0; i<localStorage.length; i++) { 
       const key = localStorage.key(i); 
       if(key.startsWith('attendance_')) { 
         const parts = key.split('_'); const grade = parts[1]; const classNum = parts[2]; const date = parts.slice(3).join('_'); 
         if (mode === 'class' && (grade !== String(state.currentGrade) || classNum !== String(state.currentClass))) continue; 
         if (mode === 'period' && (date < startD || date > endD)) continue; 
-        const stds = safeParse(`students_${grade}_${classNum}`, []); 
-        const att = safeParse(key, {}); const mem = safeParse(`memo_${grade}_${classNum}_${date}`, {}); 
-        stds.forEach(s => { 
-          const st = att[s['일련번호']] || 0; 
-          if (st === 2 || st === 3 || st === 4) { 
-            const mStr = mem[s['일련번호']] ? mem[s['일련번호']].replace(/,/g, ' ') : ''; 
-            csv += `${date},${nowTime},${grade}학년 ${classNum}반 ${s['일련번호']},${s['이름']},${statusMap[st]},${mStr}\n`; 
-          } 
-        }); 
+        const stds = safeParse(`students_${grade}_${classNum}`, []); const att = safeParse(key, {}); const mem = safeParse(`memo_${grade}_${classNum}_${date}`, {}); 
+        stds.forEach(s => { const st = att[s['일련번호']] || 0; if (st === 2 || st === 3 || st === 4) { const mStr = mem[s['일련번호']] ? mem[s['일련번호']].replace(/,/g, ' ') : ''; csv += `${date},${nowTime},${grade}학년 ${classNum}반 ${s['일련번호']},${s['이름']},${statusMap[st]},${mStr}\n`; } }); 
       } 
     } 
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); 
-    const link = document.createElement("a"); link.href = URL.createObjectURL(blob); 
-    link.download = `출결데이터_${new Date().toLocaleDateString('en-CA')}.csv`; link.click(); 
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `출결데이터_${new Date().toLocaleDateString('en-CA')}.csv`; link.click(); 
   }
   
-  document.getElementById('btn-export-excel').addEventListener('click', () => exportExcel('all')); 
-  document.getElementById('btn-export-class-excel').addEventListener('click', () => exportExcel('class')); 
-  document.getElementById('btn-export-period-excel').addEventListener('click', () => exportExcel('period'));
-  document.getElementById('btn-clear-all').addEventListener('click', () => { 
-    if(confirm("정말로 기기의 모든 출결 데이터를 지우시겠습니까?")) { 
-      localStorage.clear(); showToast("초기화 완료"); location.reload(); 
-    } 
-  });
+  document.getElementById('btn-export-excel').addEventListener('click', () => exportExcel('all')); document.getElementById('btn-export-class-excel').addEventListener('click', () => exportExcel('class')); document.getElementById('btn-export-period-excel').addEventListener('click', () => exportExcel('period'));
+  document.getElementById('btn-clear-all').addEventListener('click', () => { if(confirm("정말로 기기의 모든 출결 데이터를 지우시겠습니까?")) { localStorage.clear(); showToast("초기화 완료"); location.reload(); } });
   
   navLeft.addEventListener('click', () => initHome()); 
   navRight.addEventListener('click', () => switchView('setup')); 
   document.getElementById('btn-game-toggle').addEventListener('click', () => switchView('game')); 
   document.getElementById('btn-close-game').addEventListener('click', () => initHome());
-  document.getElementById('btn-quit-game').addEventListener('click', () => { stopMiniGame(); openGameLobby(); });
 
   function showContactPopup(student, status) { 
     state.currentStudentId = student['일련번호']; document.getElementById('sheet-name').textContent = `${student['이름']} 학생`; 
-    const sNum = student['전화번호'] ? student['전화번호'].replace(/[^0-9]/g,'') : ''; 
-    const sBtn = document.getElementById('contact-student'); 
-    if(sNum) { sBtn.href = `tel:${sNum}`; sBtn.style.opacity = 1; document.getElementById('contact-student-num').textContent = sNum; } 
-    else { sBtn.href = '#'; sBtn.style.opacity = 0.5; document.getElementById('contact-student-num').textContent = '없음'; } 
-    const pNum = student['추가전화번호'] ? student['추가전화번호'].replace(/[^0-9]/g,'') : ''; 
-    const pBtn = document.getElementById('contact-parent'); 
-    if(pNum) { pBtn.href = `tel:${pNum}`; pBtn.style.opacity = 1; document.getElementById('contact-parent-num').textContent = pNum; } 
-    else { pBtn.href = '#'; pBtn.style.opacity = 0.5; document.getElementById('contact-parent-num').textContent = '없음'; } 
+    const sNum = student['전화번호'] ? student['전화번호'].replace(/[^0-9]/g,'') : ''; const sBtn = document.getElementById('contact-student'); 
+    if(sNum) { sBtn.href = `tel:${sNum}`; sBtn.style.opacity = 1; document.getElementById('contact-student-num').textContent = sNum; } else { sBtn.href = '#'; sBtn.style.opacity = 0.5; document.getElementById('contact-student-num').textContent = '없음'; } 
+    const pNum = student['추가전화번호'] ? student['추가전화번호'].replace(/[^0-9]/g,'') : ''; const pBtn = document.getElementById('contact-parent'); 
+    if(pNum) { pBtn.href = `tel:${pNum}`; pBtn.style.opacity = 1; document.getElementById('contact-parent-num').textContent = pNum; } else { pBtn.href = '#'; pBtn.style.opacity = 0.5; document.getElementById('contact-parent-num').textContent = '없음'; } 
     const smsBtn = document.getElementById('sms-parent'); 
-    if(pNum) { 
-      let tpl = localStorage.getItem('sms_template') || '안녕하세요. 오늘 {이름} 학생이 {사유}하여 연락드렸습니다.'; 
-      tpl = tpl.replace('{이름}', student['이름']).replace('{사유}', statusMap[status]||'결석'); 
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent); 
-      smsBtn.href = `sms:${pNum}${isIOS ? '&' : '?'}body=${encodeURIComponent(tpl)}`; smsBtn.style.opacity = 1; 
-    } else { smsBtn.href = '#'; smsBtn.style.opacity = 0.5; } 
-    document.getElementById('student-memo-input').value = state.memos[student['일련번호']] || ''; 
-    document.getElementById('overlay').classList.add('show'); document.getElementById('contact-sheet').classList.add('show'); 
+    if(pNum) { let tpl = localStorage.getItem('sms_template') || '안녕하세요. 오늘 {이름} 학생이 {사유}하여 연락드렸습니다.'; tpl = tpl.replace('{이름}', student['이름']).replace('{사유}', statusMap[status]||'결석'); const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent); smsBtn.href = `sms:${pNum}${isIOS ? '&' : '?'}body=${encodeURIComponent(tpl)}`; smsBtn.style.opacity = 1; } else { smsBtn.href = '#'; smsBtn.style.opacity = 0.5; } 
+    document.getElementById('student-memo-input').value = state.memos[student['일련번호']] || ''; document.getElementById('overlay').classList.add('show'); document.getElementById('contact-sheet').classList.add('show'); 
   }
+  document.getElementById('btn-save-memo').addEventListener('click', () => { if(state.currentStudentId) { const val = document.getElementById('student-memo-input').value; if (val) state.memos[state.currentStudentId] = val; else delete state.memos[state.currentStudentId]; renderAttendanceGrid(); closeAllPopups(); } });
   
-  document.getElementById('btn-save-memo').addEventListener('click', () => { 
-    if(state.currentStudentId) { 
-      const val = document.getElementById('student-memo-input').value; 
-      if (val) state.memos[state.currentStudentId] = val; else delete state.memos[state.currentStudentId]; 
-      renderAttendanceGrid(); closeAllPopups(); 
-    } 
-  });
-  
-  function closeAllPopups() { 
-    document.getElementById('overlay').classList.remove('show'); 
-    document.getElementById('contact-sheet').classList.remove('show'); 
-    document.getElementById('seat-sheet').classList.remove('show'); 
-    state.currentStudentId = null; 
-  }
-  
-  document.getElementById('overlay').addEventListener('click', closeAllPopups); 
-  document.getElementById('btn-close-contact-sheet').addEventListener('click', closeAllPopups); 
-  document.getElementById('btn-close-seat-sheet').addEventListener('click', closeAllPopups);
+  function closeAllPopups() { document.getElementById('overlay').classList.remove('show'); document.getElementById('contact-sheet').classList.remove('show'); document.getElementById('seat-sheet').classList.remove('show'); state.currentStudentId = null; }
+  document.getElementById('overlay').addEventListener('click', closeAllPopups); document.getElementById('btn-close-contact-sheet').addEventListener('click', closeAllPopups); document.getElementById('btn-close-seat-sheet').addEventListener('click', closeAllPopups);
 
   // ==========================================
-  // 🔊 오디오(사운드) 시스템 
+  // 🔊 오디오 시스템 & 게임 공통 로직
   // ==========================================
   let audioCtx;
   const bgm = new Audio('https://ia801407.us.archive.org/21/items/cdk-sunday/cdk-sunday.mp3'); 
-  bgm.loop = true;
-  bgm.volume = 0.3;
+  bgm.loop = true; bgm.volume = 0.3;
+  let currentPlayerName = '';
 
   function initAudio() {
-    if (!audioCtx) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      audioCtx = new AudioContext();
-    }
+    if (!audioCtx) { const AudioContext = window.AudioContext || window.webkitAudioContext; audioCtx = new AudioContext(); }
     if (audioCtx.state === 'suspended') audioCtx.resume();
   }
 
   function playJumpSound() {
-    if (!audioCtx) return;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    
-    osc.type = 'square'; 
-    osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.1);
-    
-    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-    
+    if (!audioCtx) return; const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination); osc.type = 'square'; 
+    osc.frequency.setValueAtTime(300, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.05, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
     osc.start(); osc.stop(audioCtx.currentTime + 0.1);
   }
 
   function playGameOverSound() {
-    if (!audioCtx) return;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(250, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.5);
-    
-    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
-    
+    if (!audioCtx) return; const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination); osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(250, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.5);
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
     osc.start(); osc.stop(audioCtx.currentTime + 0.5);
   }
 
-  // ==========================================
-  // 🏆 랭킹 & 미니게임 로직 
-  // ==========================================
-  let currentPlayerName = '';
-
   function getLeaderboard() {
-    let lb = safeParse('penguin_leaderboard', []);
-    const now = Date.now();
-    const weekInMs = 7 * 24 * 60 * 60 * 1000;
-    lb = lb.filter(entry => (now - entry.timestamp) < weekInMs);
+    let lb = safeParse('penguin_leaderboard', []); const weekInMs = 7 * 24 * 60 * 60 * 1000;
+    lb = lb.filter(entry => (Date.now() - entry.timestamp) < weekInMs);
     return lb.sort((a, b) => b.score - a.score).slice(0, 10);
   }
 
-  function saveToLeaderboard(score) {
+  function saveToLeaderboard(score, gameType) {
     let lb = getLeaderboard();
     const dateStr = new Date().toLocaleDateString('en-CA').substring(5);
-    lb.push({
-      name: currentPlayerName || '무명 선생님',
-      score: Math.floor(score),
-      date: dateStr,
-      timestamp: Date.now()
-    });
-    
+    let displayName = (currentPlayerName || '무명 선생님') + (gameType === 'poker' ? ' 🃏' : ' 🐧');
+    lb.push({ name: displayName, score: Math.floor(score), date: dateStr, timestamp: Date.now() });
     lb = lb.sort((a, b) => b.score - a.score).slice(0, 10);
-    localStorage.setItem('penguin_leaderboard', JSON.stringify(lb));
-    saveToCloud(); 
+    localStorage.setItem('penguin_leaderboard', JSON.stringify(lb)); saveToCloud(); 
   }
 
   function renderLeaderboard() {
-    const list = document.getElementById('lb-list');
-    const lb = getLeaderboard();
-    
-    if (lb.length === 0) {
-      list.innerHTML = '<div style="text-align:center; color:#999; padding: 10px;">아직 기록이 없습니다.<br>첫 기록의 주인공이 되어보세요!</div>';
-      return;
-    }
-    
+    const list = document.getElementById('lb-list'); const lb = getLeaderboard();
+    if (lb.length === 0) { list.innerHTML = '<div style="text-align:center; color:#999; padding: 10px;">아직 기록이 없습니다.<br>첫 기록의 주인공이 되어보세요!</div>'; return; }
     list.innerHTML = lb.map((entry, idx) => {
-      let medal = '';
-      if(idx === 0) medal = '🥇'; else if(idx === 1) medal = '🥈'; else if(idx === 2) medal = '🥉'; else medal = `<span style="font-size:11px;color:#888;">${idx+1}.</span>`;
-      
-      return `
-        <div class="lb-row">
-          <div class="lb-rank">${medal}</div>
-          <div class="lb-name">${entry.name}</div>
-          <div class="lb-score">${entry.score}점</div>
-          <div class="lb-date">${entry.date}</div>
-        </div>
-      `;
+      let medal = ''; if(idx === 0) medal = '🥇'; else if(idx === 1) medal = '🥈'; else if(idx === 2) medal = '🥉'; else medal = `<span style="font-size:11px;color:#888;">${idx+1}.</span>`;
+      return `<div class="lb-row"><div class="lb-rank">${medal}</div><div class="lb-name">${entry.name}</div><div class="lb-score">${entry.score}점</div><div class="lb-date">${entry.date}</div></div>`;
     }).join('');
   }
 
-  const canvas = document.getElementById('gameCanvas');
-  const ctx = canvas.getContext('2d');
-  let gameAnimationId = null;
-  let gameRunning = false;
-  let hasKeydownListener = false;
+  // ==========================================
+  // 🎮 듀얼 미니 오락실 로비 UI 주입 
+  // ==========================================
+  function injectGameUI() {
+    if(document.getElementById('poker-play-area')) return; // 이미 생성됨
+    
+    // 포커용 스타일
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .pk-card { width: 45px; height: 68px; border-radius: 6px; background: white; color: black; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; border: 2px solid #ddd; font-weight: bold; font-size: 16px; user-select: none; transition: transform 0.1s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+      .pk-card.selected { transform: translateY(-12px); border-color: #007AFF; box-shadow: 0 5px 10px rgba(0,122,255,0.4); }
+      .pk-suit-spade { color: #1C1C1E; } .pk-suit-heart { color: #FF3B30; }
+      .pk-hand-area { display: flex; gap: 6px; justify-content: center; margin: 20px 0; flex-wrap: wrap; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 10px; min-height: 80px;}
+      .joker-item { width: 70px; height: 90px; border-radius: 6px; background: linear-gradient(135deg, #FFD700, #FFA500); color: #1c1c1e; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; font-size: 10px; padding: 4px; border: 2px solid #FF8C00; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+      .joker-item h4 { margin:0 0 4px 0; font-size:11px; }
+      #poker-play-area { display: none; flex-direction: column; align-items: center; padding: 15px; width: 100%; box-sizing: border-box; color: var(--text-main); }
+    `;
+    document.head.appendChild(style);
 
-  let score = 0;
-  let penguin = { x: 40, y: 140, w: 24, h: 30, vy: 0, jumping: false, frame: 0 };
-  let obstacles = [];
-  let environment = { clouds: [], icebergs: [], groundX: 0 };
-  let spawnTimer = 0;
-  let jumpPressed = false; // 점프 버튼 유지 상태
+    // 로비 개편
+    const lobbyBtnArea = document.getElementById('btn-start-game').parentElement;
+    lobbyBtnArea.innerHTML = `
+      <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:15px; width:100%;">
+          <button id="btn-start-penguin" class="btn-primary" style="padding:15px; font-size:16px; flex:1; min-width:140px;">🐧 빙하 탈리기</button>
+          <button id="btn-start-poker" class="btn-primary" style="padding:15px; font-size:16px; flex:1; min-width:140px; background-color:#FF9500;">🃏 스쿨라트로</button>
+      </div>
+    `;
+
+    let adminBtn = document.createElement('button');
+    adminBtn.id = 'btn-admin-reset'; adminBtn.innerHTML = '👑 랭킹 초기화';
+    adminBtn.style.cssText = 'margin-top: 15px; background: #FF3B30; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; width: 100%; max-width: 300px; display: block; margin-left: auto; margin-right: auto;';
+    adminBtn.addEventListener('click', () => {
+      if (prompt('관리자 비밀번호를 입력하세요:') === '1234') { localStorage.removeItem('penguin_leaderboard'); saveToCloud(); renderLeaderboard(); alert('🏆 초기화 완료!'); }
+    });
+    document.querySelector('#game-lobby .lobby-content').appendChild(adminBtn);
+
+    // 포커 게임 영역 추가
+    const pokerArea = document.createElement('div');
+    pokerArea.id = 'poker-play-area';
+    pokerArea.innerHTML = `
+      <div style="width:100%; max-width:500px; display:flex; justify-content:space-between; margin-bottom:10px; background:var(--bg-sub); padding:12px; border-radius:10px;">
+          <div>라운드: <span id="pk-round" style="font-weight:bold; font-size:18px;">1</span><br>목표: <strong id="pk-target" class="text-danger" style="font-size:16px;">300</strong></div>
+          <div style="text-align:right;">현재 점수: <strong id="pk-score" class="text-primary" style="font-size:18px;">0</strong><br>남은 손: <span id="pk-plays">4</span> | 버리기: <span id="pk-discards">3</span></div>
+      </div>
+      <div id="pk-jokers" style="display:flex; gap:8px; min-height:95px; margin-bottom:10px; justify-content:center; flex-wrap:wrap; width:100%;"></div>
+      <div id="pk-eval-name" style="font-size:22px; font-weight:bold; color:var(--primary); height:30px; margin-bottom:5px;">카드를 선택하세요</div>
+      <div id="pk-eval-calc" style="font-size:18px; font-weight:bold; margin-bottom:10px; color:#FF9500; height:25px;"></div>
+      
+      <div id="pk-hand" class="pk-hand-area"></div>
+      
+      <div style="display:flex; gap:15px; margin-top:10px;">
+          <button id="btn-pk-play" class="btn-primary" style="padding:15px 30px; font-size:18px; border-radius:25px; box-shadow:0 4px 6px rgba(0,0,0,0.1);">제출하기</button>
+          <button id="btn-pk-discard" class="btn-secondary" style="padding:15px 20px; font-size:16px; border-radius:25px; background-color:#FF3B30; color:white;">버리기</button>
+      </div>
+      <button id="btn-pk-quit" class="btn-secondary" style="margin-top:20px; font-size:14px; background:transparent; color:var(--text-sub); border:none;">로비로 돌아가기</button>
+    `;
+    views.game.appendChild(pokerArea);
+
+    // 상점 모달 (포커용)
+    const shopModal = document.createElement('div');
+    shopModal.id = 'pk-shop';
+    shopModal.style.cssText = 'display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:999; flex-direction:column; justify-content:center; align-items:center; padding:20px; color:white; text-align:center; box-sizing:border-box;';
+    shopModal.innerHTML = `
+      <h2 style="margin-bottom:10px; color:#FFD700; font-size:28px;">라운드 클리어! 🎉</h2>
+      <p style="margin-bottom:30px; font-size:16px;">보상으로 학교 조커를 하나 영입하세요.</p>
+      <div id="pk-shop-options" style="display:flex; gap:15px; flex-wrap:wrap; justify-content:center; margin-bottom:30px;"></div>
+      <button id="btn-pk-next" class="btn-primary" style="padding:12px 25px; font-size:16px; border-radius:20px;">건너뛰고 다음 라운드</button>
+    `;
+    views.game.appendChild(shopModal);
+
+    // 이벤트 리스너 바인딩
+    document.getElementById('btn-start-penguin').addEventListener('click', () => tryStartGame('penguin'));
+    document.getElementById('btn-start-poker').addEventListener('click', () => tryStartGame('poker'));
+    document.getElementById('btn-pk-quit').addEventListener('click', stopMiniGame);
+    
+    document.getElementById('btn-pk-play').addEventListener('click', pokerPlayHand);
+    document.getElementById('btn-pk-discard').addEventListener('click', pokerDiscard);
+    document.getElementById('btn-pk-next').addEventListener('click', pokerNextRound);
+  }
 
   function openGameLobby() {
+    injectGameUI();
     document.getElementById('game-lobby').style.display = 'flex';
     document.getElementById('game-play-area').style.display = 'none';
+    document.getElementById('poker-play-area').style.display = 'none';
     
     const savedName = localStorage.getItem('penguin_player_name');
     if(savedName) document.getElementById('player-name-input').value = savedName;
-    
-    // 모바일 터치 영역 확장을 위한 스타일링 (캔버스 리사이즈)
-    canvas.style.width = '100%';
-    canvas.style.maxWidth = '600px';
-    canvas.style.height = 'auto';
-    canvas.style.minHeight = '30vh'; 
-    canvas.style.objectFit = 'contain';
-    document.getElementById('game-play-area').style.touchAction = 'none'; // 스크롤 방지
-    
-    let adminBtn = document.getElementById('btn-admin-reset');
-    if (!adminBtn) {
-      adminBtn = document.createElement('button');
-      adminBtn.id = 'btn-admin-reset';
-      adminBtn.innerHTML = '👑 관리자 (랭킹 초기화)';
-      adminBtn.style.cssText = 'margin-top: 15px; background: #FF3B30; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; width: 100%; max-width: 300px; display: block; margin-left: auto; margin-right: auto;';
-      
-      adminBtn.addEventListener('click', () => {
-        const pwd = prompt('관리자 비밀번호를 입력하세요 (4자리):');
-        if (pwd === '1234') {
-          localStorage.removeItem('penguin_leaderboard');
-          saveToCloud();
-          renderLeaderboard();
-          alert('🏆 랭킹이 성공적으로 초기화되었습니다!');
-        } else if (pwd !== null) {
-          alert('❌ 비밀번호가 일치하지 않습니다.');
-        }
-      });
-      
-      const lobbyContainer = document.querySelector('#game-lobby .lobby-content') || document.getElementById('game-lobby');
-      lobbyContainer.appendChild(adminBtn);
-    }
     renderLeaderboard();
   }
 
-  document.getElementById('btn-start-game').addEventListener('click', () => {
+  function tryStartGame(type) {
     const nameInput = document.getElementById('player-name-input').value.trim();
-    if (!nameInput) {
-      alert("선생님의 닉네임을 입력해 주세요!");
-      document.getElementById('player-name-input').focus();
-      return;
-    }
-    currentPlayerName = nameInput;
-    localStorage.setItem('penguin_player_name', currentPlayerName);
+    if (!nameInput) { alert("선생님의 닉네임을 입력해 주세요!"); document.getElementById('player-name-input').focus(); return; }
+    currentPlayerName = nameInput; localStorage.setItem('penguin_player_name', currentPlayerName);
     
     document.getElementById('game-lobby').style.display = 'none';
-    document.getElementById('game-play-area').style.display = 'flex';
+    initAudio(); bgm.currentTime = 0; bgm.play().catch(e => console.log("BGM 실패", e));
     
-    initAudio();
-    bgm.currentTime = 0;
-    bgm.play().catch(e => console.log("BGM 재생 실패", e));
-    
-    startMiniGame();
-  });
-
-  function initGameObjects() {
-    score = 0;
-    penguin.y = 140; penguin.vy = 0; penguin.jumping = false; penguin.frame = 0;
-    obstacles = [];
-    environment.clouds = [{x: 100, y: 30, w: 40}, {x: 280, y: 50, w: 50}];
-    environment.icebergs = [{x: 60, w: 40, h: 30}, {x: 230, w: 60, h: 45}];
-    environment.groundX = 0;
-    spawnTimer = 0;
-    jumpPressed = false;
-  }
-
-  function startMiniGame() {
-    if (gameRunning) return;
-    if (!hasKeydownListener) {
-      window.addEventListener('keydown', handleKeyDown);
-      window.addEventListener('keyup', handleKeyUp);
-      hasKeydownListener = true;
+    if(type === 'penguin') {
+      document.getElementById('game-play-area').style.display = 'flex';
+      startPenguinGame();
+    } else {
+      document.getElementById('poker-play-area').style.display = 'flex';
+      startPokerGame();
     }
-    gameRunning = true;
-    initGameObjects();
-    gameLoop();
   }
 
   function stopMiniGame() {
-    gameRunning = false;
-    bgm.pause(); 
-    if (gameAnimationId) {
-      cancelAnimationFrame(gameAnimationId);
-      gameAnimationId = null;
-    }
+    gameRunning = false; bgm.pause(); 
+    if (gameAnimationId) { cancelAnimationFrame(gameAnimationId); gameAnimationId = null; }
+    if(document.getElementById('pk-shop')) document.getElementById('pk-shop').style.display = 'none';
+    openGameLobby();
   }
 
-  // ==== 롱 점프/숏 점프 컨트롤 ====
+  // ==========================================
+  // 🐧 빙하 달리기 (펭귄 게임) 로직
+  // ==========================================
+  const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d');
+  let gameAnimationId = null; let gameRunning = false; let hasKeydownListener = false;
+  let score = 0; let penguin = { x: 40, y: 140, w: 24, h: 30, vy: 0, jumping: false, frame: 0 };
+  let obstacles = []; let environment = { clouds: [], icebergs: [], groundX: 0 };
+  let spawnTimer = 0; let jumpPressed = false;
+
+  function initPenguinObjects() {
+    score = 0; penguin.y = 140; penguin.vy = 0; penguin.jumping = false; penguin.frame = 0;
+    obstacles = []; environment.clouds = [{x: 100, y: 30, w: 40}, {x: 280, y: 50, w: 50}]; environment.icebergs = [{x: 60, w: 40, h: 30}, {x: 230, w: 60, h: 45}];
+    environment.groundX = 0; spawnTimer = 0; jumpPressed = false;
+    canvas.style.width = '100%'; canvas.style.maxWidth = '600px'; canvas.style.height = 'auto'; canvas.style.minHeight = '30vh'; 
+    document.getElementById('game-play-area').style.touchAction = 'none';
+  }
+
+  function startPenguinGame() {
+    if (gameRunning) return;
+    if (!hasKeydownListener) { window.addEventListener('keydown', handleKeyDown); window.addEventListener('keyup', handleKeyUp); hasKeydownListener = true; }
+    gameRunning = true; initPenguinObjects(); gameLoop();
+  }
+
   function handleJumpStart(e) {
     if (e && e.cancelable) e.preventDefault(); 
-    if (!gameRunning) return;
-    jumpPressed = true;
-    if (!penguin.jumping) {
-      penguin.vy = -6.2; // 초기 점프력 
-      penguin.jumping = true;
-      playJumpSound(); 
-    }
+    if (!gameRunning || document.getElementById('game-play-area').style.display === 'none') return;
+    jumpPressed = true; if (!penguin.jumping) { penguin.vy = -6.2; penguin.jumping = true; playJumpSound(); }
   }
-  
-  function handleJumpEnd(e) {
-    jumpPressed = false;
-  }
+  function handleJumpEnd(e) { jumpPressed = false; }
+  function handleKeyDown(e) { if (e.code === 'Space' && views.game.classList.contains('active')) { e.preventDefault(); handleJumpStart(); } }
+  function handleKeyUp(e) { if (e.code === 'Space') handleJumpEnd(); }
 
-  function handleKeyDown(e) {
-    if (e.code === 'Space' && views.game.classList.contains('active') && document.getElementById('game-play-area').style.display === 'flex') {
-      e.preventDefault(); handleJumpStart();
-    }
-  }
-  
-  function handleKeyUp(e) {
-    if (e.code === 'Space') handleJumpEnd();
-  }
-
-  // 화면 전체(게임 영역)를 터치/클릭해도 작동하도록 넓게 이벤트 부착
   const gamePlayArea = document.getElementById('game-play-area');
-  gamePlayArea.addEventListener('touchstart', handleJumpStart, { passive: false });
-  gamePlayArea.addEventListener('touchend', handleJumpEnd);
-  gamePlayArea.addEventListener('mousedown', handleJumpStart);
-  gamePlayArea.addEventListener('mouseup', handleJumpEnd);
-  gamePlayArea.addEventListener('mouseleave', handleJumpEnd);
+  gamePlayArea.addEventListener('touchstart', handleJumpStart, { passive: false }); gamePlayArea.addEventListener('touchend', handleJumpEnd);
+  gamePlayArea.addEventListener('mousedown', handleJumpStart); gamePlayArea.addEventListener('mouseup', handleJumpEnd); gamePlayArea.addEventListener('mouseleave', handleJumpEnd);
 
-  // ==== 장애물 그리기 로직 (테두리 추가로 시인성 향상) ====
   function drawPenguin(x, y, frame, isDead, isNight) {
-    ctx.fillStyle = isNight ? '#E5E5EA' : '#1C1C1E'; 
-    ctx.fillRect(x + 4, y, 16, 26);
-    ctx.fillStyle = isNight ? '#1C1C1E' : '#FFFFFF'; 
-    ctx.fillRect(x + 8, y + 8, 10, 16);
+    ctx.fillStyle = isNight ? '#E5E5EA' : '#1C1C1E'; ctx.fillRect(x + 4, y, 16, 26);
+    ctx.fillStyle = isNight ? '#1C1C1E' : '#FFFFFF'; ctx.fillRect(x + 8, y + 8, 10, 16);
     ctx.fillStyle = '#FF9500'; ctx.fillRect(x + 18, y + 6, 4, 3);
-    
-    if (isDead) {
-      ctx.strokeStyle = '#FF3B30'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x+12, y+4); ctx.lineTo(x+16, y+8); ctx.moveTo(x+16, y+4); ctx.lineTo(x+12, y+8); ctx.stroke();
-    } else {
-      ctx.fillStyle = isNight ? '#FFFFFF' : '#000000'; ctx.fillRect(x + 14, y + 4, 2, 3);
-    }
-    if (!penguin.jumping && !isDead) { 
-      ctx.fillStyle = '#FF9500'; if (frame % 20 < 10) { ctx.fillRect(x + 5, y + 26, 4, 3); } else { ctx.fillRect(x + 14, y + 26, 4, 3); }
-    } else {
-      ctx.fillStyle = '#FF9500'; ctx.fillRect(x + 5, y + 26, 4, 3); ctx.fillRect(x + 14, y + 26, 4, 3);
-    }
+    if (isDead) { ctx.strokeStyle = '#FF3B30'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x+12, y+4); ctx.lineTo(x+16, y+8); ctx.moveTo(x+16, y+4); ctx.lineTo(x+12, y+8); ctx.stroke(); } 
+    else { ctx.fillStyle = isNight ? '#FFFFFF' : '#000000'; ctx.fillRect(x + 14, y + 4, 2, 3); }
+    if (!penguin.jumping && !isDead) { ctx.fillStyle = '#FF9500'; if (frame % 20 < 10) { ctx.fillRect(x + 5, y + 26, 4, 3); } else { ctx.fillRect(x + 14, y + 26, 4, 3); } } 
+    else { ctx.fillStyle = '#FF9500'; ctx.fillRect(x + 5, y + 26, 4, 3); ctx.fillRect(x + 14, y + 26, 4, 3); }
   }
-
-  function drawSeal(x, y, w, h, isNight) { 
-    ctx.fillStyle = isNight ? '#D1D1D6' : '#8E8E93'; 
-    ctx.strokeStyle = '#1C1C1E'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.rect(x, y + h - 14, w, 14); ctx.fill(); ctx.stroke();
-    ctx.fillRect(x + w - 6, y + h - 20, 8, 10); 
-    ctx.fillStyle = isNight ? '#FFFFFF' : '#3A3A3C'; 
-    ctx.fillRect(x + w - 3, y + h - 18, 2, 2); 
-    ctx.fillStyle = isNight ? '#AEAEB2' : '#555555'; 
-    ctx.fillRect(x + 2, y + h - 4, 6, 4); 
-  }
-
-  function drawSeagull(x, y, frame, isNight) {
-    ctx.strokeStyle = isNight ? '#F2F2F7' : '#3A3A3C'; 
-    ctx.lineWidth = 2.5; ctx.beginPath();
-    if (frame % 30 < 15) { ctx.moveTo(x, y); ctx.lineTo(x + 10, y + 6); ctx.lineTo(x + 20, y); } else { ctx.moveTo(x, y + 6); ctx.lineTo(x + 10, y); ctx.lineTo(x + 20, y + 6); }
-    ctx.stroke(); ctx.fillStyle = '#FFCC00'; ctx.fillRect(x + 8, y + 2, 3, 2);
-  }
-
-  function drawPolarBear(x, y, w, h, isNight) {
-    ctx.fillStyle = isNight ? '#D1D1D6' : '#FFFFFF'; 
-    ctx.strokeStyle = '#1C1C1E'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.rect(x, y+10, w, h-10); ctx.fill(); ctx.stroke();
-    ctx.fillRect(x+w-12, y, 12, 12); 
-    ctx.fillStyle = isNight ? '#FF3B30' : '#1C1C1E'; 
-    ctx.fillRect(x+w-4, y+3, 2, 2); 
-  }
-
-  function drawIceSpike(x, y, w, h, isNight, count = 1) {
-    ctx.fillStyle = isNight ? '#00FFFF' : '#00BFFF'; 
-    ctx.strokeStyle = isNight ? '#008888' : '#0055AA';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    let spikeW = w / count;
-    for(let i=0; i<count; i++) {
-        let sx = x + (spikeW * i);
-        ctx.moveTo(sx, y+h);
-        ctx.lineTo(sx + spikeW/2, y);
-        ctx.lineTo(sx + spikeW, y+h);
-    }
-    ctx.fill(); ctx.stroke();
-  }
+  function drawSeal(x, y, w, h, isNight) { ctx.fillStyle = isNight ? '#D1D1D6' : '#8E8E93'; ctx.strokeStyle = '#1C1C1E'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.rect(x, y + h - 14, w, 14); ctx.fill(); ctx.stroke(); ctx.fillRect(x + w - 6, y + h - 20, 8, 10); ctx.fillStyle = isNight ? '#FFFFFF' : '#3A3A3C'; ctx.fillRect(x + w - 3, y + h - 18, 2, 2); ctx.fillStyle = isNight ? '#AEAEB2' : '#555555'; ctx.fillRect(x + 2, y + h - 4, 6, 4); }
+  function drawSeagull(x, y, frame, isNight) { ctx.strokeStyle = isNight ? '#F2F2F7' : '#3A3A3C'; ctx.lineWidth = 2.5; ctx.beginPath(); if (frame % 30 < 15) { ctx.moveTo(x, y); ctx.lineTo(x + 10, y + 6); ctx.lineTo(x + 20, y); } else { ctx.moveTo(x, y + 6); ctx.lineTo(x + 10, y); ctx.lineTo(x + 20, y + 6); } ctx.stroke(); ctx.fillStyle = '#FFCC00'; ctx.fillRect(x + 8, y + 2, 3, 2); }
+  function drawPolarBear(x, y, w, h, isNight) { ctx.fillStyle = isNight ? '#D1D1D6' : '#FFFFFF'; ctx.strokeStyle = '#1C1C1E'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.rect(x, y+10, w, h-10); ctx.fill(); ctx.stroke(); ctx.fillRect(x+w-12, y, 12, 12); ctx.fillStyle = isNight ? '#FF3B30' : '#1C1C1E'; ctx.fillRect(x+w-4, y+3, 2, 2); }
+  function drawIceSpike(x, y, w, h, isNight, count = 1) { ctx.fillStyle = isNight ? '#00FFFF' : '#00BFFF'; ctx.strokeStyle = isNight ? '#008888' : '#0055AA'; ctx.lineWidth = 1.5; ctx.beginPath(); let spikeW = w / count; for(let i=0; i<count; i++) { let sx = x + (spikeW * i); ctx.moveTo(sx, y+h); ctx.lineTo(sx + spikeW/2, y); ctx.lineTo(sx + spikeW, y+h); } ctx.fill(); ctx.stroke(); }
 
   function gameLoop() {
-    if (!gameRunning) return;
-
-    // 1. 낮/밤 사이클 로직 (일정 점수마다 계속 순환)
-    let cycle = Math.floor(score / 800); 
-    let isNight = cycle % 2 === 1;
-    
-    let skyColor = '#E0F7FA'; // 낮
-    if (isNight) skyColor = '#1A3A4B'; // 밤
-    else if (score % 800 > 600) skyColor = '#4A7C96'; // 밤이 오기 전 노을
-    
+    if (!gameRunning || document.getElementById('game-play-area').style.display === 'none') return;
+    let cycle = Math.floor(score / 800); let isNight = cycle % 2 === 1;
+    let skyColor = '#E0F7FA'; if (isNight) skyColor = '#1A3A4B'; else if (score % 800 > 600) skyColor = '#4A7C96'; 
     ctx.fillStyle = skyColor; ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = isNight ? '#2A5A6B' : '#B2EBF2'; 
-    environment.clouds.forEach(c => { c.x -= 0.3; if(c.x + c.w < 0) c.x = canvas.width + 20; ctx.fillRect(c.x, c.y, c.w, 12); ctx.fillRect(c.x + 5, c.y - 4, c.w - 10, 16); });
-
-    ctx.fillStyle = isNight ? '#164356' : '#80DEEA'; 
-    environment.icebergs.forEach(b => { b.x -= 0.7; if(b.x + b.w < 0) b.x = canvas.width + Math.random()*50; ctx.beginPath(); ctx.moveTo(b.x, 166); ctx.lineTo(b.x + b.w/2, 166 - b.h); ctx.lineTo(b.x + b.w, 166); ctx.fill(); });
-
-    ctx.fillStyle = isNight ? '#2B4A54' : '#E0F2F1'; ctx.fillRect(0, 166, canvas.width, 34);
-    ctx.fillStyle = isNight ? '#395E69' : '#B2DFDB'; ctx.fillRect(0, 166, canvas.width, 3);
-
+    ctx.fillStyle = isNight ? '#2A5A6B' : '#B2EBF2'; environment.clouds.forEach(c => { c.x -= 0.3; if(c.x + c.w < 0) c.x = canvas.width + 20; ctx.fillRect(c.x, c.y, c.w, 12); ctx.fillRect(c.x + 5, c.y - 4, c.w - 10, 16); });
+    ctx.fillStyle = isNight ? '#164356' : '#80DEEA'; environment.icebergs.forEach(b => { b.x -= 0.7; if(b.x + b.w < 0) b.x = canvas.width + Math.random()*50; ctx.beginPath(); ctx.moveTo(b.x, 166); ctx.lineTo(b.x + b.w/2, 166 - b.h); ctx.lineTo(b.x + b.w, 166); ctx.fill(); });
+    ctx.fillStyle = isNight ? '#2B4A54' : '#E0F2F1'; ctx.fillRect(0, 166, canvas.width, 34); ctx.fillStyle = isNight ? '#395E69' : '#B2DFDB'; ctx.fillRect(0, 166, canvas.width, 3);
     penguin.frame++;
     
-    // 점프 중 중력 조절 (누르고 있으면 중력 약함 = 롱 점프)
-    if (penguin.jumping) { 
-      let gravity = (jumpPressed && penguin.vy < 0) ? 0.25 : 0.6; 
-      penguin.vy += gravity; 
-      penguin.y += penguin.vy; 
-      if (penguin.y >= 140) { penguin.y = 140; penguin.jumping = false; penguin.vy = 0; } 
-    }
-
-    spawnTimer++;
-    let spawnRate = Math.max(50, 90 - Math.floor(score / 80));
+    if (penguin.jumping) { let gravity = (jumpPressed && penguin.vy < 0) ? 0.25 : 0.6; penguin.vy += gravity; penguin.y += penguin.vy; if (penguin.y >= 140) { penguin.y = 140; penguin.jumping = false; penguin.vy = 0; } }
+    spawnTimer++; let spawnRate = Math.max(50, 90 - Math.floor(score / 80));
     
     if (spawnTimer > spawnRate) {
       let rand = Math.random();
-      if (rand > 0.7) {
-        obstacles.push({ type: 'seal', x: canvas.width, y: 140, w: Math.random() > 0.5 ? 26 : 38, h: 20 }); 
-      } else if (rand > 0.45) {
-        // 갈매기는 하늘 또는 지상 양쪽에서 랜덤하게 등장
-        let isGround = Math.random() > 0.5;
-        let gy = isGround ? 135 : (85 + Math.random()*25);
-        obstacles.push({ type: 'seagull', x: canvas.width, y: gy, w: 20, h: 10 }); 
-      } else if (rand > 0.25) {
-        obstacles.push({ type: 'polarbear', x: canvas.width, y: 130, w: 45, h: 30 }); 
-      } else {
-        // 얼음 송곳은 1~3개가 나란히 붙어서 등장
-        let spikeCount = Math.floor(Math.random() * 3) + 1;
-        obstacles.push({ type: 'icespike', x: canvas.width, y: 145, w: 15 * spikeCount, h: 15, count: spikeCount }); 
-      }
+      if (rand > 0.7) { obstacles.push({ type: 'seal', x: canvas.width, y: 140, w: Math.random() > 0.5 ? 26 : 38, h: 20 }); } 
+      else if (rand > 0.45) { let gy = Math.random() > 0.5 ? 135 : (85 + Math.random()*25); obstacles.push({ type: 'seagull', x: canvas.width, y: gy, w: 20, h: 10 }); } 
+      else if (rand > 0.25) { obstacles.push({ type: 'polarbear', x: canvas.width, y: 130, w: 45, h: 30 }); } 
+      else { let spikeCount = Math.floor(Math.random() * 3) + 1; obstacles.push({ type: 'icespike', x: canvas.width, y: 145, w: 15 * spikeCount, h: 15, count: spikeCount }); }
       spawnTimer = 0;
     }
 
-    let gameOver = false;
-    let speed = 3.2 + (score / 700);
-
+    let gameOver = false; let speed = 3.2 + (score / 700);
     for (let i = obstacles.length - 1; i >= 0; i--) {
-      let obs = obstacles[i];
-      obs.x -= speed;
-
-      if (obs.type === 'seal') drawSeal(obs.x, obs.y, obs.w, obs.h, isNight); 
-      else if (obs.type === 'seagull') drawSeagull(obs.x, obs.y, penguin.frame, isNight);
-      else if (obs.type === 'polarbear') drawPolarBear(obs.x, obs.y, obs.w, obs.h, isNight);
-      else if (obs.type === 'icespike') drawIceSpike(obs.x, obs.y, obs.w, obs.h, isNight, obs.count);
-
-      // 충돌 판정 (살짝 여유를 줌)
-      if (obs.x < penguin.x + penguin.w - 4 && obs.x + obs.w > penguin.x + 4 &&
-          obs.y < penguin.y + penguin.h - 3 && obs.y + obs.h > penguin.y + 3) {
-        gameOver = true;
-      }
-
+      let obs = obstacles[i]; obs.x -= speed;
+      if (obs.type === 'seal') drawSeal(obs.x, obs.y, obs.w, obs.h, isNight); else if (obs.type === 'seagull') drawSeagull(obs.x, obs.y, penguin.frame, isNight); else if (obs.type === 'polarbear') drawPolarBear(obs.x, obs.y, obs.w, obs.h, isNight); else if (obs.type === 'icespike') drawIceSpike(obs.x, obs.y, obs.w, obs.h, isNight, obs.count);
+      if (obs.x < penguin.x + penguin.w - 4 && obs.x + obs.w > penguin.x + 4 && obs.y < penguin.y + penguin.h - 3 && obs.y + obs.h > penguin.y + 3) gameOver = true;
       if (obs.x + obs.w < 0) { obstacles.splice(i, 1); score += 50; } 
     }
 
-    score += 0.5;
-    ctx.fillStyle = isNight ? '#E0F7FA' : '#005F73'; 
-    ctx.font = 'bold 13px sans-serif'; 
-    ctx.fillText(`SCORE: ${Math.floor(score)}`, 15, 25);
+    score += 0.5; ctx.fillStyle = isNight ? '#E0F7FA' : '#005F73'; ctx.font = 'bold 13px sans-serif'; ctx.fillText(`SCORE: ${Math.floor(score)}`, 15, 25);
 
     if (gameOver) {
-      bgm.pause();           
-      playGameOverSound();   
-      
-      drawPenguin(penguin.x, penguin.y, penguin.frame, true, isNight);
+      bgm.pause(); playGameOverSound(); drawPenguin(penguin.x, penguin.y, penguin.frame, true, isNight);
       ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0,0,canvas.width,canvas.height);
-      ctx.fillStyle = '#FFFFFF'; ctx.font = 'bold 20px sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText('🎮 GAME OVER', canvas.width/2, 90);
+      ctx.fillStyle = '#FFFFFF'; ctx.font = 'bold 20px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('🎮 GAME OVER', canvas.width/2, 90);
       ctx.font = '13px sans-serif'; ctx.fillText(`최종 스코어: ${Math.floor(score)}점`, canvas.width/2, 115);
-      
-      saveToLeaderboard(score);
-      ctx.fillStyle = '#FFCC00'; ctx.fillText('화면 터치 시 로비로 돌아갑니다', canvas.width/2, 145);
-      ctx.textAlign = 'left';
-      
+      saveToLeaderboard(score, 'penguin'); ctx.fillStyle = '#FFCC00'; ctx.fillText('화면 터치 시 로비로 돌아갑니다', canvas.width/2, 145); ctx.textAlign = 'left';
       stopMiniGame();
-      
-      const goToLobby = () => {
-        gamePlayArea.removeEventListener('touchstart', goToLobby);
-        gamePlayArea.removeEventListener('mousedown', goToLobby);
-        openGameLobby();
-      };
-      setTimeout(() => {
-        gamePlayArea.addEventListener('touchstart', goToLobby);
-        gamePlayArea.addEventListener('mousedown', goToLobby);
-      }, 700);
+      const goToLobby = () => { gamePlayArea.removeEventListener('touchstart', goToLobby); gamePlayArea.removeEventListener('mousedown', goToLobby); openGameLobby(); };
+      setTimeout(() => { gamePlayArea.addEventListener('touchstart', goToLobby); gamePlayArea.addEventListener('mousedown', goToLobby); }, 700);
       return;
     }
-
-    drawPenguin(penguin.x, penguin.y, penguin.frame, false, isNight);
-    gameAnimationId = requestAnimationFrame(gameLoop);
+    drawPenguin(penguin.x, penguin.y, penguin.frame, false, isNight); gameAnimationId = requestAnimationFrame(gameLoop);
   }
 
-  // 앱 초기화 로직
+
+  // ==========================================
+  // 🃏 스쿨라트로 (하프덱 포커 스코어 어택) 로직
+  // ==========================================
+  let pkDeck = []; let pkHand = []; let pkSelected = []; let pkJokers = [];
+  let pkState = { round: 1, target: 300, score: 0, plays: 4, discards: 3, totalScore: 0 };
+  
+  const JOKER_POOL = [
+    { id: 'principal', name: '교장 선생님', desc: '배수(Mult) +20', rarity: 'rare' },
+    { id: 'math', name: '수학 선생님', desc: '칩(Chips) +50', rarity: 'common' },
+    { id: 'pe', name: '체육부장', desc: '♠ 스페이드 카드당 칩 +15', rarity: 'uncommon' },
+    { id: 'nurse', name: '보건 선생님', desc: '♥ 하트 카드당 배수 +4', rarity: 'uncommon' },
+    { id: 'nerd', name: '전교 1등', desc: '페어, 투페어 시 배수 +10', rarity: 'common' }
+  ];
+
+  function getBaseHand(cards) {
+    if(cards.length === 0) return { name: '하이 카드', chips: 5, mult: 1 };
+    
+    let ranks = cards.map(c => c.rank).sort((a,b)=>a-b);
+    let suits = cards.map(c => c.suit);
+    
+    let isFlush = suits.every(s => s === suits[0]) && cards.length >= 5;
+    let isStraight = false;
+    
+    if(cards.length >= 5) {
+      let uniqueRanks = [...new Set(ranks)];
+      if (uniqueRanks.length === 5 && uniqueRanks[4] - uniqueRanks[0] === 4) isStraight = true;
+      // 백스트레이트 (A-2-3-4-5) 예외처리
+      if (uniqueRanks.join(',') === '2,3,4,5,14') isStraight = true; 
+    }
+
+    let counts = {}; ranks.forEach(r => counts[r] = (counts[r]||0)+1);
+    let vals = Object.values(counts).sort((a,b)=>b-a);
+
+    if (isFlush && isStraight) return { name: '스트레이트 플러시!', chips: 100, mult: 8 };
+    if (vals[0] === 4) return { name: '포카드!', chips: 60, mult: 7 };
+    if (vals[0] === 3 && vals[1] === 2) return { name: '풀하우스!', chips: 40, mult: 4 };
+    if (isFlush) return { name: '플러시', chips: 35, mult: 4 };
+    if (isStraight) return { name: '스트레이트', chips: 30, mult: 4 };
+    if (vals[0] === 3) return { name: '트리플', chips: 30, mult: 3 };
+    if (vals[0] === 2 && vals[1] === 2) return { name: '투 페어', chips: 20, mult: 2 };
+    if (vals[0] === 2) return { name: '원 페어', chips: 10, mult: 2 };
+    
+    return { name: '하이 카드', chips: 5, mult: 1 };
+  }
+
+  function startPokerGame() {
+    pkState = { round: 1, target: 400, score: 0, plays: 4, discards: 3, totalScore: 0 };
+    pkJokers = []; pkSelected = [];
+    initPokerRound();
+  }
+
+  function createHalfDeck() {
+    let d = [];
+    for(let r = 2; r <= 14; r++) { d.push({suit: '♠', rank: r, view: getRankView(r)}); d.push({suit: '♥', rank: r, view: getRankView(r)}); }
+    return d.sort(() => Math.random() - 0.5);
+  }
+
+  function getRankView(r) {
+    if(r <= 10) return r.toString();
+    if(r===11) return 'J'; if(r===12) return 'Q'; if(r===13) return 'K'; return 'A';
+  }
+
+  function initPokerRound() {
+    pkDeck = createHalfDeck();
+    pkHand = []; pkSelected = [];
+    pkState.score = 0; pkState.plays = 4; pkState.discards = 3;
+    drawPokerCards(7); updatePokerUI();
+  }
+
+  function drawPokerCards(num) {
+    while(pkHand.length < 7 && pkDeck.length > 0 && num > 0) {
+      pkHand.push(pkDeck.pop()); num--;
+    }
+  }
+
+  function getCardChipValue(r) {
+    if(r <= 10) return r;
+    if(r <= 13) return 10;
+    return 11; // A
+  }
+
+  function updatePokerUI() {
+    document.getElementById('pk-round').textContent = pkState.round;
+    document.getElementById('pk-target').textContent = pkState.target.toLocaleString();
+    document.getElementById('pk-score').textContent = pkState.score.toLocaleString();
+    document.getElementById('pk-plays').textContent = pkState.plays;
+    document.getElementById('pk-discards').textContent = pkState.discards;
+
+    const handDiv = document.getElementById('pk-hand');
+    handDiv.innerHTML = '';
+    pkHand.forEach((card, idx) => {
+      let cDiv = document.createElement('div');
+      cDiv.className = `pk-card suit-${card.suit === '♠' ? 'spade' : 'heart'}`;
+      if(pkSelected.includes(idx)) cDiv.classList.add('selected');
+      cDiv.innerHTML = `<div>${card.suit}</div><div style="font-size:20px;">${card.view}</div>`;
+      cDiv.addEventListener('click', () => toggleCardSelect(idx));
+      handDiv.appendChild(cDiv);
+    });
+
+    const jokerDiv = document.getElementById('pk-jokers');
+    jokerDiv.innerHTML = '';
+    pkJokers.forEach(j => {
+      let jDiv = document.createElement('div'); jDiv.className = 'joker-item';
+      jDiv.innerHTML = `<h4>${j.name}</h4><span>${j.desc}</span>`;
+      jokerDiv.appendChild(jDiv);
+    });
+
+    evalCurrentSelection();
+  }
+
+  function toggleCardSelect(idx) {
+    const sIdx = pkSelected.indexOf(idx);
+    if(sIdx > -1) { pkSelected.splice(sIdx, 1); playJumpSound(); }
+    else if(pkSelected.length < 5) { pkSelected.push(idx); playJumpSound(); }
+    updatePokerUI();
+  }
+
+  function evalCurrentSelection() {
+    const elName = document.getElementById('pk-eval-name');
+    const elCalc = document.getElementById('pk-eval-calc');
+    
+    if(pkSelected.length === 0) {
+      elName.textContent = '카드를 선택하세요 (최대 5장)';
+      elCalc.textContent = '';
+      return;
+    }
+    
+    let selCards = pkSelected.map(i => pkHand[i]);
+    let base = getBaseHand(selCards);
+    
+    let totalChips = base.chips;
+    let totalMult = base.mult;
+
+    // 조커 패시브 적용 시뮬레이션
+    let isPairFamily = (base.name === '원 페어' || base.name === '투 페어');
+
+    pkJokers.forEach(j => {
+      if(j.id === 'principal') totalMult += 20;
+      if(j.id === 'math') totalChips += 50;
+      if(j.id === 'nerd' && isPairFamily) totalMult += 10;
+    });
+
+    selCards.forEach(c => {
+      totalChips += getCardChipValue(c.rank);
+      pkJokers.forEach(j => {
+        if(j.id === 'pe' && c.suit === '♠') totalChips += 15;
+        if(j.id === 'nurse' && c.suit === '♥') totalMult += 4;
+      });
+    });
+
+    elName.textContent = base.name;
+    elCalc.textContent = `${totalChips} 칩 × ${totalMult} 배수 = ${(totalChips * totalMult).toLocaleString()} 점`;
+  }
+
+  function pokerDiscard() {
+    if(pkSelected.length === 0 || pkState.discards <= 0) return;
+    
+    // 뒤에서부터 지워야 인덱스 꼬임 방지
+    pkSelected.sort((a,b)=>b-a).forEach(idx => pkHand.splice(idx, 1));
+    pkState.discards--;
+    pkSelected = [];
+    
+    drawPokerCards(7 - pkHand.length);
+    playJumpSound(); updatePokerUI();
+  }
+
+  function pokerPlayHand() {
+    if(pkSelected.length === 0 || pkState.plays <= 0) return;
+    
+    let selCards = pkSelected.map(i => pkHand[i]);
+    let base = getBaseHand(selCards);
+    
+    let totalChips = base.chips; let totalMult = base.mult;
+    let isPairFamily = (base.name === '원 페어' || base.name === '투 페어');
+
+    pkJokers.forEach(j => {
+      if(j.id === 'principal') totalMult += 20;
+      if(j.id === 'math') totalChips += 50;
+      if(j.id === 'nerd' && isPairFamily) totalMult += 10;
+    });
+
+    selCards.forEach(c => {
+      totalChips += getCardChipValue(c.rank);
+      pkJokers.forEach(j => {
+        if(j.id === 'pe' && c.suit === '♠') totalChips += 15;
+        if(j.id === 'nurse' && c.suit === '♥') totalMult += 4;
+      });
+    });
+
+    let gained = totalChips * totalMult;
+    pkState.score += gained;
+    pkState.totalScore += gained;
+    pkState.plays--;
+    
+    // 낸 카드는 버림
+    pkSelected.sort((a,b)=>b-a).forEach(idx => pkHand.splice(idx, 1));
+    pkSelected = [];
+    drawPokerCards(7 - pkHand.length);
+    
+    playJumpSound(); updatePokerUI();
+
+    setTimeout(() => {
+      if(pkState.score >= pkState.target) {
+        showPokerShop();
+      } else if (pkState.plays <= 0) {
+        pokerGameOver();
+      }
+    }, 500);
+  }
+
+  function showPokerShop() {
+    playGameOverSound(); // 승리 효과음 대용 (임시)
+    const shop = document.getElementById('pk-shop');
+    const optionsDiv = document.getElementById('pk-shop-options');
+    optionsDiv.innerHTML = '';
+    
+    // 조커 3개 랜덤 추출 (중복 허용으로 덱 완성하는 재미)
+    for(let i=0; i<3; i++) {
+      let rJ = JOKER_POOL[Math.floor(Math.random() * JOKER_POOL.length)];
+      let card = document.createElement('div');
+      card.style.cssText = 'width:120px; height:160px; background:white; color:black; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; cursor:pointer; text-align:center; transition:transform 0.2s; box-shadow:0 5px 15px rgba(0,0,0,0.5); border:3px solid #FFD700;';
+      card.innerHTML = `<h3 style="margin-bottom:10px; color:#FF8C00;">${rJ.name}</h3><p style="font-size:14px; font-weight:bold;">${rJ.desc}</p>`;
+      
+      card.addEventListener('pointerenter', () => card.style.transform = 'translateY(-10px)');
+      card.addEventListener('pointerleave', () => card.style.transform = 'translateY(0)');
+      card.addEventListener('click', () => {
+        if(pkJokers.length >= 6) { alert('조커는 최대 6개까지만 가질 수 있습니다!'); return; }
+        pkJokers.push(rJ);
+        shop.style.display = 'none';
+        pokerNextRound(true);
+      });
+      optionsDiv.appendChild(card);
+    }
+    shop.style.display = 'flex';
+  }
+
+  function pokerNextRound(bought = false) {
+    if(!bought) document.getElementById('pk-shop').style.display = 'none';
+    pkState.round++;
+    pkState.target = Math.floor(pkState.target * 2.5); // 라운드마다 목표 점수 2.5배 증가
+    initPokerRound();
+  }
+
+  function pokerGameOver() {
+    playGameOverSound();
+    alert(`🎮 GAME OVER\n\n최종 도달 라운드: ${pkState.round}\n누적 점수: ${pkState.totalScore.toLocaleString()}점`);
+    saveToLeaderboard(pkState.totalScore, 'poker');
+    stopMiniGame();
+  }
+
+  // 앱 초기화 
   async function initApp() { await loadFromCloud(); initHome(); }
   initApp();
 </script>
