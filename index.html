@@ -14,611 +14,7 @@
       --bg: #1C1C1E; --card: #2C2C2E; --text-main: #FFFFFF; --text-sub: #8E8E93; --border: #3A3A3C; --default: #3A3A3C; --segment-bg: #1C1C1E;
     }
 
-    body { font-family: -apple-system, 'Noto Sans KR', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; display: flex; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s, color 0.3s; overflow-x: hidden;}
-    
-    #app { width: 100%; max-width: 430px; min-height: 100vh; background-color: var(--bg); position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.05); overflow-x: hidden; display: flex; flex-direction: column; }
-
-    .nav-bar { position: fixed; top: 0; width: 100%; max-width: 430px; height: 54px; background: rgba(var(--bg), 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; padding: 0 16px; box-sizing: border-box; z-index: 100; border-bottom: 1px solid var(--border); transition: background 0.3s; }
-    .nav-title { font-size: 17px; font-weight: 600; }
-    .nav-btn { background: none; border: none; font-size: 20px; cursor: pointer; padding: 5px; color: var(--primary); }
-
-    .view { display: none; padding: 74px 16px 20px 16px; animation: fadeIn 0.3s ease; flex: 1; flex-direction: column; box-sizing: border-box; }
-    .view.active { display: flex; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-    .card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; transition: background-color 0.3s; }
-    select, input[type="date"], input[type="text"] { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; margin-bottom: 12px; background-color: var(--card); color: var(--text-main); box-sizing: border-box; }
-    textarea { width: 100%; height: 100px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; margin: 5px 0 15px 0; font-size: 14px; resize: none; background-color: var(--card); color: var(--text-main); }
-    button.primary-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 10px;}
-    button.excel-btn { width: 100%; padding: 14px; background: var(--success); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 10px;}
-    button.outline-btn { width: 100%; padding: 14px; background: transparent; color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 10px; }
-
-    .segment-control { display: flex; background: var(--segment-bg); border-radius: 8px; padding: 2px; margin-bottom: 12px; }
-    .segment-btn { flex: 1; padding: 8px 0; text-align: center; border: none; background: transparent; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; color: var(--text-sub); }
-    .segment-btn.active { background: var(--card); color: var(--text-main); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-
-    .grade-stats, .stat-banner { text-align: center; font-size: 13px; font-weight: 600; background: var(--card); padding: 12px 14px; border-radius: 8px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); }
-    .text-danger { color: var(--danger); }
-    .text-success { color: var(--success); }
-    .text-warning { color: var(--warning); }
-    .text-primary { color: var(--primary); }
-    
-    .toolbar { display: flex; gap: 8px; margin-bottom: 15px; }
-    .toolbar button { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text-main); font-size: 13px; font-weight: 600; cursor: pointer; }
-
-    .class-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .class-btn { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 125px; box-sizing: border-box; }
-    .class-btn-info { width: 100%; }
-    .class-btn h3 { margin: 0 0 4px 0; font-size: 16px; font-weight: 700; }
-    .class-status { font-size: 12px; color: var(--text-sub); line-height: 1.4; font-weight: 500; margin-bottom: 8px; }
-    .class-stats-box { background: var(--bg); padding: 6px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; text-align: left; line-height: 1.5; width: 100%; box-sizing: border-box; }
-
-    .student-grid { display: grid; gap: 8px; }
-    .student-cell { border-radius: 12px; padding: 10px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; position: relative; border: 1px solid var(--border); -webkit-user-select: none; user-select: none; transition: transform 0.1s; min-height: 65px; display: flex; flex-direction: column; justify-content: center; align-items: center;}
-    .student-cell.active-press { transform: scale(0.92); }
-    .student-num { font-size: 10px; font-weight: bold; pointer-events: none; opacity: 0.7; margin-bottom: 2px;}
-    .student-name { font-size: 14px; font-weight: 700; pointer-events: none; word-break: keep-all; }
-    
-    .state-icon { position: absolute; top: -6px; right: -6px; font-size: 14px; display: none; pointer-events: none; background: white; border-radius: 50%; padding: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);}
-    .memo-text { font-size: 10px; color: #b45309; background: #fef3c7; border-radius: 4px; padding: 2px 4px; margin-top: 4px; pointer-events: none; width: 95%; box-sizing: border-box; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-    .warning-text { font-size: 9px; color: var(--danger); font-weight: bold; margin-top: 2px; pointer-events: none; }
-
-    .state-0 { background: var(--default); color: var(--text-main); border-color: var(--border); }
-    .state-1 { background: var(--success); color: white; border-color: var(--success); }
-    .state-2 { background: var(--danger); color: white; border-color: var(--danger); }
-    .state-3 { background: var(--warning); color: black; border-color: var(--warning); }
-    .state-4 { background: var(--primary); color: white; border-color: var(--primary); }
-
-    .state-1 .state-icon, .state-2 .state-icon, .state-3 .state-icon, .state-4 .state-icon { display: block; }
-    .state-1 .state-icon::after { content: '✅'; } .state-2 .state-icon::after { content: '❌'; }
-    .state-3 .state-icon::after { content: '⚠️'; } .state-4 .state-icon::after { content: '🏃'; }
-
-    .dashboard-card { background: #FFF5F5; border: 1px solid #FFDCE0; border-radius: 12px; padding: 15px; margin-bottom: 15px; }
-    .dark-mode .dashboard-card { background: #3A1D1D; border-color: #5C2B2B; }
-    .dashboard-title { font-size: 14px; font-weight: bold; color: var(--danger); margin-bottom: 8px; }
-    .dashboard-list { font-size: 13px; color: var(--text-main); line-height: 1.6; }
-
-    .bottom-bar { position: fixed; bottom: 0; width: 100%; max-width: 430px; padding: 16px; background: rgba(var(--bg), 0.9); backdrop-filter: blur(10px); display: flex; gap: 12px; box-sizing: border-box; border-top: 1px solid var(--border); z-index: 100; transition: background 0.3s;}
-    .bottom-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; font-size: 16px; font-weight: 600; cursor: pointer; }
-    .btn-reset { background: var(--segment-bg); color: var(--text-main); } .btn-save { background: var(--text-main); color: var(--bg); }
-
-    .school-logo-footer { text-align: center; padding: 30px 0 100px 0; font-size: 14px; font-weight: 700; color: var(--text-sub); letter-spacing: 1.5px; margin-top: auto; }
-
-    .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; z-index: 300; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
-    .toast.show { opacity: 1; }
-    .spinner { display: none; font-size: 14px; margin-right: 5px; } .spinner.show { display: inline-block; animation: spin 1s linear infinite; }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-
-    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 150; display: none; opacity: 0; transition: opacity 0.3s; }
-    .overlay.show { display: block; opacity: 1; }
-    .action-sheet { position: fixed; bottom: -100%; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--bg); border-radius: 16px 16px 0 0; z-index: 200; transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); padding-bottom:env(safe-area-inset-bottom); }
-    .action-sheet.show { bottom: 0; }
-    .sheet-header { padding: 16px; text-align: center; font-weight: 600; border-bottom: 1px solid var(--border); }
-    .sheet-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-    .contact-btn { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 16px; border-radius: 12px; text-decoration: none; color: var(--text-main); font-weight: 500; }
-    .memo-area { display: flex; gap: 8px; margin-top: 10px; }
-    .memo-area input { flex: 1; margin-bottom: 0; }
-    .memo-area button { padding: 0 16px; background: var(--text-main); color: var(--bg); border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
-    
-    .label-title { font-size: 13px; font-weight: bold; color: var(--text-sub); margin-bottom: -4px; margin-top: 8px; }
-
-    /* 🎮 게임 화면 스타일 전용 */
-    #view-game { background: #E0F7FA; display: none; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; padding: 20px; box-sizing: border-box; transition: background 0.3s;}
-    #view-game.active { display: flex; }
-    #gameCanvas { background: #FFFFFF; border: 3px solid #005F73; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 100%; max-width: 390px; height: 200px; touch-action: none; transition: border-color 0.3s;}
-    .game-instruction { font-size: 13px; color: #005F73; text-align: center; margin-top: 12px; font-weight: bold; line-height: 1.5; background: rgba(255,255,255,0.6); padding: 10px; border-radius: 8px; }
-
-    /* 로비 UI */
-    #game-lobby { width: 100%; max-width: 390px; display: flex; flex-direction: column; align-items: center; margin-top: 10px; }
-    #player-name-input { text-align: center; font-size: 18px; font-weight: bold; border: 2px solid var(--primary); }
-    #leaderboard-container { width: 100%; background: var(--card); border-radius: 12px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-top: 15px; border: 1px solid var(--border); box-sizing: border-box; }
-    .lb-title { text-align: center; font-weight: 800; font-size: 16px; color: #005F73; margin-bottom: 12px; }
-    .lb-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
-    .lb-row:last-child { border-bottom: none; }
-    .lb-rank { width: 30px; font-weight: bold; }
-    .lb-name { flex: 1; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
-    .lb-score { font-weight: bold; color: var(--primary); margin: 0 10px; }
-    .lb-date { color: var(--text-sub); font-size: 11px; text-align: right; width: 70px; }
-
-    /* 플레이 UI */
-    #game-play-area { width: 100%; display: none; flex-direction: column; align-items: center; margin-top: 30px; }
-    
-    /* 🃏 포커(스쿨라트로) 전용 스타일 */
-    #poker-play-area { display: none; flex-direction: column; align-items: center; padding: 15px; width: 100%; box-sizing: border-box; color: var(--text-main); }
-    .pk-card { width: 45px; height: 68px; border-radius: 6px; background: white; color: black; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; border: 2px solid #ddd; font-weight: bold; font-size: 16px; user-select: none; transition: transform 0.1s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-    .pk-card.selected { transform: translateY(-12px); border-color: #007AFF; box-shadow: 0 5px 10px rgba(0,122,255,0.4); }
-    .pk-suit-spade { color: #1C1C1E; } .pk-suit-heart { color: #FF3B30; }
-    .pk-hand-area { display: flex; gap: 6px; justify-content: center; margin: 20px 0; flex-wrap: wrap; padding: 10px; background: rgba(var(--text-main), 0.05); border-radius: 10px; min-height: 80px; width: 100%; box-sizing: border-box;}
-    .joker-item { width: 70px; height: 90px; border-radius: 6px; background: linear-gradient(135deg, #FFD700, #FFA500); color: #1c1c1e; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; font-size: 10px; padding: 4px; border: 2px solid #FF8C00; box-shadow: 0 2px 4px rgba(0,0,0,0.3); box-sizing: border-box; }
-    .joker-item h4 { margin:0 0 4px 0; font-size:11px; }
-    #pk-shop { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:999; flex-direction:column; justify-content:center; align-items:center; padding:20px; color:white; text-align:center; box-sizing:border-box; }
-
-    @media print {
-      @page { size: A4 portrait; margin: 15mm; }
-      body, html { background: white !important; color: black !important; }
-      #app { width: 100% !important; max-width: none !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; display: block !important; }
-      .nav-bar, .toolbar, .bottom-bar, .segment-control, .school-logo-footer, .excel-btn, #class-stats, #btn-open-seat-modal, #btn-print-seats, #btn-bulk-sms, .stat-banner { display: none !important; }
-      .view { padding: 0 !important; display: none !important; }
-      #view-attendance { display: block !important; }
-      .student-grid { gap: 4px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-      .student-cell { border: 1px solid #000 !important; background: white !important; color: black !important; min-height: 70px !important; box-shadow: none !important; page-break-inside: avoid; }
-      .state-1 { background: #e2e8f0 !important; }
-      .state-2 { border: 2px dashed #ff0000 !important; background: #fff5f5 !important; }
-      .state-3 { background: #fffae6 !important; }
-      .state-4 { background: #ebf8ff !important; }
-      .state-icon, .warning-text { display: none !important; }
-      .memo-text { border: 1px solid #ccc !important; background: transparent !important; color: black !important; padding: 1px; }
-    }
-  </style>
-</head>
-<body>
-
-<div id="app">
-  <!-- 상단 네비게이션 바 -->
-  <nav class="nav-bar">
-    <button class="nav-btn" id="nav-left">📋</button>
-    <div class="nav-title" id="nav-title">출석 체크 명렬표</div>
-    <div style="display:flex; align-items:center;">
-      <span class="spinner" id="loading-spinner">🔄</span>
-      <button class="nav-btn" id="btn-game-toggle" style="margin-right: 5px;">🎮</button>
-      <button class="nav-btn" id="btn-theme-toggle" style="font-size: 16px; margin-right: 5px;">🌙</button>
-      <button class="nav-btn" id="nav-right">⚙️</button>
-    </div>
-  </nav>
-  
-  <!-- ⚙️ 설정(Setup) 뷰 -->
-  <div id="view-setup" class="view">
-    <div class="card">
-      <h3 style="margin-top:0;">📋 학생/비상연락망 명단 등록</h3>
-      <select id="setup-type"><option value="student">학생 명단 등록</option><option value="teacher">비상연락망 등록</option></select>
-      <div id="student-setup-area">
-        <select id="setup-grade"><option value="1">1학년</option><option value="2">2학년</option></select>
-        <select id="setup-class">
-          <option value="1">1반</option><option value="2">2반</option><option value="3">3반</option><option value="4">4반</option>
-          <option value="5">5반</option><option value="6">6반</option><option value="7">7반</option><option value="8">8반</option>
-        </select>
-      </div>
-      <textarea id="excel-input" placeholder="엑셀 복사/붙여넣기 (학번, 이름, 학생전화, 학부모전화)"></textarea>
-      <button class="primary-btn" id="btn-save-list">💾 명단 등록</button>
-    </div>
-    <div class="card">
-      <h3 style="margin-top:0;">💬 학부모 안내 문자 템플릿</h3>
-      <div style="font-size:12px; color:var(--text-sub); margin-bottom:10px;">* {이름}, {사유}를 입력하면 자동으로 바뀝니다.</div>
-      <textarea id="sms-template" placeholder="예: 안녕하세요. 오늘 {이름} 학생이 {사유}하여 연락드렸습니다."></textarea>
-      <button class="outline-btn" id="btn-save-template">문자 템플릿 저장</button>
-    </div>
-    <div class="card">
-      <h3 style="margin-top:0;">📅 기간 설정 엑셀 다운로드</h3>
-      <input type="date" id="excel-start-date" />
-      <input type="date" id="excel-end-date" />
-      <button class="excel-btn" id="btn-export-period-excel">📥 기간별 전체 엑셀 다운로드</button>
-    </div>
-    <button class="outline-btn" id="btn-clear-all" style="color:var(--danger); border-color:var(--danger);">데이터 전체 초기화 (주의)</button>
-  </div>
-
-  <!-- 🏠 메인(Home) 뷰 -->
-  <div id="view-home" class="view active">
-    <input type="text" id="search-input" placeholder="🔍 학생 이름 검색..." style="border-radius: 20px; padding-left: 20px;" />
-    <div class="dashboard-card" id="warning-dashboard" style="display:none;">
-      <div class="dashboard-title">🚨 누적 결석 3회 이상 요주의 학생</div>
-      <div class="dashboard-list" id="warning-list"></div>
-    </div>
-    <div class="segment-control">
-      <button class="segment-btn active" data-tab="1">1학년</button>
-      <button class="segment-btn" data-tab="2">2학년</button>
-      <button class="segment-btn" data-tab="emergency">비상연락망</button>
-    </div>
-    <div id="home-class-area">
-      <div class="toolbar" style="margin-bottom: 10px;">
-        <input type="date" id="home-date" style="margin-bottom:0; flex:1; text-align:center; font-weight:bold;" />
-      </div>
-      <div class="grade-stats" id="grade-total-stats-banner"></div>
-      <div class="class-grid" id="class-grid"></div>
-      <div style="margin-top: 20px;"><button class="excel-btn" id="btn-export-excel">📊 전체 누적 출결데이터 다운로드</button></div>
-    </div>
-    <div id="home-emergency-area" style="display:none;">
-      <div class="class-grid" id="teacher-grid"></div>
-    </div>
-    <div class="school-logo-footer">🏫 한서고등학교</div>
-  </div>
-
-  <!-- 📋 출석체크(Attendance) 뷰 -->
-  <div id="view-attendance" class="view" style="padding-bottom: 100px;">
-    <div class="toolbar">
-      <input type="date" id="attendance-date" style="margin-bottom:0; flex:1;" />
-      <button id="btn-export-class-excel" style="flex:none; width:auto; background:var(--success); color:white; border:none;">📥 반별엑셀</button>
-    </div>
-    <div class="stat-banner" id="class-stats"></div>
-    <div class="toolbar" style="margin-bottom: 15px;">
-      <button id="btn-open-seat-modal">🔀 자리 배치/섞기</button>
-      <button id="btn-print-seats" style="background: #5856D6; color: white; border: none;">🖨️ 자리 인쇄</button>
-      <button id="btn-bulk-sms" style="color: var(--primary); flex: 0.8;">✉️ 단체문자</button>
-    </div>
-    <div style="display:flex; justify-content:center; gap:10px; font-size:11px; margin-bottom:15px; color:var(--text-sub); font-weight:bold;">
-      <span>⬜ 평소</span><span class="text-success">🟩 출석</span><span class="text-danger">🟥 결석</span><span class="text-warning">🟨 지각</span><span class="text-primary">🟦 조퇴</span>
-    </div>
-    <div class="student-grid" id="student-grid"></div>
-    <div class="bottom-bar">
-      <button class="bottom-btn btn-reset" id="btn-reset">🔄 출결 초기화</button>
-      <button class="bottom-btn btn-save" id="btn-save">💾 출결 저장하기</button>
-    </div>
-  </div>
-
-  <!-- 🎮 게임(Game) 뷰 -->
-  <div id="view-game" class="view">
-    <div id="game-lobby-title" style="font-size: 22px; font-weight: 900; margin-bottom: 10px; color: #005F73;">쉬는시간 오락실</div>
-    
-    <!-- 게임 로비 화면 -->
-    <div id="game-lobby">
-      <div class="lobby-content" style="width:100%; display:flex; flex-direction:column; align-items:center;">
-        <input type="text" id="player-name-input" placeholder="선생님 닉네임 (예: 불꽃주먹)" maxlength="8">
-        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:15px; width:100%;">
-            <button id="btn-start-penguin" class="primary-btn" style="padding:15px; font-size:16px; flex:1; min-width:140px; margin-bottom:0;">🐧 빙하 달리기</button>
-            <button id="btn-start-poker" class="primary-btn" style="padding:15px; font-size:16px; flex:1; min-width:140px; background-color:#FF9500; margin-bottom:0;">🃏 스쿨라트로</button>
-        </div>
-        
-        <div id="leaderboard-container">
-          <div class="lb-title">🏆 주간 명예의 전당 (Top 10)</div>
-          <div id="lb-list"></div>
-        </div>
-        <button class="outline-btn" id="btn-close-game" style="margin-top: 15px; background: white;">명렬표로 돌아가기</button>
-      </div>
-    </div>
-
-    <!-- 🐧 펭귄 달리기 플레이 화면 -->
-    <div id="game-play-area">
-      <div style="font-size: 20px; font-weight: 900; margin-bottom: 10px; color: #005F73; text-align:center;">남극 펭귄 탈출기</div>
-      <canvas id="gameCanvas" width="390" height="200"></canvas>
-      <div class="game-instruction">
-        [화면 터치] 또는 [스페이스바] 로 점프!<br> 길게 누르면 높게 뜁니다.<br>
-        🦭물범, 🐦갈매기, 🐻북극곰, 🧊얼음을 피해 생존하세요!
-      </div>
-      <button class="outline-btn" id="btn-quit-penguin" style="margin-top: 20px; background: white; width:100%;">중단하고 로비로 가기</button>
-    </div>
-
-    <!-- 🃏 포커(스쿨라트로) 플레이 화면 -->
-    <div id="poker-play-area">
-      <div style="font-size: 20px; font-weight: 900; margin-bottom: 10px; color: #FF3B30; text-align:center;">스쿨라트로 (포커)</div>
-      <div style="width:100%; max-width:500px; display:flex; justify-content:space-between; margin-bottom:10px; background:rgba(var(--text-main), 0.05); padding:12px; border-radius:10px; box-sizing:border-box;">
-          <div>라운드: <span id="pk-round" style="font-weight:bold; font-size:18px;">1</span><br>목표: <strong id="pk-target" class="text-danger" style="font-size:16px;">300</strong></div>
-          <div style="text-align:right;">현재 점수: <strong id="pk-score" class="text-primary" style="font-size:18px;">0</strong><br>남은 손: <span id="pk-plays">4</span> | 버리기: <span id="pk-discards">3</span></div>
-      </div>
-      <div id="pk-jokers" style="display:flex; gap:8px; min-height:95px; margin-bottom:10px; justify-content:center; flex-wrap:wrap; width:100%;"></div>
-      <div id="pk-eval-name" style="font-size:22px; font-weight:bold; color:var(--primary); height:30px; margin-bottom:5px;">카드를 선택하세요</div>
-      <div id="pk-eval-calc" style="font-size:18px; font-weight:bold; margin-bottom:10px; color:#FF9500; height:25px;"></div>
-      
-      <div id="pk-hand" class="pk-hand-area"></div>
-      
-      <div style="display:flex; gap:15px; margin-top:10px; width:100%; justify-content:center;">
-          <button id="btn-pk-play" class="primary-btn" style="padding:15px 30px; font-size:18px; border-radius:25px; box-shadow:0 4px 6px rgba(0,0,0,0.1); width:auto; margin-bottom:0;">제출하기</button>
-          <button id="btn-pk-discard" class="segment-btn" style="padding:15px 20px; font-size:16px; border-radius:25px; background-color:#FF3B30; color:white; width:auto;">버리기</button>
-      </div>
-      <button id="btn-pk-quit" class="outline-btn" style="margin-top:20px; font-size:14px; background:white; width:100%;">중단하고 로비로 가기</button>
-      
-      <!-- 상점 모달 -->
-      <div id="pk-shop">
-        <h2 style="margin-bottom:10px; color:#FFD700; font-size:28px;">라운드 클리어! 🎉</h2>
-        <p style="margin-bottom:30px; font-size:16px;">보상으로 학교 조커를 하나 영입하세요.</p>
-        <div id="pk-shop-options" style="display:flex; gap:15px; flex-wrap:wrap; justify-content:center; margin-bottom:30px;"></div>
-        <button id="btn-pk-next" class="primary-btn" style="padding:12px 25px; font-size:16px; border-radius:20px; width:auto;">건너뛰고 다음 라운드</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 오버레이 및 액션 시트 -->
-  <div class="overlay" id="overlay"></div>
-  <div class="action-sheet" id="contact-sheet">
-    <div class="sheet-header" id="sheet-name">연락처</div>
-    <div class="sheet-body">
-      <a href="#" class="contact-btn" id="contact-student"><span>📱 학생 연락처</span><span id="contact-student-num">-</span></a>
-      <a href="#" class="contact-btn" id="contact-parent"><span>📞 학부모 연락처</span><span id="contact-parent-num">-</span></a>
-      <a href="#" class="contact-btn" id="sms-parent" style="background:#E5F0FF; color:var(--primary); justify-content:center; font-weight:bold;">💬 학부모 문자 발송</a>
-      <div class="memo-area"><input type="text" id="student-memo-input" placeholder="특이사항 메모 (예: 질병)" /><button id="btn-save-memo">저장</button></div>
-    </div>
-    <div style="margin: 10px 16px 16px 16px; padding: 16px; text-align: center; font-weight: 600; color: var(--danger); cursor: pointer; border: 1px solid var(--danger); border-radius: 12px;" id="btn-close-contact-sheet">닫기</div>
-  </div>
-  <div class="action-sheet" id="seat-sheet">
-    <div class="sheet-header">🔀 교실 자리 배치 설정</div>
-    <div class="sheet-body">
-      <div class="label-title">자리 형태</div><select id="seat-layout-type"><option value="single">한 줄로 앉기</option><option value="pair">짝꿍으로 앉기</option></select>
-      <div class="label-title">가로 칸(열) 수</div><select id="seat-cols"><option value="4">4칸</option><option value="5">5칸</option><option value="6" selected>6칸</option></select>
-      <button class="primary-btn" id="btn-execute-shuffle">🔀 랜덤 자리 섞기</button>
-      <button class="outline-btn" id="btn-execute-sort" style="margin-bottom:0;">🔢 번호순 배치</button>
-    </div>
-    <div style="margin: 10px 16px 16px 16px; padding: 16px; text-align: center; font-weight: 600; color: var(--danger); cursor: pointer; border: 1px solid var(--danger); border-radius: 12px;" id="btn-close-seat-sheet">닫기</div>
-  </div>
-  <div class="toast" id="toast"></div>
-</div>
-
-<script>
-  // 🔗 앱 설정 및 상태 관리
-  const API_URL = "여기에_복사한_구글_웹앱_URL을_넣으세요";
-  
-  const state = { 
-    currentTab: '1', currentGrade: 1, currentClass: null, 
-    students: [], attendance: {}, memos: {}, 
-    selectedDate: new Date().toLocaleDateString('en-CA'), 
-    currentStudentId: null, 
-    isDarkMode: localStorage.getItem('darkMode') === 'true' 
-  };
-  
-  const views = { 
-    setup: document.getElementById('view-setup'), 
-    home: document.getElementById('view-home'), 
-    attendance: document.getElementById('view-attendance'), 
-    game: document.getElementById('view-game') 
-  };
-  
-  const navLeft = document.getElementById('nav-left'); 
-  const navTitle = document.getElementById('nav-title'); 
-  const navRight = document.getElementById('nav-right'); 
-  const spinner = document.getElementById('loading-spinner'); 
-  const statusMap = { 0: '평소', 1: '출석', 2: '결석', 3: '지각', 4: '조퇴' };
-  
-  document.getElementById('home-date').value = state.selectedDate; 
-  document.getElementById('attendance-date').value = state.selectedDate;
-  
-  if(state.isDarkMode) { 
-    document.body.classList.add('dark-mode'); 
-    document.getElementById('btn-theme-toggle').textContent = '☀️'; 
-  }
-
-  document.getElementById('btn-theme-toggle').addEventListener('click', () => { 
-    state.isDarkMode = !state.isDarkMode; 
-    document.body.classList.toggle('dark-mode', state.isDarkMode); 
-    document.getElementById('btn-theme-toggle').textContent = state.isDarkMode ? '☀️' : '🌙'; 
-    localStorage.setItem('darkMode', state.isDarkMode); 
-  });
-  
-  function showToast(msg) { 
-    const toast = document.getElementById('toast'); 
-    toast.textContent = msg; toast.classList.add('show'); 
-    setTimeout(() => toast.classList.remove('show'), 2000); 
-  }
-
-  function switchView(viewName) {
-    Object.values(views).forEach(v => v.classList.remove('active')); 
-    views[viewName].classList.add('active');
-    
-    if (viewName === 'game') {
-      navLeft.style.visibility = 'visible'; navLeft.textContent = '←'; 
-      navTitle.textContent = '쉬는시간 오락실'; navRight.style.display = 'none';
-      openGameLobby(); 
-    } else {
-      stopMiniGame(); 
-      if (viewName === 'setup') { 
-        navLeft.style.visibility = 'visible'; navLeft.textContent = '✕'; 
-        navTitle.textContent = '설정 및 등록'; navRight.style.display = 'none'; 
-      } else if (viewName === 'home') { 
-        navLeft.style.visibility = 'hidden'; navTitle.textContent = '📋 출석 체크'; 
-        navRight.style.display = 'block'; navRight.textContent = '⚙️'; 
-        updateDashboard(); 
-      } else if (viewName === 'attendance') { 
-        navLeft.style.visibility = 'visible'; navLeft.textContent = '←'; 
-        navTitle.textContent = `${state.currentGrade}학년 ${state.currentClass}반`; 
-        navRight.style.display = 'none'; 
-      }
-    }
-  }
-
-  function safeParse(key, defaultVal = null) { 
-    try { 
-      let val = localStorage.getItem(key); 
-      if (!val) return defaultVal; 
-      let parsed = JSON.parse(val); 
-      if (typeof parsed === 'string') parsed = JSON.parse(parsed); 
-      return parsed; 
-    } catch (e) { return defaultVal; } 
-  }
-  
-  async function loadFromCloud() {
-    if (!API_URL || API_URL.startsWith("여기에")) return;
-    try { 
-      spinner.classList.add('show'); 
-      const res = await fetch(`${API_URL}?t=${Date.now()}`); 
-      const data = await res.json();
-      if (data) { 
-        Object.keys(data).forEach(k => { 
-          let val = data[k]; 
-          if (typeof val === 'object' && val !== null) localStorage.setItem(k, JSON.stringify(val)); 
-          else if (typeof val === 'string') localStorage.setItem(k, val); 
-        }); 
-      }
-    } catch (e) { showToast("⚠️ 로컬 모드"); } 
-    finally { spinner.classList.remove('show'); }
-  }
-  
-  async function saveToCloud() {
-    if (!API_URL || API_URL.startsWith("여기에")) return;
-    try { 
-      spinner.classList.add('show'); const all = {};
-      for (let i = 0; i < localStorage.length; i++) { 
-        const k = localStorage.key(i); 
-        if (k.startsWith("students_") || k.startsWith("attendance_") || k.startsWith("memo_") || k === "teachers_list" || k.startsWith("seat_") || k === "penguin_leaderboard") { 
-          all[k] = safeParse(k); 
-        }
-      }
-      await fetch(API_URL, { method: "POST", body: JSON.stringify(all) }); 
-      showToast("☁️ 클라우드 저장 완료");
-    } catch (e) { showToast("❌ 저장 실패"); } 
-    finally { spinner.classList.remove('show'); }
-  }
-
-  function getStudentTotalAbsence(id) { 
-    let count = 0; 
-    for(let i=0; i<localStorage.length; i++) { 
-      const k = localStorage.key(i); 
-      if(k.startsWith(`attendance_`)) { 
-        const att = safeParse(k, {}); 
-        if(att && att[id] === 2) count++; 
-      } 
-    } 
-    return count; 
-  }
-  
-  function updateDashboard() { 
-    const list = document.getElementById('warning-list'); list.innerHTML = ''; let hasWarning = false; 
-    for(let i=0; i<localStorage.length; i++) { 
-      const k = localStorage.key(i); 
-      if(k.startsWith('students_')) { 
-        const parts = k.split('_'); const grade = parts[1]; const cNum = parts[2]; 
-        const stds = safeParse(k, []); 
-        if (Array.isArray(stds)) { 
-          stds.forEach(s => { 
-            const abs = getStudentTotalAbsence(s['일련번호']); 
-            if(abs >= 3) { hasWarning = true; list.innerHTML += `<div>• ${grade}학년 ${cNum}반 ${s['이름']} (결석 ${abs}회)</div>`; } 
-          }); 
-        } 
-      } 
-    } 
-    document.getElementById('warning-dashboard').style.display = hasWarning ? 'block' : 'none'; 
-  }
-
-  document.getElementById('search-input').addEventListener('input', (e) => { 
-    const val = e.target.value.trim(); 
-    if(!val) { initHome(); return; } 
-    document.getElementById('home-class-area').style.display = 'block'; 
-    const grid = document.getElementById('class-grid'); grid.innerHTML = ''; grid.style.gridTemplateColumns = '1fr'; 
-    document.getElementById('grade-total-stats-banner').style.display = 'none'; 
-    for(let i=0; i<localStorage.length; i++) { 
-      const k = localStorage.key(i); 
-      if(k.startsWith('students_')) { 
-        const parts = k.split('_'); const grade = parts[1]; const cNum = parts[2]; 
-        const stds = safeParse(k, []); 
-        if (Array.isArray(stds)) { 
-          stds.forEach(s => { 
-            if(s['이름'] && s['이름'].includes(val)) { 
-              const btn = document.createElement('div'); btn.className = 'class-btn'; btn.style.minHeight = 'auto'; 
-              const abs = getStudentTotalAbsence(s['일련번호']); 
-              btn.innerHTML = `<div class="class-btn-info"><h3>${s['이름']}</h3><div class="class-status">${grade}학년 ${cNum}반 ${s['일련번호']}번 | 누적결석: <span class="text-danger">${abs}회</span></div></div>`; 
-              btn.addEventListener('click', () => openAttendance(grade, cNum)); grid.appendChild(btn); 
-            } 
-          }); 
-        } 
-      } 
-    } 
-  });
-  
-  document.getElementById('btn-save-list').addEventListener('click', async () => { 
-    const type = document.getElementById('setup-type').value; 
-    const raw = document.getElementById('excel-input').value; 
-    if (!raw.trim()) return alert("데이터 없음"); 
-    if (type === 'student') { 
-      const g = document.getElementById('setup-grade').value; 
-      const c = document.getElementById('setup-class').value; 
-      const parsed = raw.trim().split('\n').map(line => { 
-        const t = line.split('\t').map(x=>x.trim()); 
-        return { '일련번호': t[0]||'', '이름': t[1]||'', '전화번호': t[2]||'', '추가전화번호': t[3]||'' }; 
-      }); 
-      localStorage.setItem(`students_${g}_${c}`, JSON.stringify(parsed)); 
-    } else { 
-      const parsed = raw.trim().split('\n').map(line => { 
-        const t = line.split('\t').map(x=>x.trim()); 
-        return { '이름': t[0]||'', '전화번호': t[1]||'' }; 
-      }); 
-      localStorage.setItem(`teachers_list`, JSON.stringify(parsed)); 
-    } 
-    await saveToCloud(); 
-    document.getElementById('excel-input').value = ''; 
-    showToast('명단 저장됨'); initHome(); 
-  });
-  
-  document.getElementById('btn-save-template').addEventListener('click', () => { 
-    localStorage.setItem('sms_template', document.getElementById('sms-template').value); 
-    showToast('템플릿 저장됨'); 
-  }); 
-  
-  document.getElementById('sms-template').value = localStorage.getItem('sms_template') || '안녕하세요. 오늘 {이름} 학생이 {사유}하여 연락드렸습니다.';
-  
-  document.getElementById('home-date').addEventListener('change', (e) => { 
-    state.selectedDate = e.target.value; 
-    document.getElementById('attendance-date').value = state.selectedDate; 
-    renderClassGrid(); 
-  });
-  
-  function initHome() { 
-    switchView('home'); 
-    document.querySelectorAll('.segment-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === state.currentTab)); 
-    if (state.currentTab === 'emergency') { 
-      document.getElementById('home-class-area').style.display = 'none'; 
-      document.getElementById('home-emergency-area').style.display = 'block'; 
-    } else { 
-      document.getElementById('home-class-area').style.display = 'block'; 
-      document.getElementById('home-emergency-area').style.display = 'none'; 
-      document.getElementById('grade-total-stats-banner').style.display = 'flex'; 
-      state.currentGrade = parseInt(state.currentTab); 
-      renderClassGrid(); 
-    } 
-  }
-  
-  document.querySelectorAll('.segment-btn').forEach(btn => btn.addEventListener('click', (e) => { 
-    state.currentTab = e.target.dataset.tab; initHome(); 
-  }));
-  
-  function renderClassGrid() { 
-    const grid = document.getElementById('class-grid'); 
-    if(!grid) return; grid.innerHTML = ''; grid.style.gridTemplateColumns = 'repeat(2, 1fr)'; 
-    let gradeStats = { total: 0, p: 0, a: 0, l: 0, e: 0, n: 0 }; 
-    for (let i = 1; i <= 8; i++) { 
-      const btn = document.createElement('div'); btn.className = 'class-btn'; 
-      const stds = safeParse(`students_${state.currentGrade}_${i}`, null); 
-      if(stds && Array.isArray(stds)) { 
-        const att = safeParse(`attendance_${state.currentGrade}_${i}_${state.selectedDate}`, {}); 
-        let stats = { t: stds.length, p: 0, a: 0, l: 0, e: 0, n: 0 }; 
-        stds.forEach(s => { 
-          if(s && s['일련번호']) { 
-            const st = att[s['일련번호']] || 0; 
-            if(st === 1) stats.p++; else if(st === 2) stats.a++; else if(st === 3) stats.l++; else if(st === 4) stats.e++; else stats.n++; 
-          } 
-        }); 
-        gradeStats.total += stats.t; gradeStats.p += stats.p; gradeStats.a += stats.a; gradeStats.l += stats.l; gradeStats.e += stats.e; gradeStats.n += stats.n; 
-        btn.innerHTML = `<div class="class-btn-info"><h3>${i}반</h3><div class="class-status" style="color:var(--primary)">입장 체크 ➔</div></div><div class="class-stats-box">총 <strong>${stats.t}명</strong><br><span class="text-success">출석 ${stats.p}</span> | <span class="text-danger">결석 ${stats.a}</span><br><span class="text-warning">지각 ${stats.l}</span> | <span class="text-primary">조퇴 ${stats.e}</span><br><span style="color:var(--text-sub); font-size:10px;">미입력 ${stats.n}명</span></div>`; 
-      } else { 
-        btn.innerHTML = `<div class="class-btn-info"><h3>${i}반</h3><div class="class-status" style="opacity:0.5">명단 미등록</div></div>`; 
-      } 
-      btn.addEventListener('click', () => openAttendance(state.currentGrade, i)); grid.appendChild(btn); 
-    } 
-    document.getElementById('grade-total-stats-banner').innerHTML = `<span><strong>${state.currentGrade}학년 총계:</strong> <strong style="color:var(--text-main);">${gradeStats.total}명</strong></span><span style="font-size:12px;"><span class="text-success">출 ${gradeStats.p}</span> · <span class="text-danger">결 ${gradeStats.a}</span> · <span class="text-warning">지 ${gradeStats.l}</span> · <span class="text-primary">조 ${gradeStats.e}</span><br><span style="color:var(--text-sub); font-size:11px; margin-top:2px; display:inline-block;">(미입력 ${gradeStats.n}명)</span></span>`; 
-  }
-  
-  const dateInput = document.getElementById('attendance-date'); 
-  dateInput.addEventListener('change', (e) => { 
-    state.selectedDate = e.target.value; 
-    document.getElementById('home-date').value = state.selectedDate; 
-    reloadDayData(); 
-  });
-  
-  async function openAttendance(grade, classNum) { 
-    const stds = safeParse(`students_${grade}_${classNum}`, null); 
-    if (!stds || stds.length === 0) { alert("명단이 없습니다. [설정제공해주신 스크립트 코드는 명렬표의 핵심 기능(학생 등록, 출결 체크, 검색, 엑셀 다운로드, 문자 발송, 자리 배치 등)과 **'펭귄 달리'기 및 '스쿨라트로(포커)' 두 가지 게임**, 그리고 랭킹 시스템이 완벽하게 통합되어 있습니다. **기능이 빠진 것이 아닙니다.**
-
-다만, 이전에 코드 분량이 너무 길어 생략했던 **HTML의 UI(화면 구조) 부분**이 여전히 주석 처리되어 있어 실제 화면에는 명렬표가 나타나지 않았던 것입니다.
-
-선생님의 요청대로 **모든 기능이 누락 없이 완벽하게 작동하는 완전한 전체 코드**를 분할하여 전달해 드립니다. 이번에는 UI 부분도 빠짐없이 포함했습니다.
-
----
-
-### 1️⃣ 첫 번째 부분 : HTML & CSS (완전한 UI 구조 포함)
-가장 먼저 아래 코드를 복사해서 빈 문서에 붙여넣어 주세요. **`<body>` 내부의 명렬표 화면 구조가 모두 포함되어 있습니다.**
-
-```html
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>프리미엄 출석 명렬표 V12 (한서고등학교)</title>
-  <style>
-    /* 🎨 디자인 시스템 & 다크모드 변수 */
-    :root {
-      --primary: #007AFF; --success: #34C759; --warning: #FFCC00; --danger: #FF3B30; --default: #FFFFFF;
-      --bg: #F2F2F7; --card: #FFFFFF; --text-main: #1C1C1E; --text-sub: #8E8E93; --border: #C6C6C8; --segment-bg: #E3E3E8;
-    }
-    body.dark-mode {
-      --bg: #1C1C1E; --card: #2C2C2E; --text-main: #FFFFFF; --text-sub: #8E8E93; --border: #3A3A3C; --default: #3A3A3C; --segment-bg: #1C1C1E;
-    }
-
-    body { font-family: -apple-system, 'Noto Sans KR', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; display: flex; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s, color 0.3s; overflow-x: hidden;}
+    body { font-family: -apple-system, 'Noto Sans KR', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; display: flex; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s, color 0.3s; }
     
     #app { width: 100%; max-width: 430px; min-height: 100vh; background-color: var(--bg); position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.05); overflow-x: hidden; display: flex; flex-direction: column; }
 
@@ -707,12 +103,9 @@
     .label-title { font-size: 13px; font-weight: bold; color: var(--text-sub); margin-bottom: -4px; margin-top: 8px; }
 
     /* 🎮 게임 화면 전용 스타일 */
-    #view-game { background: #E0F7FA; display: none; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; padding: 20px; box-sizing: border-box; transition: background 0.3s;}
+    #view-game { background: #E0F7FA; display: none; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; padding: 20px; box-sizing: border-box; }
     #view-game.active { display: flex; }
-    #gameCanvas { background: #FFFFFF; border: 3px solid #005F73; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 100%; max-width: 390px; height: 200px; touch-action: none; transition: border-color 0.3s;}
-    .game-instruction { font-size: 13px; color: #005F73; text-align: center; margin-top: 12px; font-weight: bold; line-height: 1.5; background: rgba(255,255,255,0.6); padding: 10px; border-radius: 8px; }
-
-    /* 로비 UI */
+    
     #game-lobby { width: 100%; max-width: 390px; display: flex; flex-direction: column; align-items: center; margin-top: 10px; }
     #player-name-input { text-align: center; font-size: 18px; font-weight: bold; border: 2px solid var(--primary); }
     #leaderboard-container { width: 100%; background: var(--card); border-radius: 12px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-top: 15px; border: 1px solid var(--border); box-sizing: border-box; }
@@ -725,16 +118,8 @@
     .lb-date { color: var(--text-sub); font-size: 11px; text-align: right; width: 70px; }
 
     #game-play-area { width: 100%; display: none; flex-direction: column; align-items: center; margin-top: 30px; }
-    
-    /* 🃏 포커(스쿨라트로) 전용 스타일 */
-    #poker-play-area { display: none; flex-direction: column; align-items: center; padding: 15px; width: 100%; box-sizing: border-box; color: var(--text-main); }
-    .pk-card { width: 45px; height: 68px; border-radius: 6px; background: white; color: black; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; border: 2px solid #ddd; font-weight: bold; font-size: 16px; user-select: none; transition: transform 0.1s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-    .pk-card.selected { transform: translateY(-12px); border-color: #007AFF; box-shadow: 0 5px 10px rgba(0,122,255,0.4); }
-    .pk-suit-spade { color: #1C1C1E; } .pk-suit-heart { color: #FF3B30; }
-    .pk-hand-area { display: flex; gap: 6px; justify-content: center; margin: 20px 0; flex-wrap: wrap; padding: 10px; background: rgba(var(--text-main), 0.05); border-radius: 10px; min-height: 80px; width: 100%; box-sizing: border-box;}
-    .joker-item { width: 70px; height: 90px; border-radius: 6px; background: linear-gradient(135deg, #FFD700, #FFA500); color: #1c1c1e; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; font-size: 10px; padding: 4px; border: 2px solid #FF8C00; box-shadow: 0 2px 4px rgba(0,0,0,0.3); box-sizing: border-box; }
-    .joker-item h4 { margin:0 0 4px 0; font-size:11px; }
-    #pk-shop { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:999; flex-direction:column; justify-content:center; align-items:center; padding:20px; color:white; text-align:center; box-sizing:border-box; }
+    #gameCanvas { background: #FFFFFF; border: 3px solid #005F73; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 100%; max-width: 390px; height: 200px; touch-action: none; }
+    .game-instruction { font-size: 13px; color: #005F73; text-align: center; margin-top: 12px; font-weight: bold; line-height: 1.5; background: rgba(255,255,255,0.6); padding: 10px; border-radius: 8px; }
 
     @media print {
       @page { size: A4 portrait; margin: 15mm; }
@@ -849,62 +234,28 @@
 
   <!-- 🎮 게임(Game) 뷰 -->
   <div id="view-game" class="view">
-    <div id="game-lobby-title" style="font-size: 22px; font-weight: 900; margin-bottom: 10px; color: #005F73;">쉬는시간 오락실</div>
+    <div style="font-size: 22px; font-weight: 900; margin-bottom: 10px; color: #005F73;">🐧 남극 펭귄 탈출기</div>
     
     <!-- 게임 로비 화면 -->
     <div id="game-lobby">
-      <div class="lobby-content" style="width:100%; display:flex; flex-direction:column; align-items:center;">
-        <input type="text" id="player-name-input" placeholder="선생님 닉네임 (예: 불꽃주먹)" maxlength="8">
-        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:15px; width:100%;">
-            <button id="btn-start-penguin" class="primary-btn" style="padding:15px; font-size:16px; flex:1; min-width:140px; margin-bottom:0;">🐧 빙하 달리기</button>
-            <button id="btn-start-poker" class="primary-btn" style="padding:15px; font-size:16px; flex:1; min-width:140px; background-color:#FF9500; margin-bottom:0;">🃏 스쿨라트로</button>
-        </div>
-        
-        <div id="leaderboard-container">
-          <div class="lb-title">🏆 주간 명예의 전당 (Top 10)</div>
-          <div id="lb-list"></div>
-        </div>
-        <button class="outline-btn" id="btn-close-game" style="margin-top: 15px; background: white;">명렬표로 돌아가기</button>
+      <input type="text" id="player-name-input" placeholder="선생님 닉네임 (예: 불꽃주먹)" maxlength="8">
+      <button class="primary-btn" id="btn-start-game" style="font-size: 18px; padding: 16px; background: #FF9500;">🚀 게임 시작</button>
+      
+      <div id="leaderboard-container">
+        <div class="lb-title">🏆 주간 명예의 전당 (Top 10)</div>
+        <div id="lb-list"></div>
       </div>
+      <button class="outline-btn" id="btn-close-game" style="margin-top: 15px; background: white;">명렬표로 돌아가기</button>
     </div>
 
-    <!-- 🐧 펭귄 달리기 플레이 화면 -->
+    <!-- 실제 게임 플레이 화면 -->
     <div id="game-play-area">
-      <div style="font-size: 20px; font-weight: 900; margin-bottom: 10px; color: #005F73; text-align:center;">남극 펭귄 탈출기</div>
       <canvas id="gameCanvas" width="390" height="200"></canvas>
       <div class="game-instruction">
-        [화면 터치] 또는 [스페이스바] 로 점프!<br> 길게 누르면 높게 뜁니다.<br>
-        🦭물범, 🐦갈매기, 🐻북극곰, 🧊얼음을 피해 생존하세요!
+        [화면 터치] 또는 [스페이스바] 로 점프!<br>
+        🦭물범과 🐦갈매기를 피해 무사히 생존하세요!
       </div>
-      <button class="outline-btn" id="btn-quit-penguin" style="margin-top: 20px; background: white; width:100%;">중단하고 로비로 가기</button>
-    </div>
-
-    <!-- 🃏 포커(스쿨라트로) 플레이 화면 -->
-    <div id="poker-play-area">
-      <div style="font-size: 20px; font-weight: 900; margin-bottom: 10px; color: #FF3B30; text-align:center;">스쿨라트로 (포커)</div>
-      <div style="width:100%; max-width:500px; display:flex; justify-content:space-between; margin-bottom:10px; background:rgba(var(--text-main), 0.05); padding:12px; border-radius:10px; box-sizing:border-box;">
-          <div>라운드: <span id="pk-round" style="font-weight:bold; font-size:18px;">1</span><br>목표: <strong id="pk-target" class="text-danger" style="font-size:16px;">300</strong></div>
-          <div style="text-align:right;">현재 점수: <strong id="pk-score" class="text-primary" style="font-size:18px;">0</strong><br>남은 손: <span id="pk-plays">4</span> | 버리기: <span id="pk-discards">3</span></div>
-      </div>
-      <div id="pk-jokers" style="display:flex; gap:8px; min-height:95px; margin-bottom:10px; justify-content:center; flex-wrap:wrap; width:100%;"></div>
-      <div id="pk-eval-name" style="font-size:22px; font-weight:bold; color:var(--primary); height:30px; margin-bottom:5px;">카드를 선택하세요</div>
-      <div id="pk-eval-calc" style="font-size:18px; font-weight:bold; margin-bottom:10px; color:#FF9500; height:25px;"></div>
-      
-      <div id="pk-hand" class="pk-hand-area"></div>
-      
-      <div style="display:flex; gap:15px; margin-top:10px; width:100%; justify-content:center;">
-          <button id="btn-pk-play" class="primary-btn" style="padding:15px 30px; font-size:18px; border-radius:25px; box-shadow:0 4px 6px rgba(0,0,0,0.1); width:auto; margin-bottom:0;">제출하기</button>
-          <button id="btn-pk-discard" class="segment-btn" style="padding:15px 20px; font-size:16px; border-radius:25px; background-color:#FF3B30; color:white; width:auto;">버리기</button>
-      </div>
-      <button id="btn-pk-quit" class="outline-btn" style="margin-top:20px; font-size:14px; background:white; width:100%;">중단하고 로비로 가기</button>
-      
-      <!-- 상점 모달 -->
-      <div id="pk-shop">
-        <h2 style="margin-bottom:10px; color:#FFD700; font-size:28px;">라운드 클리어! 🎉</h2>
-        <p style="margin-bottom:30px; font-size:16px;">보상으로 학교 조커를 하나 영입하세요.</p>
-        <div id="pk-shop-options" style="display:flex; gap:15px; flex-wrap:wrap; justify-content:center; margin-bottom:30px;"></div>
-        <button id="btn-pk-next" class="primary-btn" style="padding:12px 25px; font-size:16px; border-radius:20px; width:auto;">건너뛰고 다음 라운드</button>
-      </div>
+      <button class="outline-btn" id="btn-quit-game" style="margin-top: 20px; background: white;">중단하고 로비로 가기</button>
     </div>
   </div>
 
@@ -984,7 +335,7 @@
     
     if (viewName === 'game') {
       navLeft.style.visibility = 'visible'; navLeft.textContent = '←'; 
-      navTitle.textContent = '쉬는시간 오락실'; navRight.style.display = 'none';
+      navTitle.textContent = '쉬는시간 미니게임'; navRight.style.display = 'none';
       openGameLobby(); 
     } else {
       stopMiniGame(); 
@@ -1336,8 +687,7 @@
   navRight.addEventListener('click', () => switchView('setup')); 
   document.getElementById('btn-game-toggle').addEventListener('click', () => switchView('game')); 
   document.getElementById('btn-close-game').addEventListener('click', () => initHome());
-  document.getElementById('btn-quit-penguin').addEventListener('click', stopMiniGame); // 빙하 달리기 중단 버튼 바인딩
-  document.getElementById('btn-pk-quit').addEventListener('click', stopMiniGame); // 포커 중단 버튼 바인딩 (injectGameUI 내부에 이미 존재하지만 안전장치)
+  document.getElementById('btn-quit-game').addEventListener('click', () => { stopMiniGame(); openGameLobby(); });
 
   function showContactPopup(student, status) { 
     state.currentStudentId = student['일련번호']; document.getElementById('sheet-name').textContent = `${student['이름']} 학생`; 
@@ -1379,13 +729,11 @@
   document.getElementById('btn-close-contact-sheet').addEventListener('click', closeAllPopups); 
   document.getElementById('btn-close-seat-sheet').addEventListener('click', closeAllPopups);
 
-
   // ==========================================
   // 🔊 오디오(사운드) 시스템 
   // ==========================================
   let audioCtx;
-  // BGM 설정
-  const bgm = new Audio('[https://ia801407.us.archive.org/21/items/cdk-sunday/cdk-sunday.mp3](https://ia801407.us.archive.org/21/items/cdk-sunday/cdk-sunday.mp3)'); 
+  const bgm = new Audio('https://ia801407.us.archive.org/21/items/cdk-sunday/cdk-sunday.mp3'); 
   bgm.loop = true;
   bgm.volume = 0.3;
 
@@ -1403,7 +751,7 @@
     const gain = audioCtx.createGain();
     osc.connect(gain); gain.connect(audioCtx.destination);
     
-    osc.type = 'square'; // 고전 게임 느낌의 사운드
+    osc.type = 'square'; 
     osc.frequency.setValueAtTime(300, audioCtx.currentTime);
     osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.1);
     
@@ -1430,7 +778,7 @@
   }
 
   // ==========================================
-  // 🏆 랭킹(Leaderboard) 시스템 & 게임 로직 (업데이트 완료)
+  // 🏆 랭킹 & 미니게임 로직 
   // ==========================================
   let currentPlayerName = '';
 
@@ -1438,27 +786,23 @@
     let lb = safeParse('penguin_leaderboard', []);
     const now = Date.now();
     const weekInMs = 7 * 24 * 60 * 60 * 1000;
-    // 7일(일주일)이 지난 기록은 자동 삭제
     lb = lb.filter(entry => (now - entry.timestamp) < weekInMs);
     return lb.sort((a, b) => b.score - a.score).slice(0, 10);
   }
 
-  function saveToLeaderboard(score, gameType) {
+  function saveToLeaderboard(score) {
     let lb = getLeaderboard();
-    const dateStr = new Date().toLocaleDateString('en-CA').substring(5); // MM-DD 형태
-    let displayName = (currentPlayerName || '무명 선생님') + (gameType === 'poker' ? ' 🃏' : ' 🐧');
+    const dateStr = new Date().toLocaleDateString('en-CA').substring(5);
     lb.push({
-      name: displayName,
+      name: currentPlayerName || '무명 선생님',
       score: Math.floor(score),
       date: dateStr,
       timestamp: Date.now()
     });
     
-    // 점수 높은 순 정렬 및 최대 10개 유지
     lb = lb.sort((a, b) => b.score - a.score).slice(0, 10);
     localStorage.setItem('penguin_leaderboard', JSON.stringify(lb));
-    
-    saveToCloud(); // 클라우드에 랭킹 즉시 반영
+    saveToCloud(); 
   }
 
   function renderLeaderboard() {
@@ -1485,73 +829,25 @@
     }).join('');
   }
 
-  // ==========================================
-  // 🎮 듀얼 미니 오락실 로비 UI 주입 
-  // ==========================================
-  function injectGameUI() {
-    if(document.getElementById('poker-play-area')) return; // 이미 생성됨
-    
-    // 포커용 스타일은 CSS 섹션으로 이동시킴 (V13 업데이트)
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  let gameAnimationId = null;
+  let gameRunning = false;
+  let hasKeydownListener = false;
 
-    // 로비 개편
-    const lobbyBtnArea = document.getElementById('game-lobby').querySelector('.lobby-content');
-    // 기존 버튼 삭제 후 듀얼 버튼 영역 주입
-    const oldStartBtn = document.getElementById('btn-start-game');
-    const oldQuitBtn = document.getElementById('btn-close-game');
-    oldStartBtn.remove();
-    oldQuitBtn.remove();
-    
-    const dualBtnHTML = `
-      <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:15px; width:100%;">
-          <button id="btn-start-penguin" class="primary-btn" style="padding:15px; font-size:16px; flex:1; min-width:140px; margin-bottom:0;">🐧 빙하 달리기</button>
-          <button id="btn-start-poker" class="primary-btn" style="padding:15px; font-size:16px; flex:1; min-width:140px; background-color:#FF9500; margin-bottom:0;">🃏 스쿨라트로</button>
-      </div>
-    `;
-    // 닉네임 입력란 바로 밑에 삽입
-    document.getElementById('player-name-input').insertAdjacentHTML('afterend', dualBtnHTML);
-    
-    // 닫기 버튼을 하단 컨테이너 맨 뒤에 다시 삽입
-    lobbyBtnArea.insertAdjacentHTML('beforeend', '<button class="outline-btn" id="btn-close-game" style="margin-top: 15px; background: white; width:100%;">명렬표로 돌아가기</button>');
-    document.getElementById('btn-close-game').addEventListener('click', () => initHome());
-
-    // 👑 관리자 랭킹 초기화 버튼 동적 생성
-    let adminBtn = document.createElement('button');
-    adminBtn.id = 'btn-admin-reset';
-    adminBtn.innerHTML = '👑 랭킹 초기화 (비번1234)';
-    adminBtn.style.cssText = 'margin-top: 15px; background: #FF3B30; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; width: 100%; max-width: 300px; display: block; margin-left: auto; margin-right: auto;';
-    
-    adminBtn.addEventListener('click', () => {
-      const pwd = prompt('관리자 비밀번호를 입력하세요 (4자리):');
-      if (pwd === '1234') {
-        localStorage.removeItem('penguin_leaderboard');
-        saveToCloud();
-        renderLeaderboard();
-        alert('🏆 랭킹이 성공적으로 초기화되었습니다!');
-      } else if (pwd !== null) {
-        alert('❌ 비밀번호가 일치하지 않습니다.');
-      }
-    });
-    lobbyBtnArea.appendChild(adminBtn);
-
-    // 포커 게임 영역 추가 (V12에서 이미 CSS/HTML 분할 전송 시 view-game 내부에 코드를 넣었으므로, 여기서는 이벤트 바인딩만 진행)
-    // injectGameUI가 호출될 때 이미 HTML 파트에서 pokerView 내부 요소들이 로드되어 있음
-
-    // 이벤트 리스너 바인딩
-    document.getElementById('btn-start-penguin').addEventListener('click', () => tryStartGame('penguin'));
-    document.getElementById('btn-start-poker').addEventListener('click', () => tryStartGame('poker'));
-    // view-game 내부의 중단 버튼들은 switchView에서 stopMiniGame 호출로 처리되므로 별도 바인딩 불요 (poker 제외)
-    
-    document.getElementById('btn-pk-play').addEventListener('click', pokerPlayHand);
-    document.getElementById('btn-pk-discard').addEventListener('click', pokerDiscard);
-    document.getElementById('btn-pk-next').addEventListener('click', pokerNextRound);
-    document.getElementById('btn-pk-quit').addEventListener('click', () => { stopMiniGame(); openGameLobby(); });
-  }
+  let score = 0;
+  let penguin = { x: 40, y: 140, w: 24, h: 30, vy: 0, jumping: false, frame: 0 };
+  let obstacles = [];
+  let environment = { clouds: [], icebergs: [], groundX: 0 };
+  let spawnTimer = 0;
+  let jumpPressed = false; // 점프 버튼 유지 상태
 
   function openGameLobby() {
-    injectGameUI();
     document.getElementById('game-lobby').style.display = 'flex';
     document.getElementById('game-play-area').style.display = 'none';
-    document.getElementById('poker-play-area').style.display = 'none';
+    
+    const savedName = localStorage.getItem('penguin_player_name');
+    if(savedName) document.getElementById('player-name-input').value = savedName;
     
     // 모바일 터치 영역 확장을 위한 스타일링 (캔버스 리사이즈)
     canvas.style.width = '100%';
@@ -1561,79 +857,116 @@
     canvas.style.objectFit = 'contain';
     document.getElementById('game-play-area').style.touchAction = 'none'; // 스크롤 방지
     
-    const savedName = localStorage.getItem('penguin_player_name');
-    if(savedName) document.getElementById('player-name-input').value = savedName;
+    let adminBtn = document.getElementById('btn-admin-reset');
+    if (!adminBtn) {
+      adminBtn = document.createElement('button');
+      adminBtn.id = 'btn-admin-reset';
+      adminBtn.innerHTML = '👑 관리자 (랭킹 초기화)';
+      adminBtn.style.cssText = 'margin-top: 15px; background: #FF3B30; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; width: 100%; max-width: 300px; display: block; margin-left: auto; margin-right: auto;';
+      
+      adminBtn.addEventListener('click', () => {
+        const pwd = prompt('관리자 비밀번호를 입력하세요 (4자리):');
+        if (pwd === '1234') {
+          localStorage.removeItem('penguin_leaderboard');
+          saveToCloud();
+          renderLeaderboard();
+          alert('🏆 랭킹이 성공적으로 초기화되었습니다!');
+        } else if (pwd !== null) {
+          alert('❌ 비밀번호가 일치하지 않습니다.');
+        }
+      });
+      
+      const lobbyContainer = document.querySelector('#game-lobby .lobby-content') || document.getElementById('game-lobby');
+      lobbyContainer.appendChild(adminBtn);
+    }
     renderLeaderboard();
   }
 
-  function tryStartGame(type) {
+  document.getElementById('btn-start-game').addEventListener('click', () => {
     const nameInput = document.getElementById('player-name-input').value.trim();
-    if (!nameInput) { alert("선생님의 닉네임을 입력해 주세요!"); document.getElementById('player-name-input').focus(); return; }
-    currentPlayerName = nameInput; localStorage.setItem('penguin_player_name', currentPlayerName);
+    if (!nameInput) {
+      alert("선생님의 닉네임을 입력해 주세요!");
+      document.getElementById('player-name-input').focus();
+      return;
+    }
+    currentPlayerName = nameInput;
+    localStorage.setItem('penguin_player_name', currentPlayerName);
     
     document.getElementById('game-lobby').style.display = 'none';
-    initAudio(); bgm.currentTime = 0; bgm.play().catch(e => console.log("BGM 실패", e));
+    document.getElementById('game-play-area').style.display = 'flex';
     
-    if(type === 'penguin') {
-      document.getElementById('game-play-area').style.display = 'flex';
-      startPenguinGame();
-    } else {
-      document.getElementById('poker-play-area').style.display = 'flex';
-      startPokerGame();
+    initAudio();
+    bgm.currentTime = 0;
+    bgm.play().catch(e => console.log("BGM 재생 실패", e));
+    
+    startMiniGame();
+  });
+
+  function initGameObjects() {
+    score = 0;
+    penguin.y = 140; penguin.vy = 0; penguin.jumping = false; penguin.frame = 0;
+    obstacles = [];
+    environment.clouds = [{x: 100, y: 30, w: 40}, {x: 280, y: 50, w: 50}];
+    environment.icebergs = [{x: 60, w: 40, h: 30}, {x: 230, w: 60, h: 45}];
+    environment.groundX = 0;
+    spawnTimer = 0;
+    jumpPressed = false;
+  }
+
+  function startMiniGame() {
+    if (gameRunning) return;
+    if (!hasKeydownListener) {
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('keyup', handleKeyUp);
+      hasKeydownListener = true;
     }
+    gameRunning = true;
+    initGameObjects();
+    gameLoop();
   }
 
   function stopMiniGame() {
-    gameRunning = false; bgm.pause(); 
-    if (gameAnimationId) { cancelAnimationFrame(gameAnimationId); gameAnimationId = null; }
-    if(document.getElementById('pk-shop')) document.getElementById('pk-shop').style.display = 'none';
-    // 만약 호출 시 로비로 돌아가야 한다면 switchView에서 game을 다시 호출하므로 openGameLobby() 명시 불요
-  }
-
-  // ==========================================
-  // 🐧 빙하 달리기 (펭귄 게임) 로직 (업데이트 완료)
-  // ==========================================
-  const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d');
-  let gameAnimationId = null; let gameRunning = false; let hasKeydownListener = false;
-  let score = 0; let penguin = { x: 40, y: 140, w: 24, h: 30, vy: 0, jumping: false, frame: 0 };
-  let obstacles = []; let environment = { clouds: [], icebergs: [], groundX: 0 };
-  let spawnTimer = 0; let jumpPressed = false; // 점프 버튼 유지 상태
-
-  function initPenguinObjects() {
-    score = 0; penguin.y = 140; penguin.vy = 0; penguin.jumping = false; penguin.frame = 0;
-    obstacles = []; environment.clouds = [{x: 100, y: 30, w: 40}, {x: 280, y: 50, w: 50}]; environment.icebergs = [{x: 60, w: 40, h: 30}, {x: 230, w: 60, h: 45}];
-    environment.groundX = 0; spawnTimer = 0; jumpPressed = false;
-  }
-
-  function startPenguinGame() {
-    if (gameRunning) return;
-    if (!hasKeydownListener) { window.addEventListener('keydown', handleKeyDown); window.addEventListener('keyup', handleKeyUp); hasKeydownListener = true; }
-    gameRunning = true; initPenguinObjects(); gameLoop();
+    gameRunning = false;
+    bgm.pause(); 
+    if (gameAnimationId) {
+      cancelAnimationFrame(gameAnimationId);
+      gameAnimationId = null;
+    }
   }
 
   // ==== 롱 점프/숏 점프 컨트롤 ====
   function handleJumpStart(e) {
-    if (e && e.cancelable) e.preventDefault(); // 스크롤/줌 방지
-    if (!gameRunning || document.getElementById('game-play-area').style.display === 'none') return;
+    if (e && e.cancelable) e.preventDefault(); 
+    if (!gameRunning) return;
     jumpPressed = true;
     if (!penguin.jumping) {
-      penguin.vy = -6.2; // 초기 점프력 (너무 높지 않게)
+      penguin.vy = -6.2; // 초기 점프력 
       penguin.jumping = true;
       playJumpSound(); 
     }
   }
   
-  function handleJumpEnd(e) { jumpPressed = false; }
-  function handleKeyDown(e) { if (e.code === 'Space' && views.game.classList.contains('active')) { e.preventDefault(); handleJumpStart(); } }
-  function handleKeyUp(e) { if (e.code === 'Space') handleJumpEnd(); }
+  function handleJumpEnd(e) {
+    jumpPressed = false;
+  }
+
+  function handleKeyDown(e) {
+    if (e.code === 'Space' && views.game.classList.contains('active') && document.getElementById('game-play-area').style.display === 'flex') {
+      e.preventDefault(); handleJumpStart();
+    }
+  }
+  
+  function handleKeyUp(e) {
+    if (e.code === 'Space') handleJumpEnd();
+  }
 
   // 화면 전체(게임 영역)를 터치/클릭해도 작동하도록 넓게 이벤트 부착
-  const gamePlayAreaHTML = document.getElementById('game-play-area');
-  gamePlayAreaHTML.addEventListener('touchstart', handleJumpStart, { passive: false });
-  gamePlayAreaHTML.addEventListener('touchend', handleJumpEnd);
-  gamePlayAreaHTML.addEventListener('mousedown', handleJumpStart);
-  gamePlayAreaHTML.addEventListener('mouseup', handleJumpEnd);
-  gamePlayAreaHTML.addEventListener('mouseleave', handleJumpEnd);
+  const gamePlayArea = document.getElementById('game-play-area');
+  gamePlayArea.addEventListener('touchstart', handleJumpStart, { passive: false });
+  gamePlayArea.addEventListener('touchend', handleJumpEnd);
+  gamePlayArea.addEventListener('mousedown', handleJumpStart);
+  gamePlayArea.addEventListener('mouseup', handleJumpEnd);
+  gamePlayArea.addEventListener('mouseleave', handleJumpEnd);
 
   // ==== 장애물 그리기 로직 (테두리 추가로 시인성 향상) ====
   function drawPenguin(x, y, frame, isDead, isNight) {
@@ -1657,7 +990,6 @@
 
   function drawSeal(x, y, w, h, isNight) { 
     ctx.fillStyle = isNight ? '#D1D1D6' : '#8E8E93'; 
-    // 검은색 테두리 추가 (낮에 잘 보이게)
     ctx.strokeStyle = '#1C1C1E'; ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.rect(x, y + h - 14, w, 14); ctx.fill(); ctx.stroke();
     ctx.fillRect(x + w - 6, y + h - 20, 8, 10); 
@@ -1668,9 +1000,8 @@
   }
 
   function drawSeagull(x, y, frame, isNight) {
-    ctx.strokeStyle = isNight ? '#F2F2F7' : '#3A3A3C'; // 밤에 흰색 선
-    ctx.lineWidth = 2.5; // 선을 더 굵게
-    ctx.beginPath();
+    ctx.strokeStyle = isNight ? '#F2F2F7' : '#3A3A3C'; 
+    ctx.lineWidth = 2.5; ctx.beginPath();
     if (frame % 30 < 15) { ctx.moveTo(x, y); ctx.lineTo(x + 10, y + 6); ctx.lineTo(x + 20, y); } else { ctx.moveTo(x, y + 6); ctx.lineTo(x + 10, y); ctx.lineTo(x + 20, y + 6); }
     ctx.stroke(); ctx.fillStyle = '#FFCC00'; ctx.fillRect(x + 8, y + 2, 3, 2);
   }
@@ -1679,13 +1010,13 @@
     ctx.fillStyle = isNight ? '#D1D1D6' : '#FFFFFF'; 
     ctx.strokeStyle = '#1C1C1E'; ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.rect(x, y+10, w, h-10); ctx.fill(); ctx.stroke();
-    ctx.fillRect(x+w-12, y, 12, 12); // 머리
+    ctx.fillRect(x+w-12, y, 12, 12); 
     ctx.fillStyle = isNight ? '#FF3B30' : '#1C1C1E'; 
     ctx.fillRect(x+w-4, y+3, 2, 2); 
   }
 
   function drawIceSpike(x, y, w, h, isNight, count = 1) {
-    ctx.fillStyle = isNight ? '#00FFFF' : '#00BFFF'; // 뾰족한 얼음
+    ctx.fillStyle = isNight ? '#00FFFF' : '#00BFFF'; 
     ctx.strokeStyle = isNight ? '#008888' : '#0055AA';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
@@ -1700,10 +1031,10 @@
   }
 
   function gameLoop() {
-    if (!gameRunning || document.getElementById('game-play-area').style.display === 'none') return;
+    if (!gameRunning) return;
 
     // 1. 낮/밤 사이클 로직 (일정 점수마다 계속 순환)
-    let cycle = Math.floor(score / 800); // 800점마다 바뀜
+    let cycle = Math.floor(score / 800); 
     let isNight = cycle % 2 === 1;
     
     let skyColor = '#E0F7FA'; // 낮
@@ -1725,7 +1056,7 @@
     
     // 점프 중 중력 조절 (누르고 있으면 중력 약함 = 롱 점프)
     if (penguin.jumping) { 
-      let gravity = (jumpPressed && penguin.vy < 0) ? 0.25 : 0.6; // 위로 올라갈때만 적용
+      let gravity = (jumpPressed && penguin.vy < 0) ? 0.25 : 0.6; 
       penguin.vy += gravity; 
       penguin.y += penguin.vy; 
       if (penguin.y >= 140) { penguin.y = 140; penguin.jumping = false; penguin.vy = 0; } 
@@ -1739,14 +1070,14 @@
       if (rand > 0.7) {
         obstacles.push({ type: 'seal', x: canvas.width, y: 140, w: Math.random() > 0.5 ? 26 : 38, h: 20 }); 
       } else if (rand > 0.45) {
-        // 4. 갈매기는 하늘 또는 지상 양쪽에서 랜덤하게 등장
+        // 갈매기는 하늘 또는 지상 양쪽에서 랜덤하게 등장
         let isGround = Math.random() > 0.5;
         let gy = isGround ? 135 : (85 + Math.random()*25);
         obstacles.push({ type: 'seagull', x: canvas.width, y: gy, w: 20, h: 10 }); 
       } else if (rand > 0.25) {
         obstacles.push({ type: 'polarbear', x: canvas.width, y: 130, w: 45, h: 30 }); 
       } else {
-        // 3. 얼음 송곳은 1~3개가 나란히 붙어서 등장
+        // 얼음 송곳은 1~3개가 나란히 붙어서 등장
         let spikeCount = Math.floor(Math.random() * 3) + 1;
         obstacles.push({ type: 'icespike', x: canvas.width, y: 145, w: 15 * spikeCount, h: 15, count: spikeCount }); 
       }
@@ -1789,20 +1120,20 @@
       ctx.fillText('🎮 GAME OVER', canvas.width/2, 90);
       ctx.font = '13px sans-serif'; ctx.fillText(`최종 스코어: ${Math.floor(score)}점`, canvas.width/2, 115);
       
-      saveToLeaderboard(score, 'penguin');
+      saveToLeaderboard(score);
       ctx.fillStyle = '#FFCC00'; ctx.fillText('화면 터치 시 로비로 돌아갑니다', canvas.width/2, 145);
       ctx.textAlign = 'left';
       
       stopMiniGame();
       
       const goToLobby = () => {
-        gamePlayAreaHTML.removeEventListener('touchstart', goToLobby);
-        gamePlayAreaHTML.removeEventListener('mousedown', goToLobby);
+        gamePlayArea.removeEventListener('touchstart', goToLobby);
+        gamePlayArea.removeEventListener('mousedown', goToLobby);
         openGameLobby();
       };
       setTimeout(() => {
-        gamePlayAreaHTML.addEventListener('touchstart', goToLobby);
-        gamePlayAreaHTML.addEventListener('mousedown', goToLobby);
+        gamePlayArea.addEventListener('touchstart', goToLobby);
+        gamePlayArea.addEventListener('mousedown', goToLobby);
       }, 700);
       return;
     }
@@ -1811,7 +1142,7 @@
     gameAnimationId = requestAnimationFrame(gameLoop);
   }
 
-  // 앱 초기화 
+  // 앱 초기화 로직
   async function initApp() { await loadFromCloud(); initHome(); }
   initApp();
 </script>
