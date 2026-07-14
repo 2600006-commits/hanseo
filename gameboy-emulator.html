@@ -124,7 +124,7 @@
       <div class="picker-title">게임보이 에뮬레이터</div>
       <div class="picker-sub">.gb 또는 .gbc 롬 파일을 첨부하면<br>바로 이 자리에서 게임을 플레이할 수 있어요.</div>
       <button class="attach-btn" id="btn-attach">📁 롬 파일 첨부하기</button>
-      <input type="file" id="rom-input" accept=".gb,.gbc,.zip" />
+      <input type="file" id="rom-input" />
       <div class="attach-hint">지원 형식: <b>.gb / .gbc</b><br>파일은 이 기기(브라우저) 안에서만 실행되며 서버로 전송되지 않아요.</div>
     </div>
 
@@ -245,6 +245,11 @@
   function loadRomFile(file) {
     if (!file) return;
     var name = file.name || 'ROM';
+    var lowerName = name.toLowerCase();
+    if (!/\.(gb|gbc)$/.test(lowerName)) {
+      var ok = confirm('"' + name + '" 파일은 .gb 또는 .gbc 확장자가 아니에요.\n그래도 게임보이 롬으로 불러올까요?');
+      if (!ok) return;
+    }
     var reader = new FileReader();
     reader.onload = function () {
       currentRomData = this.result;
