@@ -147,6 +147,9 @@
     .game-tile-icon { height: 110px; display: flex; align-items: center; justify-content: center; font-size: 48px; }
     .game-tile-icon.penguin { background: linear-gradient(160deg, #4FC3F7, #0288D1); }
     .game-tile-icon.card { background: linear-gradient(160deg, #2c3e50, #0e4438); }
+    .game-tile-icon.gameboy { background: linear-gradient(160deg, #6b2d8c, #4a1d63); }
+    .game-tile.wide { grid-column: 1 / -1; }
+    .game-tile.wide .game-tile-icon { height: 70px; }
     .game-tile-body { padding: 12px 14px 16px; }
     .game-tile-body h4 { margin: 0 0 4px; font-size: 15px; font-weight: 800; color: var(--text-main); }
     .game-tile-body p { margin: 0; font-size: 11.5px; color: var(--text-sub); font-weight: 600; line-height: 1.4; }
@@ -289,6 +292,10 @@
         <button class="game-tile" id="tile-card">
           <div class="game-tile-icon card">🃏</div>
           <div class="game-tile-body"><h4>핸드 크래커</h4><p>포커 족보로 승부하는 로그라이크</p></div>
+        </button>
+        <button class="game-tile wide" id="tile-gameboy">
+          <div class="game-tile-icon gameboy">👾</div>
+          <div class="game-tile-body"><h4>게임보이 에뮬레이터</h4><p>내 게임보이 롬 파일(.gb/.gbc)을 직접 불러와서 플레이하세요</p></div>
         </button>
       </div>
       <button class="outline-btn" id="btn-close-game-select" style="margin-top: 18px; background: var(--card);">명렬표로 돌아가기</button>
@@ -804,6 +811,10 @@
 
   document.getElementById('tile-card').addEventListener('click', () => {
     window.location.href = 'card-game.html';
+  });
+
+  document.getElementById('tile-gameboy').addEventListener('click', () => {
+    window.location.href = 'gameboy-emulator.html';
   });
 
   document.getElementById('btn-back-to-select').addEventListener('click', () => {
