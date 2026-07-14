@@ -219,6 +219,19 @@
   }
   .msg-toast.show{opacity:1; top:26px;}
 
+  .sound-toggle-btn{
+    position:fixed; bottom:16px; right:16px; z-index:200;
+    width:40px; height:40px; border-radius:50%;
+    background:var(--panel); border:1px solid var(--gold);
+    color:var(--gold-bright); font-size:17px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; box-shadow:0 3px 10px rgba(0,0,0,.35);
+    opacity:0.55; transition:transform .15s ease, filter .15s ease, opacity .15s ease;
+  }
+  .sound-toggle-btn:hover{filter:brightness(1.15); opacity:1;}
+  .sound-toggle-btn:active{transform:scale(0.92);}
+  .sound-toggle-btn.muted{color:var(--panel-line); border-color:var(--panel-line);}
+
   /* ---------- Overlays ---------- */
   .overlay{
     position:fixed; inset:0; background:rgba(4,14,11,.86); backdrop-filter:blur(3px);
@@ -298,6 +311,8 @@
 </style>
 </head>
 <body>
+
+<button class="sound-toggle-btn" id="soundToggleBtn" aria-label="음소거 전환">🔊</button>
 
 <div class="msg-toast" id="toast"></div>
 
@@ -401,6 +416,191 @@
 </div>
 
 <script>
+/* ================= 사운드 엔진 (배경음악 + 효과음, 외부 파일 없이 자체 생성) ================= */
+const Sound = (function(){
+  let ctx = null;
+  let masterGain, musicGain, sfxGain;
+  let muted = (localStorage.getItem('handcracker_muted') === '1');
+  let unlocked = false;
+  let musicPlaying = false;
+  let musicTimerID = null;
+  let nextNoteTime = 0;
+  let currentStep = 0;
+
+  const MUSIC_BPM = 96;
+  const secondsPerBeat = 60 / MUSIC_BPM;
+  // 재즈풍 라운지 코드 진행: Dm7 - G7 - Cmaj7 - Am7 (4마디 반복)
+  const MUSIC_PROGRESSION = [
+    { root: 73.42,  tones: [146.83, 174.61, 220.00, 261.63] }, // Dm7
+    { root: 98.00,  tones: [196.00, 246.94, 293.66, 349.23] }, // G7
+    { root: 130.81, tones: [261.63, 329.63, 392.00, 493.88] }, // Cmaj7
+    { root: 110.00, tones: [220.00, 261.63, 329.63, 392.00] }, // Am7
+  ];
+
+  function ensureContext(){
+    if(ctx) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    ctx = new AC();
+    masterGain = ctx.createGain();
+    masterGain.gain.value = muted ? 0 : 0.42;
+    masterGain.connect(ctx.destination);
+    musicGain = ctx.createGain();
+    musicGain.gain.value = 1.15;
+    musicGain.connect(masterGain);
+    sfxGain = ctx.createGain();
+    sfxGain.gain.value = 1.0;
+    sfxGain.connect(masterGain);
+  }
+
+  function unlock(){
+    if(unlocked) return;
+    ensureContext();
+    if(ctx.state === 'suspended') ctx.resume();
+    unlocked = true;
+  }
+
+  // 짧은 합성음 하나 재생 (효과음용)
+  function tone(freq, {type='sine', dur=0.18, vol=0.22, when=0, glideTo=null, gainNode=null} = {}){
+    if(!ctx) return;
+    const t0 = ctx.currentTime + when;
+    const osc = ctx.createOscillator();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, t0);
+    if(glideTo) osc.frequency.exponentialRampToValueAtTime(Math.max(1,glideTo), t0 + dur);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0002,vol), t0 + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(g);
+    g.connect(gainNode || sfxGain);
+    osc.start(t0);
+    osc.stop(t0 + dur + 0.02);
+  }
+
+  // 짧은 노이즈 버스트 (카드 넘기는 소리, 셔플 등)
+  function noiseBurst({dur=0.18, vol=0.18, when=0, filterFreq=2500, filterType='bandpass'} = {}){
+    if(!ctx) return;
+    const t0 = ctx.currentTime + when;
+    const bufferSize = Math.max(1, Math.floor(ctx.sampleRate * dur));
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for(let i=0;i<bufferSize;i++){ data[i] = (Math.random()*2-1) * (1 - i/bufferSize); }
+    const src = ctx.createBufferSource();
+    src.buffer = buffer;
+    const filt = ctx.createBiquadFilter();
+    filt.type = filterType;
+    filt.frequency.value = filterFreq;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(vol, t0);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    src.connect(filt);
+    filt.connect(g);
+    g.connect(sfxGain);
+    src.start(t0);
+  }
+
+  function arpeggio(freqs, {type='triangle', step=0.07, dur=0.16, vol=0.2, when=0} = {}){
+    freqs.forEach((f,i)=> tone(f, {type, dur, vol, when: when + i*step}));
+  }
+
+  /* ---------- 배경음악 (라운지풍 루프, 절차적 생성) ---------- */
+  function pluck(freq, time, type, dur, peakVol, target){
+    if(!ctx) return;
+    const osc = ctx.createOscillator();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, time);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, time);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0003,peakVol), time + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+    osc.connect(g);
+    g.connect(target);
+    osc.start(time);
+    osc.stop(time + dur + 0.05);
+  }
+
+  function scheduleMusicNote(stepNumber, time){
+    const barIndex = Math.floor(stepNumber/4) % MUSIC_PROGRESSION.length;
+    const beatIndex = stepNumber % 4;
+    const chord = MUSIC_PROGRESSION[barIndex];
+    if(beatIndex === 0){
+      pluck(chord.root, time, 'sine', secondsPerBeat*3.6, 0.24, musicGain);
+    }
+    pluck(chord.tones[beatIndex], time, 'triangle', secondsPerBeat*0.85, 0.115, musicGain);
+  }
+
+  function musicScheduler(){
+    while(nextNoteTime < ctx.currentTime + 0.12){
+      scheduleMusicNote(currentStep, nextNoteTime);
+      nextNoteTime += secondsPerBeat;
+      currentStep = (currentStep + 1) % (MUSIC_PROGRESSION.length * 4);
+    }
+    musicTimerID = setTimeout(musicScheduler, 25);
+  }
+
+  function startMusic(){
+    ensureContext();
+    if(musicPlaying) return;
+    musicPlaying = true;
+    currentStep = 0;
+    nextNoteTime = ctx.currentTime + 0.15;
+    musicScheduler();
+  }
+
+  function stopMusic(){
+    musicPlaying = false;
+    if(musicTimerID) clearTimeout(musicTimerID);
+  }
+
+  /* ---------- 효과음 모음 ---------- */
+  function playSelectCard(){ unlock(); tone(660, {type:'square', dur:0.07, vol:0.14}); }
+  function playDeselectCard(){ unlock(); tone(440, {type:'square', dur:0.07, vol:0.12}); }
+  function playDraw(){ unlock(); noiseBurst({dur:0.16, vol:0.14, filterFreq:3200}); }
+  function playDiscard(){ unlock(); noiseBurst({dur:0.22, vol:0.16, filterFreq:1400, filterType:'lowpass'}); tone(180,{type:'sine', dur:0.18, vol:0.1, when:0.02, glideTo:90}); }
+  function playSort(){ unlock(); noiseBurst({dur:0.14, vol:0.1, filterFreq:2600}); }
+
+  function playHandResult(handType){
+    unlock();
+    // 족보 등급에 따라 아르페지오 음 개수/음정을 다르게 재생
+    const tiers = {
+      high:[523,659], pair:[523,659,784], twopair:[523,659,784,988],
+      triple:[440,554,659,880], straight:[440,554,659,880,1109],
+      flush:[392,494,587,784,988], fullhouse:[392,494,587,784,988,1175],
+      quads:[330,415,494,659,831,988], straightflush:[262,330,392,494,659,831,988,1046]
+    };
+    const freqs = tiers[handType] || tiers.high;
+    arpeggio(freqs, {type:'triangle', step:0.055, dur:0.22, vol:0.22});
+  }
+
+  function playCoin(){ unlock(); tone(988,{type:'square',dur:0.09,vol:0.16}); tone(1318,{type:'square',dur:0.14,vol:0.15,when:0.07}); }
+  function playSell(){ unlock(); tone(700,{type:'square',dur:0.08,vol:0.14}); tone(500,{type:'square',dur:0.14,vol:0.12,when:0.06}); }
+  function playReroll(){ unlock(); noiseBurst({dur:0.22, vol:0.15, filterFreq:2000}); arpeggio([392,440,494],{type:'sine',step:0.05,dur:0.12,vol:0.12}); }
+  function playError(){ unlock(); tone(180,{type:'square',dur:0.16,vol:0.14, glideTo:110}); }
+  function playClick(){ unlock(); tone(880,{type:'square',dur:0.045,vol:0.1}); }
+  function playLevelUp(){ unlock(); arpeggio([523,659,784,1046,1318],{type:'triangle',step:0.06,dur:0.28,vol:0.22}); }
+  function playRoundWin(){ unlock(); arpeggio([523,659,784,1046],{type:'square',step:0.09,dur:0.3,vol:0.2}); }
+  function playGameOver(){ unlock(); arpeggio([392,349,294,220],{type:'sawtooth',step:0.16,dur:0.5,vol:0.16}); }
+  function playGameClear(){ unlock(); arpeggio([523,659,784,1046,1318,1568],{type:'triangle',step:0.09,dur:0.4,vol:0.24}); }
+  function playShopOpen(){ unlock(); arpeggio([440,554,659],{type:'sine',step:0.06,dur:0.2,vol:0.14}); }
+  function playSparkle(){ unlock(); arpeggio([784,988,1175,1568],{type:'sine',step:0.045,dur:0.18,vol:0.16}); }
+
+  function setMuted(v){
+    muted = v;
+    localStorage.setItem('handcracker_muted', muted ? '1' : '0');
+    if(masterGain) masterGain.gain.setTargetAtTime(muted ? 0 : 0.42, ctx.currentTime, 0.05);
+  }
+  function toggleMuted(){ setMuted(!muted); return muted; }
+  function isMuted(){ return muted; }
+
+  return {
+    unlock, startMusic, stopMusic,
+    playSelectCard, playDeselectCard, playDraw, playDiscard, playSort,
+    playHandResult, playCoin, playSell, playReroll, playError, playClick,
+    playLevelUp, playRoundWin, playGameOver, playGameClear, playShopOpen, playSparkle,
+    toggleMuted, isMuted
+  };
+})();
+
 /* ================= 데이터 정의 ================= */
 const RANKS = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
 const SUITS = [
@@ -528,6 +728,7 @@ function startBlind(){
 }
 
 function drawCards(n){
+  if(n>0) Sound.playDraw();
   for(let k=0;k<n;k++){
     if(game.deck.length===0){
       const handIds = new Set(game.hand.map(c=>c.id));
@@ -556,6 +757,7 @@ function upgradeHandLevel(type, chips, mult) {
   h.level += 1;
   h.extraChips += chips;
   h.extraMult += mult;
+  Sound.playLevelUp();
   const name = HAND_BASE_INFO[type].name;
   showToast(`${name} 족보 레벨업! (Lv.${h.level})`);
 }
@@ -589,6 +791,7 @@ function useConsumable(uid) {
   const item = game.consumables[idx];
   const def = CONSUMABLE_POOL[item.id];
   def.onUse();
+  Sound.playSparkle();
   game.consumables.splice(idx, 1); // 사용 후 제거
   render();
 }
@@ -596,6 +799,7 @@ function useConsumable(uid) {
 /* ================= 정렬 기능 ================= */
 function sortByRank() {
   game.hand.sort((a, b) => RANKS.indexOf(a.rank) - RANKS.indexOf(b.rank));
+  Sound.playSort();
   render();
   showToast("숫자 순으로 정렬했습니다.");
 }
@@ -607,6 +811,7 @@ function sortBySuit() {
     if(suitA !== suitB) return suitB - suitA;
     return RANKS.indexOf(a.rank) - RANKS.indexOf(b.rank);
   });
+  Sound.playSort();
   render();
   showToast("문양 순으로 정렬했습니다.");
 }
@@ -707,10 +912,11 @@ function calculateScore(cards){
 /* ================= 액션 ================= */
 function toggleCard(id){
   if(game.phase!=='blind') return;
-  if(selected.has(id)) selected.delete(id);
+  if(selected.has(id)){ selected.delete(id); Sound.playDeselectCard(); }
   else{
-    if(selected.size>=5) return;
+    if(selected.size>=5){ Sound.playError(); return; }
     selected.add(id);
+    Sound.playSelectCard();
   }
   render();
 }
@@ -722,11 +928,12 @@ function getSelectedCards(){
 function playHand(){
   if(game.phase!=='blind' || game.handsLeft<=0) return;
   const cards = getSelectedCards();
-  if(cards.length===0) return;
+  if(cards.length===0){ Sound.playError(); return; }
   const score = calculateScore(cards);
   game.roundScore += score.total;
   game.handsLeft--;
   
+  Sound.playHandResult(score.type);
   showToast(`${score.name}! 총 ${score.total.toLocaleString()}점`);
   
   const playedIds = new Set(cards.map(c=>c.id));
@@ -745,12 +952,13 @@ function playHand(){
 function discardHand(){
   if(game.phase!=='blind' || game.discardsLeft<=0) return;
   const cards = getSelectedCards();
-  if(cards.length===0) return;
+  if(cards.length===0){ Sound.playError(); return; }
   game.discardsLeft--;
   const ids = new Set(cards.map(c=>c.id));
   game.hand = game.hand.filter(c=>!ids.has(c.id));
   drawCards(cards.length);
   selected.clear();
+  Sound.playDiscard();
   showToast(`카드 ${cards.length}장을 버렸습니다.`);
   render();
 }
@@ -758,6 +966,7 @@ function discardHand(){
 function winRound(){
   const payout = 5 + game.handsLeft*2 + Math.min(Math.floor(game.money/5),5);
   game.money += payout;
+  Sound.playRoundWin();
   showToast(`블라인드 클리어! +$${payout}`);
   generateShop();
   game.phase='shop';
@@ -765,6 +974,8 @@ function winRound(){
 }
 
 function loseGame(){
+  Sound.stopMusic();
+  Sound.playGameOver();
   game.phase='gameover';
   render();
 }
@@ -784,8 +995,9 @@ function generateShop(){
 }
 
 function rerollShop(){
-  if(game.money < game.rerollCost) return;
+  if(game.money < game.rerollCost){ Sound.playError(); return; }
   game.money -= game.rerollCost;
+  Sound.playReroll();
   generateShop();
   game.rerollCost += 1;
   render();
@@ -793,10 +1005,11 @@ function rerollShop(){
 
 function buyJoker(id){
   const def = JOKER_POOL[id];
-  if(!def || game.money < def.cost || game.jokers.length >= game.maxJokers) return;
+  if(!def || game.money < def.cost || game.jokers.length >= game.maxJokers){ Sound.playError(); return; }
   game.money -= def.cost;
   game.jokers.push({uid:'j'+Date.now()+Math.random(), id});
   game.shopOffers = game.shopOffers.filter(o=>o!==id);
+  Sound.playCoin();
   showToast(`${def.name} 구매!`);
   render();
 }
@@ -804,12 +1017,14 @@ function buyJoker(id){
 function buyConsumable(id){
   const def = CONSUMABLE_POOL[id];
   if(!def || game.money < def.cost || game.consumables.length >= game.maxConsumables) {
+    Sound.playError();
     if(game.consumables.length >= game.maxConsumables) showToast("소모품 인벤토리가 가득 찼습니다!");
     return;
   }
   game.money -= def.cost;
   game.consumables.push({uid:'c'+Date.now()+Math.random(), id});
   game.consumableOffers = game.consumableOffers.filter(o=>o!==id);
+  Sound.playCoin();
   showToast(`${def.name} 구매!`);
   render();
 }
@@ -821,6 +1036,7 @@ function sellItem(uid, typeStr){
     const def = JOKER_POOL[game.jokers[idx].id];
     game.money += Math.floor(def.cost/2);
     game.jokers.splice(idx,1);
+    Sound.playSell();
     showToast(`${def.name} 판매 완료`);
   } else if (typeStr === 'consumable') {
     const idx = game.consumables.findIndex(c=>c.uid===uid);
@@ -828,6 +1044,7 @@ function sellItem(uid, typeStr){
     const def = CONSUMABLE_POOL[game.consumables[idx].id];
     game.money += Math.floor(def.cost/2);
     game.consumables.splice(idx,1);
+    Sound.playSell();
     showToast(`${def.name} 판매 완료`);
   }
   render();
@@ -836,6 +1053,8 @@ function sellItem(uid, typeStr){
 function nextRound(){
   game.ante++;
   if(game.ante>8){
+    Sound.stopMusic();
+    Sound.playGameClear();
     game.phase='win';
     render();
     return;
@@ -1149,10 +1368,13 @@ function openGate(){
 document.getElementById('startGameBtn').addEventListener('click', () => {
   const name = document.getElementById('nameInput').value.trim();
   if(!name){
+    Sound.playError();
     alert('닉네임을 입력해 주세요!');
     document.getElementById('nameInput').focus();
     return;
   }
+  Sound.unlock();
+  Sound.startMusic();
   currentPlayerName = name;
   localStorage.setItem('handcracker_player_name', currentPlayerName);
   document.getElementById('gateOverlay').classList.add('hidden');
@@ -1160,6 +1382,7 @@ document.getElementById('startGameBtn').addEventListener('click', () => {
 });
 
 document.getElementById('cardAdminResetBtn').addEventListener('click', () => {
+  Sound.playClick();
   const pwd = prompt('관리자 비밀번호를 입력하세요 (4자리):');
   if(pwd === '1234'){
     localStorage.removeItem(LB_KEY);
@@ -1171,19 +1394,37 @@ document.getElementById('cardAdminResetBtn').addEventListener('click', () => {
 });
 
 document.getElementById('backToMainBtn').addEventListener('click', () => {
+  Sound.stopMusic();
   window.location.href = 'index.html';
 });
 
 document.getElementById('backToLobbyBtn').addEventListener('click', () => {
+  Sound.stopMusic();
+  Sound.playClick();
   openGate();
 });
+
+document.getElementById('soundToggleBtn').addEventListener('click', () => {
+  Sound.unlock();
+  const nowMuted = Sound.toggleMuted();
+  const btn = document.getElementById('soundToggleBtn');
+  btn.textContent = nowMuted ? '🔇' : '🔊';
+  btn.classList.toggle('muted', nowMuted);
+  if(!nowMuted) Sound.playClick();
+});
+(function initSoundToggleIcon(){
+  const btn = document.getElementById('soundToggleBtn');
+  const muted = Sound.isMuted();
+  btn.textContent = muted ? '🔇' : '🔊';
+  btn.classList.toggle('muted', muted);
+})();
 
 /* ================= 이벤트 바인딩 ================= */
 document.getElementById('playBtn').onclick = playHand;
 document.getElementById('discardBtn').onclick = discardHand;
 document.getElementById('rerollBtn').onclick = rerollShop;
 document.getElementById('nextRoundBtn').onclick = nextRound;
-document.getElementById('restartBtn').onclick = initGame;
+document.getElementById('restartBtn').onclick = () => { Sound.unlock(); Sound.startMusic(); initGame(); };
 document.getElementById('sortByRankBtn').onclick = sortByRank;
 document.getElementById('sortBySuitBtn').onclick = sortBySuit;
 
