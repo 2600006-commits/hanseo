@@ -304,8 +304,19 @@
   document.getElementById('btn-exit2').addEventListener('click', exitEmulator);
 
   // ---- 터치/마우스 조작 (D-pad, A/B, Select/Start) ----
+  // iOS Safari는 사용자 제스처(탭) 안에서만 오디오 재생을 허용해요.
+  // 롬 로딩은 비동기라 오디오 컨텍스트가 'suspended' 상태로 생성되므로,
+  // 사용자가 조작 버튼을 처음 누르는 순간(진짜 제스처)에 강제로 resume 시켜줍니다.
+  function unlockAudio() {
+    try {
+      var ctx = window.XAudioJSWebAudioContextHandle;
+      if (ctx && ctx.state === 'suspended') { ctx.resume(); }
+    } catch (e) {}
+  }
+
   var pressed = {};
   function keyDown(key) {
+    unlockAudio();
     if (pressed[key]) return;
     pressed[key] = true;
     try { GameBoyKeyDown(key); } catch (e) {}
@@ -339,6 +350,9 @@
       if (zone[1].indexOf(event.keyCode) !== -1) { keyUp(zone[0]); event.preventDefault(); }
     });
   });
+
+  document.addEventListener('touchstart', unlockAudio, { passive: true });
+  document.addEventListener('click', unlockAudio);
 
   window.addEventListener('beforeunload', function () {
     try { clearLastEmulation(); } catch (e) {}
