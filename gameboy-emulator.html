@@ -249,8 +249,12 @@
     reader.onload = function () {
       currentRomData = this.result;
       try {
-        start(canvas, currentRomData); // GameBoyIO.js 의 start()
+        // 캔버스가 화면에 보여야(display:none이 아니어야) 올바른 크기로 초기화되므로
+        // 반드시 화면 전환을 먼저 하고, 그 다음 에뮬레이터를 시작한다.
         showPlayer(name);
+        canvas.width = 160;
+        canvas.height = 144;
+        start(canvas, currentRomData); // GameBoyIO.js 의 start()
       } catch (err) {
         alert('롬 파일을 불러오는 중 문제가 발생했어요: ' + err.message);
       }
