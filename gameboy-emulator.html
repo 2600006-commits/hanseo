@@ -48,6 +48,22 @@
   .attach-hint b { color: var(--text-main); }
   #rom-input { display: none; }
 
+  .library-section { width: 100%; margin-top: 30px; }
+  .library-title { font-size: 15px; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .library-list { display: flex; flex-direction: column; gap: 8px; }
+  .library-item { display: flex; align-items: center; gap: 10px; background: var(--card); border-radius: 12px;
+    padding: 10px 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+  .library-item-icon { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(160deg, #6b2d8c, #4a1d63);
+    display: flex; align-items: center; justify-content: center; font-size: 18px; flex: none; }
+  .library-item-body { flex: 1; min-width: 0; text-align: left; background: none; border: none; padding: 0; cursor: pointer; }
+  .library-item-body:active { opacity: 0.7; }
+  .library-item-name { font-size: 14px; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .library-item-meta { font-size: 11px; color: var(--text-sub); font-weight: 600; margin-top: 2px; }
+  .library-item-del { flex: none; width: 30px; height: 30px; border-radius: 8px; border: none; background: transparent;
+    color: var(--danger); font-size: 15px; cursor: pointer; }
+  .library-item-del:active { opacity: 0.6; }
+  .library-empty-hint { font-size: 12px; color: var(--text-sub); font-weight: 600; text-align: center; padding: 10px 0; }
+
   /* ---------- 플레이 화면 : GameBoy 쉘 ---------- */
   #player-view { width: 100%; display: none; flex-direction: column; align-items: center; }
   .gb-shell {
@@ -126,6 +142,11 @@
       <button class="attach-btn" id="btn-attach">📁 롬 파일 첨부하기</button>
       <input type="file" id="rom-input" />
       <div class="attach-hint">지원 형식: <b>.gb / .gbc</b><br>파일은 이 기기(브라우저) 안에서만 실행되며 서버로 전송되지 않아요.</div>
+
+      <div class="library-section" id="library-section" style="display:none;">
+        <div class="library-title">📚 내 게임 보관함</div>
+        <div class="library-list" id="library-list"></div>
+      </div>
     </div>
 
     <!-- 플레이 화면 -->
@@ -179,6 +200,14 @@
         <button class="util-btn" id="btn-reset">🔄 다시하기</button>
         <button class="util-btn" id="btn-change-rom">📁 롬 변경</button>
         <button class="util-btn danger" id="btn-exit2">🚪 나가기</button>
+        <button class="util-btn" id="btn-export-save">💾 저장 내보내기</button>
+        <button class="util-btn" id="btn-import-save">📥 저장 가져오기</button>
+        <input type="file" id="save-input" accept="application/json,.json" style="display:none;" />
+      </div>
+
+      <div class="kbd-hint" style="margin-top:12px;">
+        💡 다른 기기에서 이어하려면: 이 기기에서 <b>저장 내보내기</b>로 파일을 받은 뒤,
+        다른 기기의 이 페이지에서 같은 롬을 먼저 불러오고 <b>저장 가져오기</b>로 그 파일을 선택하세요.
       </div>
 
       <div class="kbd-hint">
@@ -226,6 +255,146 @@
   var batteryDot = document.getElementById('battery-dot');
   var isPaused = false;
   var currentRomData = null;
+  var currentLibraryId = null; // 지금 실행 중인 게임이 보관함에 저장된 것이라면 그 id
+
+  /* ================= 내 게임 보관함 (IndexedDB, 이 브라우저에만 저장) ================= */
+  var LIB_DB_NAME = 'gbEmulatorLibrary';
+  var LIB_STORE = 'roms';
+  var libSupported = !!window.indexedDB;
+
+  function openLibraryDB() {
+    return new Promise(function (resolve, reject) {
+      var req = indexedDB.open(LIB_DB_NAME, 1);
+      req.onupgradeneeded = function (e) {
+        var db = e.target.result;
+        if (!db.objectStoreNames.contains(LIB_STORE)) {
+          db.createObjectStore(LIB_STORE, { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = function (e) { resolve(e.target.result); };
+      req.onerror = function (e) { reject(e.target.error); };
+    });
+  }
+  function libraryAdd(entry) {
+    return openLibraryDB().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction(LIB_STORE, 'readwrite');
+        tx.objectStore(LIB_STORE).put(entry);
+        tx.oncomplete = function () { resolve(); };
+        tx.onerror = function () { reject(tx.error); };
+      });
+    });
+  }
+  function libraryGetAll() {
+    if (!libSupported) return Promise.resolve([]);
+    return openLibraryDB().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction(LIB_STORE, 'readonly');
+        var req = tx.objectStore(LIB_STORE).getAll();
+        req.onsuccess = function () { resolve(req.result || []); };
+        req.onerror = function () { reject(req.error); };
+      });
+    });
+  }
+  function libraryDelete(id) {
+    return openLibraryDB().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction(LIB_STORE, 'readwrite');
+        tx.objectStore(LIB_STORE).delete(id);
+        tx.oncomplete = function () { resolve(); };
+        tx.onerror = function () { reject(tx.error); };
+      });
+    });
+  }
+
+  function formatSize(bytes) {
+    if (!bytes) return '';
+    if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + 'KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + 'MB';
+  }
+
+  function renderLibrary() {
+    if (!libSupported) return;
+    var section = document.getElementById('library-section');
+    var list = document.getElementById('library-list');
+    libraryGetAll().then(function (items) {
+      if (!items.length) { section.style.display = 'none'; list.innerHTML = ''; return; }
+      items.sort(function (a, b) { return (b.addedAt || 0) - (a.addedAt || 0); });
+      section.style.display = 'block';
+      list.innerHTML = '';
+      items.forEach(function (item) {
+        var row = document.createElement('div');
+        row.className = 'library-item';
+
+        var icon = document.createElement('div');
+        icon.className = 'library-item-icon';
+        icon.textContent = '🎮';
+
+        var body = document.createElement('button');
+        body.className = 'library-item-body';
+        var nameEl = document.createElement('div');
+        nameEl.className = 'library-item-name';
+        nameEl.textContent = item.name;
+        var metaEl = document.createElement('div');
+        metaEl.className = 'library-item-meta';
+        metaEl.textContent = formatSize(item.size);
+        body.appendChild(nameEl);
+        body.appendChild(metaEl);
+        body.addEventListener('click', function () { playFromLibrary(item); });
+
+        var delBtn = document.createElement('button');
+        delBtn.className = 'library-item-del';
+        delBtn.textContent = '🗑';
+        delBtn.setAttribute('aria-label', '삭제');
+        delBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (confirm('"' + item.name + '"을(를) 보관함에서 삭제할까요? (저장된 게임 진행 상황은 별도로 남아있어요)')) {
+            libraryDelete(item.id).then(renderLibrary);
+          }
+        });
+
+        row.appendChild(icon);
+        row.appendChild(body);
+        row.appendChild(delBtn);
+        list.appendChild(row);
+      });
+    }).catch(function () { section.style.display = 'none'; });
+  }
+
+  function playFromLibrary(item) {
+    try {
+      currentRomData = atob(item.dataB64);
+      currentLibraryId = item.id;
+      showPlayer(item.name);
+      canvas.width = 160;
+      canvas.height = 144;
+      start(canvas, currentRomData);
+    } catch (err) {
+      alert('보관함에서 게임을 불러오는 중 문제가 발생했어요: ' + err.message);
+    }
+  }
+
+  function offerSaveToLibrary(name, romBinaryString, sizeBytes) {
+    if (!libSupported) return;
+    var ok = confirm('"' + name + '"을(를) 내 게임 보관함에 저장할까요?\n저장하면 다음부터 클릭 한 번으로 바로 실행할 수 있어요.\n(이 기기의 브라우저에만 저장되고, 서버로는 전송되지 않아요)');
+    if (!ok) return;
+    var defaultName = name.replace(/\.(gb|gbc)$/i, '');
+    var displayName = prompt('보관함에 표시할 이름을 입력하세요:', defaultName);
+    if (!displayName) return;
+    var entry = {
+      id: 'rom_' + Date.now() + '_' + Math.random().toString(36).slice(2),
+      name: displayName,
+      dataB64: btoa(romBinaryString),
+      size: sizeBytes || romBinaryString.length,
+      addedAt: Date.now()
+    };
+    libraryAdd(entry).then(function () {
+      currentLibraryId = entry.id;
+      renderLibrary();
+    }).catch(function (err) {
+      alert('보관함 저장에 실패했어요: ' + err.message + '\n(용량이 큰 롬 파일은 저장이 제한될 수 있어요)');
+    });
+  }
 
   function showPlayer(name) {
     pickerView.style.display = 'none';
@@ -240,6 +409,7 @@
     playerView.style.display = 'none';
     pickerView.style.display = 'flex';
     batteryDot.classList.remove('on');
+    renderLibrary();
   }
 
   function loadRomFile(file) {
@@ -253,6 +423,7 @@
     var reader = new FileReader();
     reader.onload = function () {
       currentRomData = this.result;
+      currentLibraryId = null;
       try {
         // 캔버스가 화면에 보여야(display:none이 아니어야) 올바른 크기로 초기화되므로
         // 반드시 화면 전환을 먼저 하고, 그 다음 에뮬레이터를 시작한다.
@@ -260,6 +431,7 @@
         canvas.width = 160;
         canvas.height = 144;
         start(canvas, currentRomData); // GameBoyIO.js 의 start()
+        offerSaveToLibrary(name, currentRomData, file.size);
       } catch (err) {
         alert('롬 파일을 불러오는 중 문제가 발생했어요: ' + err.message);
       }
@@ -270,10 +442,82 @@
     reader.readAsBinaryString(file);
   }
 
+  function sanitizeFileName(name) {
+    return (name || 'gbsave').trim().replace(/[^a-zA-Z0-9가-힣_\-]/g, '_') || 'gbsave';
+  }
+
+  document.getElementById('btn-export-save').addEventListener('click', function () {
+    try {
+      if (!(typeof GameBoyEmulatorInitialized === 'function' && GameBoyEmulatorInitialized())) {
+        alert('먼저 롬 파일을 불러와 주세요.');
+        return;
+      }
+      autoSave(); // 최신 상태를 localStorage에 반드시 반영
+      var romName = gameboy.name;
+      var sram = findValue('B64_SRAM_' + romName);
+      var rtc = findValue('RTC_' + romName);
+      if (!sram) {
+        alert('이 게임은 저장 데이터(배터리 세이브)가 없거나, 아직 게임 안에서 저장을 한 적이 없어요.\n게임 메뉴에서 저장(SAVE)을 한 번 하신 뒤 다시 시도해주세요.');
+        return;
+      }
+      var payload = { romName: romName, sram: sram, rtc: rtc || null, exportedAt: new Date().toISOString() };
+      var blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = sanitizeFileName(romName) + '.gbsave.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+    } catch (err) {
+      alert('저장 파일을 내보내는 중 문제가 발생했어요: ' + err.message);
+    }
+  });
+
+  document.getElementById('btn-import-save').addEventListener('click', function () {
+    if (!(typeof GameBoyEmulatorInitialized === 'function' && GameBoyEmulatorInitialized())) {
+      alert('먼저 이어하려는 게임의 롬 파일을 같은 화면에서 불러온 뒤 저장 가져오기를 눌러주세요.');
+      return;
+    }
+    document.getElementById('save-input').click();
+  });
+
+  document.getElementById('save-input').addEventListener('change', function () {
+    var file = this.files && this.files[0];
+    this.value = '';
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      try {
+        var payload = JSON.parse(this.result);
+        if (!payload || !payload.romName || !payload.sram) {
+          alert('올바른 저장 파일이 아니에요.');
+          return;
+        }
+        var currentRomName = (typeof GameBoyEmulatorInitialized === 'function' && GameBoyEmulatorInitialized()) ? gameboy.name : null;
+        if (currentRomName && currentRomName !== payload.romName) {
+          var proceed = confirm(
+            '지금 불러온 롬("' + currentRomName + '")과 저장 파일의 게임("' + payload.romName + '")이 달라 보여요.\n' +
+            '그래도 이 저장 파일을 적용할까요? (같은 게임의 다른 버전/리전일 수 있어요)'
+          );
+          if (!proceed) return;
+        }
+        setValue('B64_SRAM_' + payload.romName, payload.sram);
+        if (payload.rtc) setValue('RTC_' + payload.romName, payload.rtc);
+        alert('저장 파일을 가져왔어요! "다시하기" 버튼을 눌러 저장된 지점부터 다시 시작해주세요.');
+      } catch (err) {
+        alert('저장 파일을 읽는 중 문제가 발생했어요: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  });
+
   document.getElementById('btn-attach').addEventListener('click', function () { romInput.click(); });
   document.getElementById('btn-change-rom').addEventListener('click', function () {
+    try { autoSave(); } catch (e) {}
     try { clearLastEmulation(); } catch (e) {}
-    romInput.click();
+    showPicker();
   });
   romInput.addEventListener('change', function () {
     if (this.files && this.files.length > 0) {
@@ -297,11 +541,18 @@
   });
 
   function exitEmulator() {
+    try { autoSave(); } catch (e) {}
     try { clearLastEmulation(); } catch (e) {}
     window.location.href = 'index.html';
   }
   document.getElementById('btn-exit').addEventListener('click', exitEmulator);
   document.getElementById('btn-exit2').addEventListener('click', exitEmulator);
+
+  // 혹시 브라우저가 강제 종료되거나 크래시하는 경우를 대비해
+  // 20초마다 한 번씩 자동으로 저장해둡니다. (게임 내에서 저장한 시점 기준)
+  setInterval(function () {
+    try { autoSave(); } catch (e) {}
+  }, 20000);
 
   // ---- 터치/마우스 조작 (D-pad, A/B, Select/Start) ----
   // iOS Safari는 사용자 제스처(탭) 안에서만 오디오 재생을 허용해요.
@@ -354,8 +605,14 @@
   document.addEventListener('touchstart', unlockAudio, { passive: true });
   document.addEventListener('click', unlockAudio);
 
+  renderLibrary();
+
   window.addEventListener('beforeunload', function () {
+    try { autoSave(); } catch (e) {}
     try { clearLastEmulation(); } catch (e) {}
+  });
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { try { autoSave(); } catch (e) {} }
   });
 })();
 </script>
