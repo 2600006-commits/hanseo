@@ -87,36 +87,79 @@
   .gb-screen-label { text-align: center; font-size: 10px; color: #9a9486; font-weight: 700; letter-spacing: 0.15em; margin-top: 8px; }
 
   .gb-controls-row { display: flex; justify-content: space-between; align-items: center; margin-top: 26px; padding: 0 6px; }
-  .dpad { position: relative; width: 96px; height: 96px; }
-  .dpad-btn { position: absolute; background: linear-gradient(180deg,#3a3a3e,#1c1c1e); border: none; touch-action: none; }
-  .dpad-btn:active { background: linear-gradient(180deg,#4a4a4e,#2c2c2e); }
+
+  /* ---- D-pad: 십자 전체에 입체 베젤 + 눌렀을 때 눌림 효과 ---- */
+  .dpad { position: relative; width: 96px; height: 96px;
+    filter: drop-shadow(0 3px 5px rgba(0,0,0,0.35)); }
+  .dpad-v, .dpad-h { position:absolute;
+    background: linear-gradient(180deg,#4a4a4e,#232326);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.18), inset 0 -3px 4px rgba(0,0,0,0.55);
+  }
   .dpad-v { left: 32px; top: 0; width: 32px; height: 96px; border-radius: 6px; }
   .dpad-h { left: 0; top: 32px; width: 96px; height: 32px; border-radius: 6px; }
-  .dpad-up { position:absolute; left:32px; top:0; width:32px; height:32px; }
-  .dpad-down { position:absolute; left:32px; top:64px; width:32px; height:32px; }
-  .dpad-left { position:absolute; left:0; top:32px; width:32px; height:32px; }
-  .dpad-right { position:absolute; left:64px; top:32px; width:32px; height:32px; }
+  .dpad-btn { position: absolute; width:32px; height:32px; border: none; background: transparent;
+    touch-action: none; transition: transform .05s ease, filter .05s ease; }
+  .dpad-btn::after { content:''; position:absolute; inset:4px; border-radius:4px; background:transparent;
+    transition: background .05s ease, box-shadow .05s ease; }
+  .dpad-btn.pressed::after {
+    background: rgba(180,140,255,0.28);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.6), 0 0 8px 2px rgba(150,100,255,0.55);
+  }
+  .dpad-btn.pressed { transform: scale(0.94); }
+  .dpad-up { left:32px; top:0; }
+  .dpad-down { left:32px; top:64px; }
+  .dpad-left { left:0; top:32px; }
+  .dpad-right { left:64px; top:32px; }
 
+  /* ---- A / B 버튼: 볼록한 키캡 형태 + 눌렀을 때 확실한 눌림/발광 효과 ---- */
   .ab-group { display: flex; gap: 14px; align-items: center; transform: rotate(-18deg); margin-right: 4px; }
-  .round-btn { width: 48px; height: 48px; border-radius: 50%; border: none; background: linear-gradient(160deg, var(--accent-purple), var(--accent-purple-dark));
-    color: white; font-weight: 800; font-size: 15px; box-shadow: 0 3px 0 var(--accent-purple-dark), 0 4px 8px rgba(0,0,0,0.25); touch-action: none; }
-  .round-btn:active { box-shadow: 0 1px 0 var(--accent-purple-dark); transform: translateY(2px); }
+  .round-btn { position: relative; width: 48px; height: 48px; border-radius: 50%; border: none;
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.55), rgba(255,255,255,0) 45%),
+      linear-gradient(160deg, #8b3fb0, var(--accent-purple-dark));
+    color: white; font-weight: 800; font-size: 15px;
+    box-shadow: 0 4px 0 var(--accent-purple-dark), 0 6px 10px rgba(0,0,0,0.3), inset 0 -2px 3px rgba(0,0,0,0.25);
+    touch-action: none; transition: transform .05s ease, box-shadow .05s ease; }
+  .round-btn.pressed {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 var(--accent-purple-dark), 0 1px 3px rgba(0,0,0,0.3), inset 0 3px 6px rgba(0,0,0,0.5),
+      0 0 14px 3px rgba(190,120,255,0.75);
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.25), rgba(255,255,255,0) 45%),
+      linear-gradient(160deg, #7b2fa0, var(--accent-purple-dark));
+  }
 
+  /* ---- Select / Start: 오목하지 않고 볼록한 캡슐 버튼 + 눌림 효과 ---- */
   .gb-startselect-row { display: flex; justify-content: center; gap: 22px; margin-top: 22px; }
-  .pill-btn { width: 52px; height: 16px; border-radius: 8px; border: none; background: var(--shell-shadow);
-    box-shadow: 0 2px 0 rgba(0,0,0,0.15); touch-action: none; }
-  .pill-btn:active { background: #6a6558; }
+  .pill-btn { position: relative; width: 52px; height: 16px; border-radius: 8px; border: none;
+    background: linear-gradient(180deg, #8c8578, var(--shell-shadow));
+    box-shadow: 0 3px 0 #5c574c, 0 4px 6px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.35);
+    touch-action: none; transition: transform .05s ease, box-shadow .05s ease; }
+  .pill-btn.pressed {
+    transform: translateY(3px);
+    box-shadow: 0 0 0 #5c574c, inset 0 2px 4px rgba(0,0,0,0.45), 0 0 10px 2px rgba(190,120,255,0.6);
+    background: linear-gradient(180deg, #6a6558, #4c483e);
+  }
   .pill-label { display:block; text-align:center; font-size: 9px; color: var(--shell-shadow); font-weight:700; margin-top:4px; letter-spacing:0.1em; }
 
   .gb-speaker { position: absolute; right: 22px; bottom: 18px; display: grid; grid-template-columns: repeat(3, 6px); gap: 4px; transform: rotate(-18deg); }
   .gb-speaker span { width: 6px; height: 6px; border-radius: 50%; background: var(--shell-shadow); opacity: 0.6; }
 
-  .action-row { width: 100%; max-width: 340px; display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
-  .util-btn { flex: 1; min-width: 100px; padding: 13px 8px; border-radius: 12px; border: none; background: var(--card);
-    color: var(--text-main); font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    display: flex; align-items: center; justify-content: center; gap: 6px; }
-  .util-btn.danger { color: var(--danger); }
-  .util-btn:active { opacity: 0.8; }
+  .action-row { width: 100%; max-width: 340px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
+  .util-btn { border: none; background: var(--card); border-radius: 14px; padding: 10px 12px;
+    display: flex; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: transform .08s ease, opacity .08s ease; }
+  .util-btn:active { transform: scale(0.97); opacity: 0.85; }
+  .util-icon-badge { flex: none; width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+  .util-icon-badge svg { width: 18px; height: 18px; }
+  .util-label { font-size: 12.5px; font-weight: 700; color: var(--text-main); text-align: left; line-height: 1.25; }
+  .util-btn.danger .util-label { color: var(--danger); }
+  .icon-blue{ background: linear-gradient(160deg,#5AC8FA,#0A84FF); }
+  .icon-orange{ background: linear-gradient(160deg,#FFC24C,#FF9F0A); }
+  .icon-slate{ background: linear-gradient(160deg,#A5A5AA,#8E8E93); }
+  .icon-red{ background: linear-gradient(160deg,#FF6961,#FF3B30); }
+  .icon-teal{ background: linear-gradient(160deg,#64D2E8,#32ADE6); }
+  .icon-green{ background: linear-gradient(160deg,#63D480,#34C759); }
 
   .rom-name-tag { margin-top: 14px; font-size: 12px; color: var(--text-sub); font-weight: 600; text-align: center; }
   .rom-name-tag b { color: var(--text-main); }
@@ -196,12 +239,50 @@
       <div class="rom-name-tag">현재 실행 중: <b id="rom-name-label">-</b></div>
 
       <div class="action-row">
-        <button class="util-btn" id="btn-pause">⏸ 일시정지</button>
-        <button class="util-btn" id="btn-reset">🔄 다시하기</button>
-        <button class="util-btn" id="btn-change-rom">📁 롬 변경</button>
-        <button class="util-btn danger" id="btn-exit2">🚪 나가기</button>
-        <button class="util-btn" id="btn-export-save">💾 저장 내보내기</button>
-        <button class="util-btn" id="btn-import-save">📥 저장 가져오기</button>
+        <button class="util-btn" id="btn-pause">
+          <span class="util-icon-badge icon-blue" id="pause-icon-badge">
+            <svg id="pause-icon" viewBox="0 0 24 24" fill="none"><rect x="6" y="5" width="4" height="14" rx="1.3" fill="white"/><rect x="14" y="5" width="4" height="14" rx="1.3" fill="white"/></svg>
+          </span>
+          <span class="util-label" id="pause-label">일시정지</span>
+        </button>
+        <button class="util-btn" id="btn-reset">
+          <span class="util-icon-badge icon-orange">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 12a8 8 0 1 1-2.9-6.16"/><path d="M20 4.5V9h-4.5"/>
+            </svg>
+          </span>
+          <span class="util-label">다시하기</span>
+        </button>
+        <button class="util-btn" id="btn-change-rom">
+          <span class="util-icon-badge icon-slate">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h4l1.7 2H18.5A1.5 1.5 0 0 1 20 9.5v7A1.5 1.5 0 0 1 18.5 18h-13A1.5 1.5 0 0 1 4 16.5v-9z"/></svg>
+          </span>
+          <span class="util-label">롬 변경</span>
+        </button>
+        <button class="util-btn danger" id="btn-exit2">
+          <span class="util-icon-badge icon-red">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="4.5" width="8" height="15" rx="1.8"/><path d="M11 12h8"/><path d="M16.5 8.5 20 12l-3.5 3.5"/>
+            </svg>
+          </span>
+          <span class="util-label">나가기</span>
+        </button>
+        <button class="util-btn" id="btn-export-save">
+          <span class="util-icon-badge icon-teal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3.5v10"/><path d="M8.2 7.3 12 3.5l3.8 3.8"/><path d="M5 13.5v4A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5v-4"/>
+            </svg>
+          </span>
+          <span class="util-label">저장 내보내기</span>
+        </button>
+        <button class="util-btn" id="btn-import-save">
+          <span class="util-icon-badge icon-green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3.5v10"/><path d="M8.2 10.2 12 14l3.8-3.8"/><path d="M5 13.5v4A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5v-4"/>
+            </svg>
+          </span>
+          <span class="util-label">저장 가져오기</span>
+        </button>
         <input type="file" id="save-input" accept="application/json,.json" style="display:none;" />
       </div>
 
@@ -396,13 +477,32 @@
     });
   }
 
+  var PAUSE_ICON_SVG = '<rect x="6" y="5" width="4" height="14" rx="1.3" fill="white"/><rect x="14" y="5" width="4" height="14" rx="1.3" fill="white"/>';
+  var PLAY_ICON_SVG = '<path d="M8 5.5v13l11-6.5z" fill="white"/>';
+  function setPauseButtonState(isPausedState) {
+    var icon = document.getElementById('pause-icon');
+    var badge = document.getElementById('pause-icon-badge');
+    var label = document.getElementById('pause-label');
+    if (isPausedState) {
+      icon.innerHTML = PLAY_ICON_SVG;
+      badge.classList.remove('icon-blue');
+      badge.classList.add('icon-green');
+      label.textContent = '재개';
+    } else {
+      icon.innerHTML = PAUSE_ICON_SVG;
+      badge.classList.remove('icon-green');
+      badge.classList.add('icon-blue');
+      label.textContent = '일시정지';
+    }
+  }
+
   function showPlayer(name) {
     pickerView.style.display = 'none';
     playerView.style.display = 'flex';
     romNameLabel.textContent = name;
     batteryDot.classList.add('on');
     isPaused = false;
-    document.getElementById('btn-pause').textContent = '⏸ 일시정지';
+    setPauseButtonState(false);
   }
 
   function showPicker() {
@@ -528,14 +628,14 @@
 
   document.getElementById('btn-pause').addEventListener('click', function () {
     try {
-      if (isPaused) { run(); isPaused = false; this.textContent = '⏸ 일시정지'; }
-      else { pause(); isPaused = true; this.textContent = '▶ 재개'; }
+      if (isPaused) { run(); isPaused = false; setPauseButtonState(false); }
+      else { pause(); isPaused = true; setPauseButtonState(true); }
     } catch (e) {}
   });
 
   document.getElementById('btn-reset').addEventListener('click', function () {
     if (currentRomData) {
-      try { start(canvas, currentRomData); isPaused = false; document.getElementById('btn-pause').textContent = '⏸ 일시정지'; }
+      try { start(canvas, currentRomData); isPaused = false; setPauseButtonState(false); }
       catch (e) { alert('다시 시작하는 중 문제가 발생했어요.'); }
     }
   });
@@ -566,14 +666,27 @@
   }
 
   var pressed = {};
+  var keyElementMap = {};
+  document.querySelectorAll('[data-key]').forEach(function (el) {
+    var key = el.getAttribute('data-key');
+    if (!keyElementMap[key]) keyElementMap[key] = [];
+    keyElementMap[key].push(el);
+  });
+  function setPressedVisual(key, isPressed) {
+    var els = keyElementMap[key];
+    if (!els) return;
+    els.forEach(function (el) { el.classList.toggle('pressed', isPressed); });
+  }
   function keyDown(key) {
     unlockAudio();
+    setPressedVisual(key, true);
     if (pressed[key]) return;
     pressed[key] = true;
     try { GameBoyKeyDown(key); } catch (e) {}
   }
   function keyUp(key) {
     pressed[key] = false;
+    setPressedVisual(key, false);
     try { GameBoyKeyUp(key); } catch (e) {}
   }
   document.querySelectorAll('[data-key]').forEach(function (el) {
