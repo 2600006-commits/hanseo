@@ -242,14 +242,19 @@
   <!-- ⚙️ 설정(Setup) 뷰 -->
   <div id="view-setup" class="view">
     <div class="card">
-      <h3 style="margin-top:0;">📋 학생/비상연락망 명단 등록</h3>
-      <select id="setup-type"><option value="student">학생 명단 등록</option><option value="teacher">비상연락망 등록</option></select>
+      <h3 style="margin-top:0;">📋 데이터 등록</h3>
+      <select id="setup-type">
+        <option value="student">학생 명단 등록</option>
+        <option value="teacher">비상연락망 등록</option>
+        <option value="timetable">교사 시간표 등록 (엑셀)</option>
+        <option value="schedule">하루 일정 등록 (엑셀)</option>
+      </select>
       <div id="student-setup-area">
         <input type="number" id="setup-grade" placeholder="학년 입력 (예: 1)" min="1" inputmode="numeric" />
         <input type="number" id="setup-class" placeholder="반 입력 (예: 1)" min="1" inputmode="numeric" />
       </div>
       <textarea id="excel-input" placeholder="엑셀 복사/붙여넣기 (학번, 이름, 학생전화, 학부모전화)"></textarea>
-      <button class="primary-btn" id="btn-save-list">💾 명단 등록</button>
+      <button class="primary-btn" id="btn-save-list">💾 저장 및 등록</button>
     </div>
     <div class="card">
       <h3 style="margin-top:0;">💬 학부모 안내 문자 템플릿</h3>
@@ -541,10 +546,6 @@
       const res = await fetch(`${API_URL}?t=${Date.now()}`); 
       const data = await res.json();
       if (data) { 
-        // ⚠️ 클라우드를 기준(source of truth)으로 동기화한다.
-        // 그렇지 않으면, 이전에 삭제했지만 아직 클라우드에는 반영되지 않았던
-        // "유령" 데이터가 남아있다가 여기서 다시 덮어써지며 삭제가 무효화되는 문제가 생긴다.
-        // 클라우드 응답에 없는 키는 로컬에서도 함께 제거해준다.
         const cloudKeys = new Set(Object.keys(data)); 
         const localKeysToPrune = []; 
         for (let i = 0; i < localStorage.length; i++) { 
@@ -652,7 +653,6 @@
         } 
       } 
     } 
-    // localStorage 키 순서는 저장된 순서일 뿐 숫자 순서가 아니므로, 검색 결과도 학년 > 반 > 번호 순으로 정렬한다.
     results.sort((a, b) => 
       (parseInt(a.grade) - parseInt(b.grade)) || 
       (parseInt(a.cNum) - parseInt(b.cNum)) || 
@@ -670,6 +670,7 @@
     const type = document.getElementById('setup-type').value; 
     const raw = document.getElementById('excel-input').value; 
     if (!raw.trim()) return alert("데이터 없음"); 
+
     if (type === 'student') { 
       const g = document.getElementById('setup-grade').value.trim(); 
       const c = document.getElementById('setup-class').value.trim(); 
@@ -679,16 +680,70 @@
         return { '일련번호': t[0]||'', '이름': t[1]||'', '전화번호': t[2]||'', '추가전화번호': t[3]||'' }; 
       }); 
       localStorage.setItem(`students_${g}_${c}`, JSON.stringify(parsed)); 
-    } else { 
+    } else if (type === 'teacher') { 
       const parsed = raw.trim().split('\n').map(line => { 
         const t = line.split('\t').map(x=>x.trim()); 
         return { '이름': t[0]||'', '전화번호': t[1]||'' }; 
       }); 
       localStorage.setItem(`teachers_list`, JSON.stringify(parsed)); 
-    } 
+    } else if (type === 'timetable') {
+      const parsed = raw.trim().split('\n');
+      const data = getTimetableData(); 
+      parsed.forEach(line => {
+        const t = line.split('\t').map(x => x.trim());
+        if (t.length >= 2) {
+          const name = t[0];
+          const day = t[1];
+          if (!data[name]) data[name] = emptyTeacherSchedule();
+          if (['월','화','수','목','금'].includes(day)) {
+            for (let i = 0; i < 7; i++) {
+              data[name][day][i] = t[2 + i] || ''; 
+            }
+          }
+        }
+      });
+      saveTimetableData(data);
+      if(state.ttMode === 'teacher') renderTeacherChips();
+    } else if (type === 'schedule') {
+      const parsed = raw.trim().split('\n');
+      const scheduleList = [];
+      parsed.forEach(line => {
+        const t = line.split('\t').map(x => x.trim());
+        if (t.length >= 2) {
+          scheduleList.push({ time: t[0], text: t[1] });
+        }
+      });
+      saveDailySchedule(scheduleList);
+      renderScheduleSheet(); 
+    }
+
     await saveToCloud(); 
     document.getElementById('excel-input').value = ''; 
-    showToast('명단 저장됨'); initHome(); 
+    showToast('명단/데이터 저장 완료'); 
+    
+    if (type === 'student' || type === 'teacher') {
+      initHome(); 
+    }
+  });
+
+  document.getElementById('setup-type').addEventListener('change', (e) => {
+    const type = e.target.value;
+    const ta = document.getElementById('excel-input');
+    const area = document.getElementById('student-setup-area');
+    
+    if (type === 'student') {
+      area.style.display = 'block';
+      ta.placeholder = '엑셀 복사/붙여넣기 (학번, 이름, 학생전화, 학부모전화)';
+    } else if (type === 'teacher') {
+      area.style.display = 'none';
+      ta.placeholder = '엑셀 복사/붙여넣기 (이름, 전화번호)';
+    } else if (type === 'timetable') {
+      area.style.display = 'none';
+      ta.placeholder = '엑셀 복사/붙여넣기\n형식: 교사명 [탭] 요일(월~금) [탭] 1교시 [탭] 2교시 ... [탭] 7교시\n예시: 김한서   월   1-1수학   (공란)   1-2수학 ...';
+    } else if (type === 'schedule') {
+      area.style.display = 'none';
+      ta.placeholder = '엑셀 복사/붙여넣기\n형식: 시간 [탭] 일정내용\n예시: 09:00   1교시 시작';
+    }
   });
   
   document.getElementById('btn-save-template').addEventListener('click', () => { 
@@ -800,8 +855,6 @@
     if (!(await showConfirm(`${grade}학년 전체(모든 반)의 명단과 출결 데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`))) return; 
     collectGradeKeys(grade).forEach(k => localStorage.removeItem(k)); 
     state.currentTab = '1'; initHome(); updateDashboard(); 
-    // saveToCloud()가 실패하면(오프라인 등) 자체적으로 실패 토스트를 띄운다.
-    // 이 경우 클라우드에는 아직 삭제 전 데이터가 남아있으므로, 인터넷이 연결되면 다시 삭제를 시도해야 한다.
     await saveToCloud(); 
   }
 
@@ -1028,7 +1081,7 @@
     localStorage.setItem(`attendance_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`, JSON.stringify(state.attendance)); 
     localStorage.setItem(`memo_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`, JSON.stringify(state.memos)); 
     await saveToCloud(); 
-    updateDashboard(); // 홈 화면으로 나가지 않고 이 반 화면에 그대로 머무르되, 출석경고 배지 수치는 최신화한다.
+    updateDashboard(); 
     renderAttendanceGrid(); 
   });
   
@@ -1073,7 +1126,6 @@
   
   navLeft.addEventListener('click', () => initHome()); 
   navRight.addEventListener('click', () => switchView('setup')); 
-  // 🎮 게임보이 에뮬레이터만 남겨두고, 게임 버튼을 누르면 바로 에뮬레이터 페이지로 이동한다.
   document.getElementById('btn-game-toggle').addEventListener('click', () => { window.location.href = 'gameboy-emulator.html'; }); 
   document.getElementById('btn-open-timetable-home').addEventListener('click', () => switchView('timetable'));
 
@@ -1120,9 +1172,6 @@
   
   document.getElementById('overlay').addEventListener('click', closeAllPopups); 
 
-  // 일부 브라우저/인앱 브라우저/확장 프로그램에서 네이티브 window.confirm()이
-  // 아무 반응 없이 막히는 경우가 있어(예: 이전에 "이 페이지의 추가 대화상자 차단"을 선택한 경우 등),
-  // 앱 자체 UI로 만든 확인 모달을 사용한다. deleteClass/deleteGrade 등에서 사용.
   let confirmResolver = null; 
   function showConfirm(message, okLabel = '삭제') { 
     return new Promise((resolve) => { 
@@ -1326,3 +1375,5 @@
   async function initApp() { await loadFromCloud(); initHome(); }
   initApp();
 </script>
+</body>
+</html>
