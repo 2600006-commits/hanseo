@@ -4,6 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>프리미엄 출석 명렬표 V12 (한서고등학교)</title>
+  
+  <!-- PWA 관련 설정 추가 시작 -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#007AFF">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <!-- PWA 관련 설정 추가 끝 -->
+
   <style>
     /* 🎨 디자인 시스템 & 다크모드 변수 (유리감 & 반응형) */
     :root {
@@ -1747,4 +1754,20 @@
   // 앱 초기화 로직
   async function initApp() { await loadFromCloud(); initHome(); }
   initApp();
+
+  // PWA 서비스 워커 등록 추가 시작
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(registration => {
+          console.log('Service Worker 등록 성공:', registration);
+        })
+        .catch(error => {
+          console.log('Service Worker 등록 실패:', error);
+        });
+    });
+  }
+  // PWA 서비스 워커 등록 추가 끝
 </script>
+</body>
+</html>
