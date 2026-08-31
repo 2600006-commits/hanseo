@@ -2,14 +2,20 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>프리미엄 출석 명렬표 V12 (한서고등학교)</title>
-  
-  <!-- PWA 관련 설정 추가 시작 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>출석 체크 명렬표</title>
+
+  <!-- 📱 PWA(홈 화면 설치형 앱) 설정 -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#007AFF">
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <!-- PWA 관련 설정 추가 끝 -->
+  <!-- 안드로이드 -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <!-- iOS(아이폰) -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="출석부">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" href="icons/icon-192.png">
 
   <style>
     /* 🎨 디자인 시스템 & 다크모드 변수 (유리감 & 반응형) */
@@ -614,7 +620,7 @@
   }
   
   const CLOUD_SYNCED_PREFIXES = ["students_", "attendance_", "memo_", "seat_"];
-  const CLOUD_SYNCED_KEYS = ["teachers_list", "daily_schedule", "teacher_timetable_data"];
+  const CLOUD_SYNCED_KEYS = ["teachers_list", "daily_schedule", "teacher_timetable_data", "teacher_timetable_periods"];
   function isCloudSyncedKey(k) { return CLOUD_SYNCED_PREFIXES.some(p => k.startsWith(p)) || CLOUD_SYNCED_KEYS.includes(k); }
 
   async function loadFromCloud() {
@@ -749,6 +755,22 @@
     }); 
   });
   
+  document.getElementById('setup-type').addEventListener('change', (e) => {
+    const isTeacher = e.target.value === 'teacher';
+    document.getElementById('student-setup-area').style.display = isTeacher ? 'none' : 'block';
+    const excelInput = document.getElementById('excel-input');
+    if (isTeacher) {
+      excelInput.placeholder = '엑셀 복사/붙여넣기 (이름, 전화번호)\n예) 김한서[Tab]010-1234-5678';
+      const existing = safeParse('teachers_list', []);
+      if (Array.isArray(existing) && existing.length > 0) {
+        excelInput.value = existing.map(t => `${t['이름'] || ''}\t${t['전화번호'] || ''}`).join('\n');
+      }
+    } else {
+      excelInput.placeholder = '엑셀 복사/붙여넣기 (학번, 이름, 학생전화, 학부모전화)';
+      excelInput.value = '';
+    }
+  });
+
   document.getElementById('btn-save-list').addEventListener('click', async () => { 
     const type = document.getElementById('setup-type').value; 
     const raw = document.getElementById('excel-input').value; 
@@ -948,6 +970,7 @@
     if (state.currentTab === 'emergency') { 
       document.getElementById('home-class-area').style.display = 'none'; 
       document.getElementById('home-emergency-area').style.display = 'block'; 
+      renderTeacherGrid(); 
     } else { 
       document.getElementById('home-class-area').style.display = 'block'; 
       document.getElementById('home-emergency-area').style.display = 'none'; 
@@ -955,6 +978,32 @@
       state.currentGrade = parseInt(state.currentTab); 
       renderClassGrid(); 
     } 
+  }
+
+  // 🚨 버그 수정: '비상연락망' 탭을 눌러도 목록을 실제로 그려주는 함수가 없어서
+  // 등록을 해도 항상 빈 화면으로 보였던 문제를 해결.
+  function renderTeacherGrid() {
+    const grid = document.getElementById('teacher-grid');
+    grid.innerHTML = '';
+    const list = safeParse('teachers_list', []);
+    if (!Array.isArray(list) || list.length === 0) {
+      grid.innerHTML = '<div class="timetable-empty" style="grid-column: 1 / -1;">등록된 비상연락망이 없습니다.<br>⚙️ 설정 화면 → "비상연락망 등록"에서 이름과 전화번호를 추가해주세요.</div>';
+      return;
+    }
+    list.forEach(t => {
+      const name = (t['이름'] || '').trim();
+      const rawNum = (t['전화번호'] || '').trim();
+      const num = rawNum.replace(/[^0-9]/g, '');
+      const btn = document.createElement('div');
+      btn.className = 'class-btn';
+      btn.style.minHeight = 'auto';
+      btn.innerHTML = `<div class="class-btn-info"><h3>${name || '(이름 없음)'}</h3><div class="class-status">${rawNum ? '📞 ' + rawNum : '전화번호 없음'}</div></div>`;
+      if (num) {
+        btn.style.cursor = 'pointer';
+        btn.addEventListener('click', () => { window.location.href = `tel:${num}`; });
+      }
+      grid.appendChild(btn);
+    });
   }
   
   
@@ -1755,19 +1804,15 @@
   async function initApp() { await loadFromCloud(); initHome(); }
   initApp();
 
-  // PWA 서비스 워커 등록 추가 시작
-  if ('serviceWorker' in navigator) {
+  // 📱 PWA: 서비스워커 등록 (홈 화면 설치 + 오프라인 지원)
+  // file:// 로 직접 연 경우나 http(s)가 아닌 환경에서는 서비스워커를 지원하지 않으므로 조용히 건너뛴다.
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(registration => {
-          console.log('Service Worker 등록 성공:', registration);
-        })
-        .catch(error => {
-          console.log('Service Worker 등록 실패:', error);
-        });
+      navigator.serviceWorker.register('sw.js').catch((err) => {
+        console.warn('서비스워커 등록 실패(오프라인/설치 기능만 제한됨):', err);
+      });
     });
   }
-  // PWA 서비스 워커 등록 추가 끝
 </script>
 </body>
 </html>
