@@ -40,7 +40,7 @@
       #app { box-shadow: var(--glass-shadow); border-radius: 0 0 28px 28px; margin-top: 0; }
       .class-grid { grid-template-columns: repeat(3, 1fr) !important; }
       .student-grid { }
-      .game-tile-grid, .quick-actions { grid-template-columns: repeat(3, 1fr) !important; }
+      .quick-actions { grid-template-columns: repeat(4, 1fr) !important; }
       .view { padding-left: 28px; padding-right: 28px; }
     }
     @media (min-width: 1100px) {
@@ -82,7 +82,7 @@
     .toolbar button { flex: 1; padding: 11px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--card); backdrop-filter: blur(14px); color: var(--text-main); font-size: 13px; font-weight: 700; cursor: pointer; transition: transform 0.15s var(--ease), background 0.2s ease; }
     .toolbar button:active { transform: scale(0.96); }
 
-    .quick-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+    .quick-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
     .quick-action-btn { background: var(--card); backdrop-filter: blur(16px) saturate(160%); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; box-shadow: var(--glass-shadow); transition: transform 0.18s var(--ease), box-shadow 0.18s ease; position: relative; }
     .quick-action-btn:active { transform: scale(0.94); }
     .quick-action-btn .qa-emoji { font-size: 22px; line-height: 1; }
@@ -201,6 +201,36 @@
     .schedule-row .sch-time { width: 84px; flex: none; }
     .schedule-row .sch-del { flex: none; width: 30px; height: 30px; border-radius: 50%; border: none; background: rgba(255,59,48,0.12); color: var(--danger); font-weight: 800; cursor: pointer; }
 
+    /* 🧳 수학여행 일정 스타일 */
+    .trip-stop { display:flex; gap:10px; }
+    .trip-stop .ts-marker { display:flex; flex-direction:column; align-items:center; flex-shrink:0; padding-top:4px; }
+    .trip-stop .ts-dot { width:11px; height:11px; border-radius:50%; background:var(--primary); box-shadow:0 0 0 4px rgba(0,122,255,0.15); flex-shrink:0; }
+    .trip-stop .ts-line { width:2px; flex:1; background:var(--border); margin-top:4px; min-height: 18px; }
+    .trip-stop:last-child .ts-line { display:none; }
+    .trip-stop .ts-body { flex:1; background:var(--card); backdrop-filter: blur(14px); border:1px solid var(--border); border-radius: var(--radius-md); padding:12px 14px; margin-bottom:14px; }
+    .trip-stop .ts-index { font-size:11px; color:var(--text-sub); font-weight:800; letter-spacing:0.3px; }
+    .trip-stop .ts-name { font-size:14.5px; font-weight:800; margin:3px 0 9px; }
+    .trip-map-btns { display:flex; gap:6px; flex-wrap:wrap; }
+    .trip-map-btn { flex:none; padding:6px 12px; font-size:11.5px; font-weight:700; border-radius:20px; border:1px solid var(--border); background: var(--segment-bg); text-decoration:none; display:inline-flex; align-items:center; gap:4px; transition: transform .15s var(--ease), background .2s ease; }
+    .trip-map-btn:active { transform: scale(0.94); }
+    .trip-map-btn.google { color:#1a73e8; }
+    .trip-map-btn.naver { color:#03c75a; }
+    .trip-contact-row-wrap { border-bottom:1px solid var(--border); padding:10px 0; margin-bottom: 4px; }
+    .trip-contact-row-wrap:last-child { border-bottom:none; }
+    .trip-contact-row { display:flex; justify-content:space-between; align-items:center; font-size:13px; gap:8px; margin-bottom:8px; }
+    .trip-contact-name { font-weight:700; }
+    .trip-contact-addr { font-size:11.5px; color:var(--text-sub); margin-top:2px; }
+    .trip-tel-btn { flex-shrink:0; padding:7px 12px; border-radius:16px; background: rgba(52,199,89,0.14); color:var(--success); font-size:11.5px; font-weight:800; text-decoration:none; white-space:nowrap; }
+    .trip-visit-item { border:1px solid var(--border); border-radius: var(--radius-md); padding:14px; margin-bottom:12px; background: var(--card); backdrop-filter: blur(14px); }
+    .trip-visit-item h4 { margin:0 0 4px; font-size:14.5px; }
+    .trip-visit-item .tv-addr { font-size:11.5px; color:var(--text-sub); margin-bottom:9px; }
+    .trip-visit-item ul { margin:0 0 9px; padding-left:18px; font-size:12.5px; line-height:1.75; color: var(--text-main); }
+    .trip-flight-table { width:100%; border-collapse:separate; border-spacing:0 5px; font-size:11.5px; margin-top:4px; }
+    .trip-flight-table th { color:var(--text-sub); font-weight:700; padding:4px; text-align:center; }
+    .trip-flight-table td { background: rgba(128,128,128,0.08); padding:8px 4px; text-align:center; font-weight:600; }
+    .trip-flight-table td:first-child { border-radius:8px 0 0 8px; font-weight:800; }
+    .trip-flight-table td:last-child { border-radius:0 8px 8px 0; }
+
     /* 🚨 출석 경고 시트 */
     .warning-row { display: flex; justify-content: space-between; align-items: center; background: var(--card); backdrop-filter: blur(14px); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 8px; font-size: 13px; }
     .warning-row .wr-name { font-weight: 700; }
@@ -223,6 +253,7 @@
       .memo-text { border: 1px solid #ccc !important; background: transparent !important; color: black !important; padding: 1px; }
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -242,19 +273,14 @@
   <!-- ⚙️ 설정(Setup) 뷰 -->
   <div id="view-setup" class="view">
     <div class="card">
-      <h3 style="margin-top:0;">📋 데이터 등록</h3>
-      <select id="setup-type">
-        <option value="student">학생 명단 등록</option>
-        <option value="teacher">비상연락망 등록</option>
-        <option value="timetable">교사 시간표 등록 (엑셀)</option>
-        <option value="schedule">하루 일정 등록 (엑셀)</option>
-      </select>
+      <h3 style="margin-top:0;">📋 학생/비상연락망 명단 등록</h3>
+      <select id="setup-type"><option value="student">학생 명단 등록</option><option value="teacher">비상연락망 등록</option></select>
       <div id="student-setup-area">
         <input type="number" id="setup-grade" placeholder="학년 입력 (예: 1)" min="1" inputmode="numeric" />
         <input type="number" id="setup-class" placeholder="반 입력 (예: 1)" min="1" inputmode="numeric" />
       </div>
       <textarea id="excel-input" placeholder="엑셀 복사/붙여넣기 (학번, 이름, 학생전화, 학부모전화)"></textarea>
-      <button class="primary-btn" id="btn-save-list">💾 저장 및 등록</button>
+      <button class="primary-btn" id="btn-save-list">💾 명단 등록</button>
     </div>
     <div class="card">
       <h3 style="margin-top:0;">💬 학부모 안내 문자 템플릿</h3>
@@ -287,6 +313,9 @@
       </button>
       <button class="quick-action-btn" id="btn-open-timetable-home">
         <span class="qa-emoji">🕐</span><span class="qa-label">교사 시간표</span>
+      </button>
+      <button class="quick-action-btn" id="btn-open-trip-home">
+        <span class="qa-emoji">🧳</span><span class="qa-label">수학여행 일정</span>
       </button>
     </div>
     <div class="segment-control" id="segment-control"></div>
@@ -341,6 +370,12 @@
 
     <!-- 선생님별 보기 -->
     <div id="timetable-teacher-view">
+      <input type="file" id="timetable-excel-input" accept=".xlsx,.xls,.csv" style="display:none;" />
+      <button class="outline-btn icon-btn" id="btn-import-timetable-excel" style="margin-bottom:10px;">📥 엑셀 파일로 전체 시간표 불러오기</button>
+      <div class="search-wrap" style="margin-bottom:12px;">
+        <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+        <input type="text" id="timetable-search" placeholder="선생님 이름 검색" style="padding-left:38px;" />
+      </div>
       <div class="timetable-add-row" style="margin-bottom: 14px;">
         <input type="text" id="timetable-new-teacher" placeholder="선생님 이름 추가 (예: 김한서)" />
         <button id="btn-add-timetable-teacher">추가</button>
@@ -360,6 +395,37 @@
         <table class="timetable-daily-table" id="timetable-day-table"></table>
       </div>
       <div class="timetable-empty" id="timetable-day-empty" style="display:none;">등록된 선생님이 없습니다.</div>
+    </div>
+  </div>
+
+  <!-- 🧳 수학여행 일정(Trip) 뷰 -->
+  <div id="view-trip" class="view">
+    <div class="card" style="margin-bottom:14px; text-align:center; padding:16px;">
+      <div style="font-size:16px; font-weight:800;" id="trip-title"></div>
+      <div style="font-size:12.5px; color:var(--text-sub); margin-top:4px;" id="trip-daterange"></div>
+    </div>
+
+    <div class="segment-control" id="trip-team-control">
+      <button class="segment-btn active" data-team="teamA">A팀 일정</button>
+      <button class="segment-btn" data-team="teamB">B팀 일정</button>
+    </div>
+
+    <div class="day-tab-row" id="trip-day-tabs"></div>
+    <div id="trip-timeline" style="margin-bottom: 6px;"></div>
+
+    <div class="card" id="trip-gather-card">
+      <div style="font-weight:800; margin-bottom:10px;">🕗 집합 · 항공편 안내</div>
+      <div id="trip-gather-body"></div>
+    </div>
+
+    <div class="card" id="trip-hotel-contacts-card">
+      <div style="font-weight:800; margin-bottom:10px;">📞 협력 숙소 연락처</div>
+      <div id="trip-hotel-contacts-body"></div>
+    </div>
+
+    <div class="card" id="trip-site-visit-card">
+      <div style="font-weight:800; margin-bottom:10px;">🏨 사전 답사 참고자료</div>
+      <div id="trip-site-visit-body"></div>
     </div>
   </div>
 
@@ -432,7 +498,8 @@
     setup: document.getElementById('view-setup'), 
     home: document.getElementById('view-home'), 
     attendance: document.getElementById('view-attendance'), 
-    timetable: document.getElementById('view-timetable') 
+    timetable: document.getElementById('view-timetable'), 
+    trip: document.getElementById('view-trip') 
   };
   
   const navLeft = document.getElementById('nav-left'); 
@@ -522,6 +589,10 @@
       navLeft.style.visibility = 'visible'; navLeft.innerHTML = ICONS.chevronLeft; 
       navTitle.textContent = '🕐 교사 시간표'; navRight.style.display = 'none'; 
       initTimetableView(); 
+    } else if (viewName === 'trip') { 
+      navLeft.style.visibility = 'visible'; navLeft.innerHTML = ICONS.chevronLeft; 
+      navTitle.textContent = '🧳 수학여행 일정'; navRight.style.display = 'none'; 
+      initTripView(); 
     }
   }
 
@@ -546,6 +617,10 @@
       const res = await fetch(`${API_URL}?t=${Date.now()}`); 
       const data = await res.json();
       if (data) { 
+        // ⚠️ 클라우드를 기준(source of truth)으로 동기화한다.
+        // 그렇지 않으면, 이전에 삭제했지만 아직 클라우드에는 반영되지 않았던
+        // "유령" 데이터가 남아있다가 여기서 다시 덮어써지며 삭제가 무효화되는 문제가 생긴다.
+        // 클라우드 응답에 없는 키는 로컬에서도 함께 제거해준다.
         const cloudKeys = new Set(Object.keys(data)); 
         const localKeysToPrune = []; 
         for (let i = 0; i < localStorage.length; i++) { 
@@ -653,6 +728,7 @@
         } 
       } 
     } 
+    // localStorage 키 순서는 저장된 순서일 뿐 숫자 순서가 아니므로, 검색 결과도 학년 > 반 > 번호 순으로 정렬한다.
     results.sort((a, b) => 
       (parseInt(a.grade) - parseInt(b.grade)) || 
       (parseInt(a.cNum) - parseInt(b.cNum)) || 
@@ -670,7 +746,6 @@
     const type = document.getElementById('setup-type').value; 
     const raw = document.getElementById('excel-input').value; 
     if (!raw.trim()) return alert("데이터 없음"); 
-
     if (type === 'student') { 
       const g = document.getElementById('setup-grade').value.trim(); 
       const c = document.getElementById('setup-class').value.trim(); 
@@ -680,70 +755,16 @@
         return { '일련번호': t[0]||'', '이름': t[1]||'', '전화번호': t[2]||'', '추가전화번호': t[3]||'' }; 
       }); 
       localStorage.setItem(`students_${g}_${c}`, JSON.stringify(parsed)); 
-    } else if (type === 'teacher') { 
+    } else { 
       const parsed = raw.trim().split('\n').map(line => { 
         const t = line.split('\t').map(x=>x.trim()); 
         return { '이름': t[0]||'', '전화번호': t[1]||'' }; 
       }); 
       localStorage.setItem(`teachers_list`, JSON.stringify(parsed)); 
-    } else if (type === 'timetable') {
-      const parsed = raw.trim().split('\n');
-      const data = getTimetableData(); 
-      parsed.forEach(line => {
-        const t = line.split('\t').map(x => x.trim());
-        if (t.length >= 2) {
-          const name = t[0];
-          const day = t[1];
-          if (!data[name]) data[name] = emptyTeacherSchedule();
-          if (['월','화','수','목','금'].includes(day)) {
-            for (let i = 0; i < 7; i++) {
-              data[name][day][i] = t[2 + i] || ''; 
-            }
-          }
-        }
-      });
-      saveTimetableData(data);
-      if(state.ttMode === 'teacher') renderTeacherChips();
-    } else if (type === 'schedule') {
-      const parsed = raw.trim().split('\n');
-      const scheduleList = [];
-      parsed.forEach(line => {
-        const t = line.split('\t').map(x => x.trim());
-        if (t.length >= 2) {
-          scheduleList.push({ time: t[0], text: t[1] });
-        }
-      });
-      saveDailySchedule(scheduleList);
-      renderScheduleSheet(); 
-    }
-
+    } 
     await saveToCloud(); 
     document.getElementById('excel-input').value = ''; 
-    showToast('명단/데이터 저장 완료'); 
-    
-    if (type === 'student' || type === 'teacher') {
-      initHome(); 
-    }
-  });
-
-  document.getElementById('setup-type').addEventListener('change', (e) => {
-    const type = e.target.value;
-    const ta = document.getElementById('excel-input');
-    const area = document.getElementById('student-setup-area');
-    
-    if (type === 'student') {
-      area.style.display = 'block';
-      ta.placeholder = '엑셀 복사/붙여넣기 (학번, 이름, 학생전화, 학부모전화)';
-    } else if (type === 'teacher') {
-      area.style.display = 'none';
-      ta.placeholder = '엑셀 복사/붙여넣기 (이름, 전화번호)';
-    } else if (type === 'timetable') {
-      area.style.display = 'none';
-      ta.placeholder = '엑셀 복사/붙여넣기\n형식: 교사명 [탭] 요일(월~금) [탭] 1교시 [탭] 2교시 ... [탭] 7교시\n예시: 김한서   월   1-1수학   (공란)   1-2수학 ...';
-    } else if (type === 'schedule') {
-      area.style.display = 'none';
-      ta.placeholder = '엑셀 복사/붙여넣기\n형식: 시간 [탭] 일정내용\n예시: 09:00   1교시 시작';
-    }
+    showToast('명단 저장됨'); initHome(); 
   });
   
   document.getElementById('btn-save-template').addEventListener('click', () => { 
@@ -855,6 +876,8 @@
     if (!(await showConfirm(`${grade}학년 전체(모든 반)의 명단과 출결 데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`))) return; 
     collectGradeKeys(grade).forEach(k => localStorage.removeItem(k)); 
     state.currentTab = '1'; initHome(); updateDashboard(); 
+    // saveToCloud()가 실패하면(오프라인 등) 자체적으로 실패 토스트를 띄운다.
+    // 이 경우 클라우드에는 아직 삭제 전 데이터가 남아있으므로, 인터넷이 연결되면 다시 삭제를 시도해야 한다.
     await saveToCloud(); 
   }
 
@@ -1081,7 +1104,7 @@
     localStorage.setItem(`attendance_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`, JSON.stringify(state.attendance)); 
     localStorage.setItem(`memo_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`, JSON.stringify(state.memos)); 
     await saveToCloud(); 
-    updateDashboard(); 
+    updateDashboard(); // 홈 화면으로 나가지 않고 이 반 화면에 그대로 머무르되, 출석경고 배지 수치는 최신화한다.
     renderAttendanceGrid(); 
   });
   
@@ -1126,8 +1149,10 @@
   
   navLeft.addEventListener('click', () => initHome()); 
   navRight.addEventListener('click', () => switchView('setup')); 
+  // 🎮 게임보이 에뮬레이터만 남겨두고, 게임 버튼을 누르면 바로 에뮬레이터 페이지로 이동한다.
   document.getElementById('btn-game-toggle').addEventListener('click', () => { window.location.href = 'gameboy-emulator.html'; }); 
   document.getElementById('btn-open-timetable-home').addEventListener('click', () => switchView('timetable'));
+  document.getElementById('btn-open-trip-home').addEventListener('click', () => switchView('trip'));
 
   function showContactPopup(student, status) { 
     state.currentStudentId = student['일련번호']; document.getElementById('sheet-name').textContent = `${student['이름']} 학생`; 
@@ -1172,6 +1197,9 @@
   
   document.getElementById('overlay').addEventListener('click', closeAllPopups); 
 
+  // 일부 브라우저/인앱 브라우저/확장 프로그램에서 네이티브 window.confirm()이
+  // 아무 반응 없이 막히는 경우가 있어(예: 이전에 "이 페이지의 추가 대화상자 차단"을 선택한 경우 등),
+  // 앱 자체 UI로 만든 확인 모달을 사용한다. deleteClass/deleteGrade 등에서 사용.
   let confirmResolver = null; 
   function showConfirm(message, okLabel = '삭제') { 
     return new Promise((resolve) => { 
@@ -1196,18 +1224,32 @@
   document.getElementById('btn-close-seat-sheet').addEventListener('click', closeAllPopups);
 
   // ==========================================
-  // 🕐 교사 시간표 시스템
+  // 🕐 교사 시간표 시스템 (엑셀 업로드 자동 인식 지원)
   // ==========================================
+  const TT_SEED_DATA = {"강서연(15)":{"월":["","307독서","308B화작","","","308A화작","308독서"],"화":["307독서","","","","308C화작","308A화작",""],"수":["307독서","","308B화작","308독서","",""],"목":["308B화작","","308C화작","","","","308A화작"],"금":["","308C화작","","308독서"]},"이주원(16)":{"월":["108공국2A","","107공국2B","106공국2B","","","103공국2B"],"화":["104공국2B","","","103공국2B","","107공국2B","105공국2B"],"수":["","","106공국2B","","108공국2A",""],"목":["107공국2A","108공국2B","","105공국2B","","","104공국2B"],"금":["","108국2B","107공국2A",""]},"최현주(15)":{"월":["106공국2A","","103공국2A","104공국2A","","105공국2A",""],"화":["","102공국2A","101공국2A","","303C언매","104공국2A",""],"수":["","105공국2A","102공국2A","","",""],"목":["106공국2A","","303C언매","","","","103공국2A"],"금":["101공국2A","303C언매","",""]},"김종대(11)":{"월":["","305독서","310진로","","","310진로",""],"화":["306독서","","","305독서","","",""],"수":["305독서","","","304독서","306독서",""],"목":["","","","","306독서","304독서",""],"금":["","","","304독서"]},"김주일(15)":{"월":["302독서","","303B화작","","","303A화작","303독서"],"화":["303독서","","","302독서","","303A화작",""],"수":["303독서","","303B화작","301독서","",""],"목":["303B화작","","","","302독서","301독서","303A화작"],"금":["","","","301독서"]},"조한설(15)":{"월":["202B독토","208A독토","","308E화작","308D화작","",""],"화":["208A독토","","308D화작","","","202C독토",""],"수":["202C독토","308E화작","","","208A독토","202B독토"],"목":["","308D화작","","","","202C독토",""],"금":["308E화작","","","202B독토"]},"윤보라(16)":{"월":["","","201화언","202화언","","","304고전감"],"화":["","202화언","","","201화언","","203화언"],"수":["","203화언","","202화언","304고전감",""],"목":["203화언","","","201화언","305H고전감","305H고전감",""],"금":["202화언","201화언","203화언",""]},"한지운(16)":{"월":["","301고전감","206화언","204화언","","","205화언"],"화":["","205화언","","","204화언","",""],"수":["302고전감","204화언","","206화언","301고전감",""],"목":["206화언","","204화언","","205화언","302고전감",""],"금":["206화언","205화언","",""]},"김혜림(16)":{"월":["307고전감","","","","203D독토","202E독토","306고전감"],"화":["308고전감","","203E독토","203D독토","","","101공국2B"],"수":["102공국2B","","","307고전감","",""],"목":["101공국2B","203D독토","","","308고전감","","203E독토"],"금":["","","102공국2B","306고전감"]},"김병화(10)":{"월":["","","","208화언","미디어D아동","","207화언"],"화":["","207화언","미디어D아동","","208화언","","208화언"],"수":["","208화언","207화언","207화언","",""],"목":["","","","","","",""],"금":["","","",""]},"임지현(15)":{"월":["306영독작","308영독작","","203영어2","","","307영독작"],"화":["","204영어2","","308영독작","203영어2","",""],"수":["308영독작","","","306영독작","307영독작",""],"목":["","","203영어2","","204영어2","306영독작",""],"금":["","204영어2","","307영독작"]},"김인원(16)":{"월":["303영독작","302영독작","","303E진로영","303D진로영","","301영독작"],"화":["302영독작","","303D진로영","301영독작","","",""],"수":["301영독작","303E진로영","","303영독작","302영독작",""],"목":["","303D진로영","","","303H음감","",""],"금":["303E진로영","","","303영독작"]},"황보현정(16)":{"월":["","107공영2","","105공영2","108공영2","","106공영2"],"화":["108공영2","","105공영2","","107공영2","","106공영2"],"수":["105공영2","108공영2","","","",""],"목":["","106공영2","105공영2","","107공영2","108공영2",""],"금":["106공영2","107공영2","",""]},"한지수(16)":{"월":["","","207영어2","205영어2","","","206영어2"],"화":["","미디어F인공","","","305C심화영","","206영어2"],"수":["","207영어2","208영어2","205영어2","",""],"목":["207영어2","","305C심화영","208영어2","206영어2","",""],"금":["205영어2","305C심화영","208영어2",""]},"함형주(17)":{"월":["103공영2","104공영2","","","102공영2","101공영2",""],"화":["102공영2","104공영2","","201D심영","103공영2","",""],"수":["104공영2","102공영2","","103공영2","101공영2",""],"목":["","","","101공영2","","104공영2","102공영2"],"금":["","","101공영2","103공영2"]},"하지영(14)":{"월":["305영독작","304영독작","","","201D심영","",""],"화":["305영독작","","","304영독작","202영어2","",""],"수":["","202영어2","201영어2","","",""],"목":["201영어2","201D심영","","202영어2","304영독작","",""],"금":["","","201영어2","305영독작"]},"안효정(16)":{"월":["304진로","303진로","","102수학2","","","302진로"],"화":["301진로","","","306진로","101수학2","",""],"수":["","101수학2","","102수학2","305 진로",""],"목":["","101수학2","102수학2","","307진로","308진로",""],"금":["","102수학2","","101수학2"]},"전상우(16)":{"월":["","","104수학2","103수학2","","305A확통","105수학2"],"화":["105수학2","103수학2","","104수학2","","305A확통",""],"수":["103수학2","","","","104수학2",""],"목":["104수학2","105수학2","","","103수학2","","305A확통"],"금":["","미디어C식품","","105수학2"]},"송해인(16)":{"월":["","","수학2B확통","","107수학2","","108수학2"],"화":["","","","106수학2","","108수학2","107수학2"],"수":["107수학2","","수학2B확통","106수학2","미디어A중문화",""],"목":["수학2B확통","107수학2","","106수학2","","","108수학2"],"금":["","","108수학2","106수학2"]},"김다나(15)":{"월":["","202A인공","","","202D인공","","202미적"],"화":["202A인공","201미적","","202D인공","","",""],"수":["","201미적","202미적","","202A인공",""],"목":["202미적","202D인공","","미디어F인공","201미적","",""],"금":["201미적","202미적","",""]},"이승주(16)":{"월":["","","203미적","207미적","305D미적분","",""],"화":["","203미적","305D미적분","","205미적","","207미적"],"수":["","205미적","203미적","","",""],"목":["205미적","305D미적분","","207미적","미디어H미감비","",""],"금":["207미적","203미적","205미적",""]},"손영헌(15)":{"월":["","","208미적","","","205E경수","204미적"],"화":["","208미적","205E경수","","206미적","","204미적"],"수":["","","206미적","204미적","",""],"목":["204미적","","206미적","","208미적","","205E경수"],"금":["208미적","206미적","",""]},"정민환(16)":{"월":["","","수학1B미적분","수학1E확통","수학1D확통","수학1A미적분",""],"화":["","","수학1D확통","","수학1C확통","수학1A미적분",""],"수":["","수학1E확통","수학1B미적분","","",""],"목":["수학1B미적분","수학1D확통","수학1C확통","","","303H음감","수학1A미적분"],"금":["수학1E확통","수학1C확통","",""]},"김상래(14)":{"월":["","105통과","108통과","","창융2D화학2","",""],"화":["","","창융2D화학2","101통과","창융2C화학2","",""],"수":["","103통과","","","",""],"목":["","창융2D화학2","창융2C화학2","","","106통과","107통과"],"금":["102통과","창융2C화학2","104 통과",""]},"이민정(16)":{"월":["","","105통과","","304D생과2","304A생과2",""],"화":["","","304D생과2","107통과","","304A생과2","304G생태"],"수":["108통과","","101통과","","103통과",""],"목":["","304D생과2","","104통과","106통과","","304A생과2"],"금":["","","304G생태","102통과"]},"이소현(16)":{"월":["","103과탐실","","108통과","106통과","","102통과"],"화":["","308F과연","107통과","","104통과","","308G과연"],"수":["","","105통과","101통과","",""],"목":["102과탐실","","101과탐실","308F과연","","103통과",""],"금":["104과탐실","","308G과연",""]},"임예슬(15)":{"월":["","101통과","","","206D지구","306A지과2",""],"화":["","305F생태","","206D지구","","306A지과2","103 통과"],"수":["106통과","","","104통과","107통과",""],"목":["108통과","206D지구","","102통과","","","306A지과2"],"금":["","105통과","",""]},"박성우(17)":{"월":["105과탐실","","","","208D세포","208E세포",""],"화":["","306F생태","208E세포","208D세포","","208C세포","306G생태"],"수":["208C세포","","107과탐실","","106과탐실",""],"목":["","208D세포","","306F생태","","208C세포","208E세포"],"금":["","","306G생태","108과탐실"]},"김나나(16)":{"월":["201B역학","201A역학","","304E물리2","","201E역학",""],"화":["201A역학","","201E역학","","304C물리2","",""],"수":["","304E물리2","","","201A역학","201B역학"],"목":["","","304C물리2","305F생태","","","201E역학"],"금":["304E물리2","304C물리2","","201B역학"]},"이하린(16)":{"월":["206B물질","206A물질","306B화학2","","","",""],"화":["206A물질","307F과연","","","","206C물질","305G생태"],"수":["206C물질","","306B화학2","","206A물질","206B물질"],"목":["306B화학2","","","304F과연","","206C물질",""],"금":["","","305G생태","206B물질"]},"김수연(16)":{"월":["","108통사","304B세지","","101통사","104통사",""],"화":["","303F사탐","106통사","","미디어C식품","","302G사탐"],"수":["","107통사","304B세지","","",""],"목":["304B세지","","","303F사탐","105통사","102통사",""],"금":["103통사","","302G사탐",""]},"박소현(16)":{"월":["101통사","","102통사","","104통사","302A정법",""],"화":["","105통사","","","102통사","302A정법",""],"수":["101통사","","108 통사","105통사","",""],"목":["","103통사","미디어C식품","","108통사","","302A정법"],"금":["","104통사","103통사",""]},"정은주(16)":{"월":["104통사","","302B윤사","302E윤사","302D윤사","",""],"화":["","","302D윤사","","302C윤사","103통사",""],"수":["","302E윤사","302B윤사","","102통사",""],"목":["302B윤사","302D윤사","302C윤사","","101통사","",""],"금":["302 E윤사3","302C윤사","",""]},"양예림(16)":{"월":["207B윤사2","207A윤사2","","","207D윤사","207 E윤사2",""],"화":["207 A윤사2","","207E윤사2","207D윤사","","105통사",""],"수":["","","","","207A윤사","207B윤사"],"목":["","207D윤사","","108통사","","107통사","207 E윤사"],"금":["","106통사","","207B윤사"]},"이영선(15)":{"월":["","204A경제","","107통사","","106통사",""],"화":["204A경제","304F사탐","","","","201C경제","303G사탐"],"수":["201C경제","","","","204A경제",""],"목":["","미디어D아동","106통사","304F사탐","","201C경제",""],"금":["107통사","","303G사탐",""]},"최영란(16)":{"월":["205B한지","205A한지","","","205D한지","",""],"화":["205A한지","302F사탐","","205D한지","","205C한지","미디어G중문화"],"수":["205C한지","","","","205A한지","205B한지"],"목":["","205D한지","","302F사탐","","205C한지",""],"금":["","","미디어G중문화","205B한지"]},"김현진(16)":{"월":["","","307B사문","307E사문","307D사문","307A사문",""],"화":["","","307D사문","","307C사문","307A사문",""],"수":["","307E사문","307B사문","","",""],"목":["307B사문","307D사문","307C사문","","","미디어H미감비","307A사문"],"금":["307E사문","307C사문","",""]},"이재형(17)":{"월":["107한국사","","106한국사","","","102진로","101진로"],"화":["107한국사","106한국사","","105진로","108진로","","108한국사"],"수":["","106한국사","","108한국사","",""],"목":["","","107진로","103진로","104진로","","106진로"],"금":["108한국사","","","107한국사"]},"주은정(15)":{"월":["102한국사","","","305E세계사","105한국사","","104한국사"],"화":["103한국사","","104한국사","","105한국사","102한국사",""],"수":["","305E세계사","103한국사","","",""],"목":["","104한국사","103한국사","","102한국사","",""],"금":["305E세계사","","105한국사",""]},"김형자(15)":{"월":["204B동아","","101한국사","","204D동아","204E동아",""],"화":["","101한국사","204E동아","204D동아","","204C동아",""],"수":["204C동아","","","","","204B동아"],"목":["","204D동아","","","","204C동아","204E동아"],"금":["","101한국사","","208B동아"]},"이주은(16)":{"월":["308스포츠","306스포츠","","101체육2","","","305스포츠"],"화":["","","103체육2","307스포츠","","101체육2","102체육2"],"수":["306스포츠","","","305스포츠","308스포츠",""],"목":["","102체육2","104체육2","","","307스포츠",""],"금":["","103체육2","","104체육2"]},"홍영민(16)":{"월":["301운동3","","205스포츠","206스포츠","","","208스포츠"],"화":["304운동3","","","303운동3","","","205스포츠"],"수":["304운동3","","","302운동3","303운동3",""],"목":["208스포츠","","207스포츠","206스포츠","301운동3","",""],"금":["","207스포츠","","302운동3"]},"유관후(17)":{"월":["310직업체","106체육2","","201스포츠","","108체육2","203스포츠"],"화":["106체육2","107체육2","","108체육2","","","202스포츠"],"수":["","","204스포츠","107체육2","",""],"목":["105체육2","","201스포츠","203스포츠","202스포츠","",""],"금":["105체육2","","204스포츠",""]},"송세현(15)":{"월":["","","","미술E드로잉","","107미술","107미술"],"화":["","108미술","108미술","","106미술","106미술",""],"수":["","미술E드로잉","","","105미술",""],"목":["","","108미술","107미술","","105미술","105미술"],"금":["미술E드로잉","","106미술",""]},"허혜지(17)":{"월":["","미디어A중문","204미창","","","미술A미전공","201미창"],"화":["미디어A중문","206미창","","","207미창","미술A미전공",""],"수":["","","205미창","201미창","",""],"목":["","","208미창","205미창","207미창","","미술A미전공"],"금":["204미창","208미창","206미창",""]},"이유경(16)":{"월":["","102음악","","","103음악","103음악",""],"화":["101음악","","102음악","102음악","","","104음악"],"수":["","104음악","104음악","203음연","",""],"목":["103음악","","202음연","","203음연","101음악","101음악"],"금":["","","202음연",""]},"이예준(14)":{"월":["AI실B영상","AI실A영상","","309직업환","309직업환","AI실E로봇",""],"화":["AI실A영상","","AI실E로봇","","","AI실C로봇",""],"수":["AI실C로봇","","","","AI실A영상","AI실B영상"],"목":["","","","","","AI실C로봇","AI실E로봇"],"금":["","","","AI실B영상"]},"정등일(15)":{"월":["","","컴실B프로","컴실E프로","컴실D인공","컴실E인공",""],"화":["","","컴실E인공","컴실D인공","","컴실C인공",""],"수":["컴실C인공","컴실E프로","컴실B프로","","",""],"목":["컴실B프로","컴실D인공","","","","컴실C인공","컴실E인공"],"금":["컴실E프로","","",""]},"김태호(16)":{"월":["203B일문","203A일문","","","","203E일문",""],"화":["203A일문","301F일어2","203E일문","","","203C일문","301G일어2"],"수":["203C일문","","","","203A일문","203B일문"],"목":["","","","301F일어2","","203C일문","203E일문"],"금":["","","301G일어2","203B일문"]},"박성희(9)":{"월":["","309진로","202진로","","","",""],"화":["","","","","","","201진로"],"수":["","206진로","","208진로","",""],"목":["","","205진로","204진로","","",""],"금":["203진로","","207진로",""]}};
+  const TT_SEED_PERIODS = {"월":7,"화":7,"수":6,"목":7,"금":4};
+
   const TT_DAYS = ['월', '화', '수', '목', '금'];
-  const TT_PERIODS = 7;
+  const TT_DEFAULT_PERIODS = { '월': 7, '화': 7, '수': 7, '목': 7, '금': 7 };
   state.ttCurrentTeacher = null;
   state.ttCurrentDay = '월';
   state.ttMode = 'teacher';
   state.ttDayViewDay = '월';
+  state.ttSearchQuery = '';
 
-  function getTimetableData() { return safeParse('teacher_timetable_data', {}); }
+  function getTimetableData() {
+    const stored = localStorage.getItem('teacher_timetable_data');
+    if (stored === null) { return JSON.parse(JSON.stringify(TT_SEED_DATA)); } // 최초 실행 시 첨부된 엑셀 데이터를 기본값으로 사용
+    return safeParse('teacher_timetable_data', {});
+  }
   function saveTimetableData(data) { localStorage.setItem('teacher_timetable_data', JSON.stringify(data)); saveToCloud(); }
-  function emptyTeacherSchedule() { const obj = {}; TT_DAYS.forEach(d => obj[d] = Array(TT_PERIODS).fill('')); return obj; }
+  function getPeriodCounts() {
+    const stored = localStorage.getItem('teacher_timetable_periods');
+    if (stored === null) { return Object.assign({}, TT_SEED_PERIODS); }
+    return safeParse('teacher_timetable_periods', TT_DEFAULT_PERIODS);
+  }
+  function savePeriodCounts(counts) { localStorage.setItem('teacher_timetable_periods', JSON.stringify(counts)); saveToCloud(); }
+  function emptyTeacherSchedule() { const counts = getPeriodCounts(); const obj = {}; TT_DAYS.forEach(d => obj[d] = Array(counts[d] || 7).fill('')); return obj; }
 
   function initTimetableView() {
     document.querySelectorAll('#timetable-mode-control .segment-btn').forEach(b => { b.classList.toggle('active', b.dataset.mode === state.ttMode); });
@@ -1220,19 +1262,33 @@
     btn.addEventListener('click', () => { state.ttMode = btn.dataset.mode; initTimetableView(); });
   });
 
+  document.getElementById('timetable-search').addEventListener('input', (e) => {
+    state.ttSearchQuery = e.target.value.trim();
+    renderTeacherChips();
+  });
+
   function renderTeacherChips() {
     const data = getTimetableData();
-    const names = Object.keys(data).sort((a, b) => a.localeCompare(b, 'ko'));
+    let names = Object.keys(data).sort((a, b) => a.localeCompare(b, 'ko'));
     const wrap = document.getElementById('timetable-teacher-chips');
     wrap.innerHTML = '';
     const emptyMsg = document.getElementById('timetable-teacher-empty');
     const editor = document.getElementById('timetable-teacher-editor');
     if (names.length === 0) {
-      emptyMsg.style.display = 'block'; editor.style.display = 'none'; state.ttCurrentTeacher = null; return;
+      emptyMsg.style.display = 'block'; editor.style.display = 'none'; state.ttCurrentTeacher = null;
+      emptyMsg.innerHTML = '등록된 선생님이 없습니다.<br>위에서 선생님을 추가하거나 엑셀 파일을 불러와주세요.';
+      return;
+    }
+    const q = state.ttSearchQuery;
+    const filtered = q ? names.filter(n => n.includes(q)) : names;
+    if (filtered.length === 0) {
+      emptyMsg.style.display = 'block'; editor.style.display = 'none';
+      emptyMsg.innerHTML = `'${q}' 선생님을 찾을 수 없습니다.`;
+      return;
     }
     emptyMsg.style.display = 'none';
-    if (!state.ttCurrentTeacher || !names.includes(state.ttCurrentTeacher)) state.ttCurrentTeacher = names[0];
-    names.forEach(name => {
+    if (!state.ttCurrentTeacher || !filtered.includes(state.ttCurrentTeacher)) state.ttCurrentTeacher = filtered[0];
+    filtered.forEach(name => {
       const chip = document.createElement('div');
       chip.className = 'teacher-chip' + (name === state.ttCurrentTeacher ? ' active' : '');
       chip.innerHTML = `<span>${name}</span><span class="chip-del" data-name="${name}">×</span>`;
@@ -1260,7 +1316,8 @@
     const data = getTimetableData();
     if (data[name]) { showToast('이미 등록된 선생님입니다.'); return; }
     data[name] = emptyTeacherSchedule(); saveTimetableData(data);
-    input.value = ''; state.ttCurrentTeacher = name; renderTeacherChips();
+    input.value = ''; state.ttCurrentTeacher = name; state.ttSearchQuery = ''; document.getElementById('timetable-search').value = '';
+    renderTeacherChips();
     showToast(`${name} 선생님이 추가되었습니다.`);
   });
   document.getElementById('timetable-new-teacher').addEventListener('keydown', (e) => {
@@ -1281,8 +1338,10 @@
     const container = document.getElementById('timetable-period-rows'); container.innerHTML = '';
     if (!state.ttCurrentTeacher) return;
     const data = getTimetableData();
-    const sched = (data[state.ttCurrentTeacher] && data[state.ttCurrentTeacher][state.ttCurrentDay]) || Array(TT_PERIODS).fill('');
-    for (let p = 0; p < TT_PERIODS; p++) {
+    const counts = getPeriodCounts();
+    const periodCount = counts[state.ttCurrentDay] || 7;
+    const sched = (data[state.ttCurrentTeacher] && data[state.ttCurrentTeacher][state.ttCurrentDay]) || Array(periodCount).fill('');
+    for (let p = 0; p < periodCount; p++) {
       const row = document.createElement('div'); row.className = 'period-row';
       const safeVal = (sched[p] || '').replace(/"/g, '&quot;');
       row.innerHTML = `<span class="period-label">${p + 1}교시</span><input type="text" placeholder="예: 2-3반 수학" value="${safeVal}" />`;
@@ -1290,7 +1349,7 @@
       inp.addEventListener('change', () => {
         const d = getTimetableData();
         if (!d[state.ttCurrentTeacher]) d[state.ttCurrentTeacher] = emptyTeacherSchedule();
-        if (!d[state.ttCurrentTeacher][state.ttCurrentDay]) d[state.ttCurrentTeacher][state.ttCurrentDay] = Array(TT_PERIODS).fill('');
+        if (!d[state.ttCurrentTeacher][state.ttCurrentDay]) d[state.ttCurrentTeacher][state.ttCurrentDay] = Array(periodCount).fill('');
         d[state.ttCurrentTeacher][state.ttCurrentDay][p] = inp.value;
         saveTimetableData(d); showToast('저장되었습니다.');
       });
@@ -1307,22 +1366,96 @@
       wrap.appendChild(btn);
     });
     const data = getTimetableData();
+    const counts = getPeriodCounts();
+    const periodCount = counts[state.ttDayViewDay] || 7;
     const names = Object.keys(data).sort((a, b) => a.localeCompare(b, 'ko'));
     const table = document.getElementById('timetable-day-table');
     const emptyMsg = document.getElementById('timetable-day-empty');
     if (names.length === 0) { table.innerHTML = ''; emptyMsg.style.display = 'block'; return; }
     emptyMsg.style.display = 'none';
     let html = '<thead><tr><th>선생님</th>';
-    for (let p = 1; p <= TT_PERIODS; p++) html += `<th>${p}교시</th>`;
+    for (let p = 1; p <= periodCount; p++) html += `<th>${p}교시</th>`;
     html += '</tr></thead><tbody>';
     names.forEach(name => {
-      const sched = (data[name] && data[name][state.ttDayViewDay]) || Array(TT_PERIODS).fill('');
+      const sched = (data[name] && data[name][state.ttDayViewDay]) || Array(periodCount).fill('');
       html += `<tr><td>${name}</td>`;
-      for (let p = 0; p < TT_PERIODS; p++) html += `<td>${sched[p] ? sched[p] : '-'}</td>`;
+      for (let p = 0; p < periodCount; p++) html += `<td>${sched[p] ? sched[p] : '-'}</td>`;
       html += '</tr>';
     });
     html += '</tbody>';
     table.innerHTML = html;
+  }
+
+  // 📥 엑셀(.xlsx/.csv) 파일 업로드로 전체 교사 시간표 자동 인식
+  document.getElementById('btn-import-timetable-excel').addEventListener('click', () => {
+    document.getElementById('timetable-excel-input').click();
+  });
+  document.getElementById('timetable-excel-input').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const wb = XLSX.read(evt.target.result, { type: 'array' });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+        const result = parseTeacherTimetableRows(rows);
+        if (Object.keys(result.data).length === 0) {
+          alert('시간표 데이터를 인식하지 못했습니다.\n\n1행에 요일(월/화/수/목/금), 2행에 교시 번호, 3행부터 선생님별 시간표가 있는 형식의 엑셀 파일인지 확인해주세요.');
+          return;
+        }
+        showConfirm(`엑셀 파일에서 선생님 ${Object.keys(result.data).length}명의 시간표를 찾았습니다.\n기존 시간표에 반영(같은 이름은 덮어쓰기)하시겠습니까?`).then(ok => {
+          if (!ok) return;
+          const existing = getTimetableData();
+          Object.assign(existing, result.data);
+          saveTimetableData(existing);
+          savePeriodCounts(result.periodCounts);
+          state.ttSearchQuery = ''; document.getElementById('timetable-search').value = '';
+          renderTeacherChips();
+          showToast(`${Object.keys(result.data).length}명의 시간표를 불러왔습니다.`);
+        });
+      } catch (err) {
+        alert('엑셀 파일을 읽는 중 오류가 발생했습니다: ' + err.message);
+      }
+      e.target.value = '';
+    };
+    reader.readAsArrayBuffer(file);
+  });
+
+  // 1행: 요일 헤더(월/화/수/목/금이 각 요일 블록의 첫 칸에만 존재), 2행: 교시 번호, 3행부터: 교사명 + 교시별 내용
+  function parseTeacherTimetableRows(rows) {
+    const dayHeaderRow = rows[0] || [];
+    const periodRow = rows[1] || [];
+    const blocks = [];
+    let curDay = null, curStart = null;
+    for (let c = 1; c < dayHeaderRow.length; c++) {
+      const v = (dayHeaderRow[c] || '').toString().trim();
+      if (v && TT_DAYS.includes(v)) {
+        if (curDay) blocks.push({ day: curDay, start: curStart, end: c - 1 });
+        curDay = v; curStart = c;
+      }
+    }
+    if (curDay) blocks.push({ day: curDay, start: curStart, end: dayHeaderRow.length - 1 });
+    blocks.forEach(b => {
+      let end = b.start;
+      for (let c = b.start; c <= b.end; c++) { if (periodRow[c] !== '' && periodRow[c] != null) end = c; }
+      b.end = end;
+    });
+    const periodCounts = Object.assign({}, TT_DEFAULT_PERIODS);
+    blocks.forEach(b => periodCounts[b.day] = (b.end - b.start + 1) || 1);
+    const data = {};
+    for (let r = 2; r < rows.length; r++) {
+      const name = (rows[r][0] || '').toString().trim();
+      if (!name) continue;
+      const entry = {};
+      blocks.forEach(b => {
+        const arr = [];
+        for (let c = b.start; c <= b.end; c++) { arr.push((rows[r][c] || '').toString().trim()); }
+        entry[b.day] = arr;
+      });
+      data[name] = entry;
+    }
+    return { data, periodCounts };
   }
 
   // ==========================================
@@ -1371,9 +1504,247 @@
     const l = getDailySchedule(); l.push({ time: '', text: '' }); saveDailySchedule(l); renderScheduleSheet();
   });
 
+  // ==========================================
+  // 🧳 수학여행 일정 (2026 제주도 수학여행 자료 기반)
+  // ==========================================
+  const TRIP_INFO = {
+    title: '2026학년도 수학여행 · 제주도',
+    dateRange: '2026. 09. 07(월) ~ 09. 09(수) · 2박 3일',
+    gather: [
+      { team: 'A팀', place: '김포공항 국내선 1층 금호빈상 앞', time: '08:00 (시간 엄수)' },
+      { team: 'B팀', place: '김포공항 국내선 1층 금호빈상 앞', time: '09:00 (시간 엄수)' }
+    ],
+    flights: [
+      { team: 'A팀', classes: '1·2·4반', go: '10:10 - 11:25 (9/7)', classesBack: '1·2·4·5반', back: '17:00 - 18:10 (9/9)' },
+      { team: 'B팀', classes: '3·5·6·7·8반', go: '11:10 - 12:20 (9/7)', classesBack: '3·6·7·8반', back: '18:15 - 19:30 (9/9)' }
+    ],
+    flightNote: '항공편 사정으로 인해, 출발 편은 3개반/5개반, 도착 편은 4개반씩 나누어 탑승합니다.',
+    days: [
+      {
+        label: '1일차', date: '9/7 월',
+        teamA: [
+          { label: '김포공항 집결·출발', mapQuery: '김포공항' },
+          { label: '중식 - MH 컨벤션', mapQuery: '제주 MH컨벤션' },
+          { label: '아르떼 뮤지엄', mapQuery: '제주 아르떼뮤지엄' },
+          { label: '송악산', mapQuery: '제주 송악산' },
+          { label: '석식 - 제주 통돗', mapQuery: '제주 통돗' },
+          { label: '숙소 이동 · 체크인', mapQuery: null }
+        ]
+      },
+      { label: '2일차', date: '9/8 화' },
+      { label: '3일차', date: '9/9 수' }
+    ],
+    hotelContacts: [
+      { name: 'WE 호텔', addr: '서귀포시 1100로 453-95', tel: '064-730-1200' },
+      { name: '캠퍼트리 호텔 & 리조트', addr: '제주시 해암마을 4길 100', tel: '064-795-8888' },
+      { name: '켄싱턴 리조트 중문점', addr: '서귀포시 중문관광로 72번길', tel: '1588-9337' },
+      { name: '켄싱턴 리조트 서귀포점', addr: '서귀포시 이어도로 684', tel: '064-739-9001' },
+      { name: '제주 신화월드 랜딩관', addr: '서귀포시 안덕면 신화역사로 304번길 38', tel: '064-731-6000' },
+      { name: '제주 신화월드 신화관', addr: '서귀포시 안덕면 신화역사로 304번길 38', tel: '1670-8800' },
+      { name: '빠레브 호텔', addr: '서귀포시 감정문화로 15', tel: '0507-1374-8905' },
+      { name: '스위트메이 호텔', addr: '서귀포시 감정문화로 27번길 9-1', tel: '0507-1374-5757' },
+      { name: '서귀포 JS 호텔', addr: '서귀포시 감정문화로 51', tel: '064-802-3000' },
+      { name: '히든클리프 호텔 & 네이처', addr: '서귀포시 여래해안로 542', tel: '064-752-7777' },
+      { name: '파크선샤인호텔', addr: '서귀포시 남성중로 135', tel: '064-766-1011' },
+      { name: '벨룸리조트', addr: '서귀포시 516로 277번길 45', tel: '064-732-5700' },
+      { name: '야크마을', addr: '서귀포시 색달중앙로 162', tel: '064-760-1950' }
+    ],
+    siteVisits: [
+      { name: 'WE 호텔', addr: '서귀포시 1100로 453-95', tel: '064-730-1200', notes: [
+        '더블베드1+싱글베드1 (3인 1실), 마루·카펫 혼합',
+        '화장실: 변기+샤워실 한 공간에 함께 위치',
+        '저층 우선 배정 / 발코니 없음, 창문 15cm만 개방',
+        '무인 편의점 (주류는 잠금 처리)',
+        '조식 아침 7시~ (일반 투숙객과 함께 사용)',
+        '연회장 층고 높고 전 인원 수용 가능',
+        '힐링 프로그램·별 보는 장소 등 부대시설 다양, 의사 3명 상시 거주'
+      ]},
+      { name: '캠퍼트리 호텔 & 리조트', addr: '제주시 해암마을 4길 100', tel: '064-795-8888', notes: [
+        '더블베드1+싱글베드2 (4인 1실, 37평형, 인원 추가 시 침구 추가)',
+        '화장실: 변기+샤워실 한 공간',
+        '1층 단층 구조, 방 2개·출입문 2개',
+        '가스레인지 등 주방용품 사용 불가',
+        '편의점: 로비에 소규모로 있음',
+        '공항과 거리가 가까움'
+      ]},
+      { name: '켄싱턴 리조트 서귀포점', addr: '서귀포시 이어도로 684', tel: '064-739-9001', notes: [
+        'C동 5층 리모델링, 더블베드1+싱글베드2 (4인 1실, 싱글베드 2개는 별도 방)',
+        '화장실: 변기·샤워실 분리 (욕조 없음)',
+        '발코니 위험 있어 1층 우선 배정 권장 (성별 무관 시 전원 1층 배정 가능)',
+        '편의점: 유인 운영, 24시간 (중간 브레이크타임 있음)',
+        '조식: 1층 \'애슐리 퀸즈\'에서 진행, 100명 수용 가능한 별도 룸 있음 (아침 7시~)',
+        '연회장 400명까지 수용 가능',
+        '부대시설: 산책로, 농구·축구·야구 등 간단한 오락시설'
+      ]},
+      { name: '켄싱턴 리조트 중문점', addr: '서귀포시 중문관광로 72번길', tel: '1588-9337', notes: [
+        '더블베드2 (4인 1실, 25평형)',
+        '화장실: 변기·샤워실 분리 (욕조 없음)',
+        '엘리베이터 없음 → 성별 무관 시 전원 같은 층 배정 가능, 성별 분리 배정도 가능',
+        '편의점: 유인 운영, 자정~새벽 1시 사이 마감',
+        '조식: 1층 호텔 조식 (평이 좋은 편) · 애슐리 퀸즈는 서귀포점에만 있음',
+        '레크레이션은 서귀포점에서 진행'
+      ]},
+      { name: '제주 신화월드 랜딩관 / 신화관', addr: '서귀포시 안덕면 신화역사로 304번길 38', tel: '064-731-6000', notes: [
+        '더블베드1+싱글베드1 (3인 1실, 약 12평, 랜딩관·신화관 동일 구조)',
+        '화장실: 변기·샤워실 분리, 욕조 있음 (가림막 설치 가능 여부 확인 중)',
+        '학생들을 최대한 같은 층으로 배정 (간혹 일반 투숙객과 혼재 가능)',
+        '편의점 외 던킨도너츠·하겐다즈·맘스터치 등 다양한 부대시설',
+        '조식: 랜딩관·신화관 각각 진행, 일반 투숙객과 공동 이용 (아침 7시~)',
+        '연회장: \'랜딩블룸\' 400여 명 수용 가능',
+        '워터파크·쇼핑몰·볼링장·식당가·영화관 등 다양한 편의시설',
+        '지하 카지노는 입구에서 통제 가능'
+      ]},
+      { name: '파크선샤인호텔', addr: '서귀포시 남성중로 135', tel: '064-766-1011', notes: [
+        '싱글베드2 (2인 1실) / 더블베드1+싱글베드1 (3인 1실)',
+        '테라스 별도 안전관리 가능 (3인실은 테라스 없음)',
+        '화장실: 욕조+샤워기 일체형',
+        '편의점: 호텔 입구 외부에 위치, 이용 시 인솔 필요',
+        '조식: 평이 좋고 메뉴 다양, 단체 수용 시 연회장 이용',
+        '연회장: 층고 높고 환기시설 양호, 200명 수용 가능'
+      ]}
+    ]
+  };
+  // 2일차 · 3일차는 A팀/B팀 동선이 서로 바뀌어 진행됩니다.
+  TRIP_INFO.days[1].teamA = [
+    { label: '주상절리', mapQuery: '제주 주상절리' },
+    { label: '제주 제트보트 체험', mapQuery: '제주 제트보트' },
+    { label: '성산일출봉', mapQuery: '성산일출봉' },
+    { label: '중식 - 국수인가 갈치인가', mapQuery: '제주 국수인가갈치인가' },
+    { label: '윈드카트 1947', mapQuery: '제주 윈드카트1947' },
+    { label: '올레길 7코스', mapQuery: '제주 올레길 7코스' },
+    { label: '서귀포 매일올레시장 (석식, 자유식)', mapQuery: '서귀포 매일올레시장' },
+    { label: '레크레이션 및 장기자랑', mapQuery: null },
+    { label: '간식타임', mapQuery: null }
+  ];
+  TRIP_INFO.days[1].teamB = [
+    { label: '윈드카트 1947', mapQuery: '제주 윈드카트1947' },
+    { label: '성산일출봉', mapQuery: '성산일출봉' },
+    { label: '중식 - 국수인가 갈치인가', mapQuery: '제주 국수인가갈치인가' },
+    { label: '제주라프 짚라인', mapQuery: '제주 짚라인' },
+    { label: '올레길 7코스', mapQuery: '제주 올레길 7코스' },
+    { label: '서귀포 매일올레시장 (석식, 자유식)', mapQuery: '서귀포 매일올레시장' },
+    { label: '레크레이션 및 장기자랑', mapQuery: null },
+    { label: '간식타임', mapQuery: null }
+  ];
+  TRIP_INFO.days[2].teamA = [
+    { label: '제주라프 짚라인', mapQuery: '제주 짚라인' },
+    { label: '4.3 평화공원', mapQuery: '제주4.3평화공원' },
+    { label: '중식 - 메종글래드 삼다정', mapQuery: '메종글래드 제주 삼다정' },
+    { label: '제주국제공항', mapQuery: '제주국제공항' },
+    { label: '김포공항 도착', mapQuery: '김포공항' }
+  ];
+  TRIP_INFO.days[2].teamB = [
+    { label: '주상절리', mapQuery: '제주 주상절리' },
+    { label: '제주 제트보트 체험', mapQuery: '제주 제트보트' },
+    { label: '4.3 평화공원', mapQuery: '제주4.3평화공원' },
+    { label: '제주국제공항', mapQuery: '제주국제공항' },
+    { label: '김포공항 도착', mapQuery: '김포공항' }
+  ];
+  TRIP_INFO.days[0].teamB = TRIP_INFO.days[0].teamA; // 1일차는 A/B팀 동일 동선
+
+  state.tripDayIndex = 0;
+  state.tripTeam = 'teamA';
+
+  function tripMapLinks(query) {
+    if (!query) return '';
+    const q = encodeURIComponent(query);
+    return `<div class="trip-map-btns">
+      <a class="trip-map-btn google" href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener">🗺️ 구글맵</a>
+      <a class="trip-map-btn naver" href="https://map.naver.com/p/search/${q}" target="_blank" rel="noopener">🟢 네이버지도</a>
+    </div>`;
+  }
+
+  function initTripView() {
+    document.getElementById('trip-title').textContent = TRIP_INFO.title;
+    document.getElementById('trip-daterange').textContent = TRIP_INFO.dateRange;
+    document.querySelectorAll('#trip-team-control .segment-btn').forEach(b => b.classList.toggle('active', b.dataset.team === state.tripTeam));
+    renderTripDayTabs();
+    renderTripTimeline();
+    renderTripGather();
+    renderTripHotelContacts();
+    renderTripSiteVisits();
+  }
+
+  document.querySelectorAll('#trip-team-control .segment-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.tripTeam = btn.dataset.team;
+      document.querySelectorAll('#trip-team-control .segment-btn').forEach(b => b.classList.toggle('active', b === btn));
+      renderTripTimeline();
+    });
+  });
+
+  function renderTripDayTabs() {
+    const wrap = document.getElementById('trip-day-tabs'); wrap.innerHTML = '';
+    TRIP_INFO.days.forEach((d, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'day-tab' + (i === state.tripDayIndex ? ' active' : '');
+      btn.style.fontSize = '11.5px';
+      btn.textContent = `${d.label} (${d.date})`;
+      btn.addEventListener('click', () => { state.tripDayIndex = i; renderTripDayTabs(); renderTripTimeline(); });
+      wrap.appendChild(btn);
+    });
+  }
+
+  function renderTripTimeline() {
+    const container = document.getElementById('trip-timeline');
+    const day = TRIP_INFO.days[state.tripDayIndex];
+    const stops = day[state.tripTeam] || [];
+    container.innerHTML = stops.map((s, i) => `
+      <div class="trip-stop">
+        <div class="ts-marker"><div class="ts-dot"></div><div class="ts-line"></div></div>
+        <div class="ts-body">
+          <div class="ts-index">STOP ${i + 1}</div>
+          <div class="ts-name">${s.label}</div>
+          ${tripMapLinks(s.mapQuery)}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderTripGather() {
+    let html = '<div style="font-size:13px; line-height:1.9;">';
+    TRIP_INFO.gather.forEach(item => {
+      html += `<div><b>${item.team}</b> 집합 : ${item.place} — <span class="text-primary" style="font-weight:800;">${item.time}</span></div>`;
+    });
+    html += tripMapLinks(TRIP_INFO.gather[0].place);
+    html += '<div style="margin:14px 0 6px; font-weight:800; font-size:12.5px;">✈️ 반별 항공편 탑승 시간</div>';
+    html += '<table class="trip-flight-table"><thead><tr><th>구분</th><th>반</th><th>서울→제주 (9/7)</th><th>반</th><th>제주→서울 (9/9)</th></tr></thead><tbody>';
+    TRIP_INFO.flights.forEach(item => {
+      html += `<tr><td>${item.team}</td><td>${item.classes}</td><td>${item.go}</td><td>${item.classesBack}</td><td>${item.back}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    html += `<div style="font-size:11.5px; color:var(--text-sub); margin-top:9px;">* ${TRIP_INFO.flightNote}</div>`;
+    html += '</div>';
+    document.getElementById('trip-gather-body').innerHTML = html;
+  }
+
+  function renderTripHotelContacts() {
+    document.getElementById('trip-hotel-contacts-body').innerHTML = TRIP_INFO.hotelContacts.map(h => `
+      <div class="trip-contact-row-wrap">
+        <div class="trip-contact-row">
+          <div>
+            <div class="trip-contact-name">${h.name}</div>
+            <div class="trip-contact-addr">${h.addr}</div>
+          </div>
+          <a class="trip-tel-btn" href="tel:${h.tel.replace(/[^0-9]/g, '')}">📞 전화</a>
+        </div>
+        ${tripMapLinks(h.addr)}
+      </div>
+    `).join('');
+  }
+
+  function renderTripSiteVisits() {
+    document.getElementById('trip-site-visit-body').innerHTML = TRIP_INFO.siteVisits.map(v => `
+      <div class="trip-visit-item">
+        <h4>🏨 ${v.name}</h4>
+        <div class="tv-addr">${v.addr}${v.tel ? ' · ' + v.tel : ''}</div>
+        <ul>${v.notes.map(n => `<li>${n}</li>`).join('')}</ul>
+        ${tripMapLinks(v.addr)}
+      </div>
+    `).join('');
+  }
+
   // 앱 초기화 로직
   async function initApp() { await loadFromCloud(); initHome(); }
   initApp();
 </script>
-</body>
-</html>
