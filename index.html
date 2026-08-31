@@ -41,7 +41,7 @@
 
     #app { width: 100%; max-width: var(--app-max-width); min-height: 100vh; background: transparent; position: relative; overflow-x: hidden; display: flex; flex-direction: column; transition: max-width 0.3s ease; }
 
-    .nav-bar { position: fixed; top: 0; width: 100%; max-width: var(--app-max-width); height: 56px; background: var(--bg-blur); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); display: flex; justify-content: space-between; align-items: center; padding: 0 16px; box-sizing: border-box; z-index: 100; border-bottom: 0.5px solid var(--border); transition: background 0.3s ease; }
+    .nav-bar { position: fixed; top: 0; width: 100%; max-width: var(--app-max-width); height: calc(56px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); background: var(--bg-blur); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); display: flex; justify-content: space-between; align-items: center; padding-left: 16px; padding-right: 16px; box-sizing: border-box; z-index: 100; border-bottom: 0.5px solid var(--border); transition: background 0.3s ease; }
     .nav-title { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
     .nav-btn { background: none; border: none; font-size: 20px; cursor: pointer; padding: 7px; color: var(--primary); display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; transition: background 0.2s ease, transform 0.15s var(--ease); }
     .nav-btn:active { background: rgba(128,128,128,0.18); transform: scale(0.9); }
@@ -61,7 +61,7 @@
       .class-grid { grid-template-columns: repeat(4, 1fr) !important; }
     }
 
-    .view { display: none; padding: 78px 16px 20px 16px; animation: fadeIn 0.35s ease; flex: 1; flex-direction: column; box-sizing: border-box; }
+    .view { display: none; padding: calc(78px + env(safe-area-inset-top)) 16px 20px 16px; animation: fadeIn 0.35s ease; flex: 1; flex-direction: column; box-sizing: border-box; }
     .view.active { display: flex; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -286,14 +286,36 @@
   <!-- ⚙️ 설정(Setup) 뷰 -->
   <div id="view-setup" class="view">
     <div class="card">
-      <h3 style="margin-top:0;">📋 학생/비상연락망 명단 등록</h3>
+      <h3 style="margin-top:0;">📋 명단 등록</h3>
       <select id="setup-type"><option value="student">학생 명단 등록</option><option value="teacher">비상연락망 등록</option></select>
+
+      <!-- 학생 명단 등록 -->
       <div id="student-setup-area">
         <input type="number" id="setup-grade" placeholder="학년 입력 (예: 1)" min="1" inputmode="numeric" />
         <input type="number" id="setup-class" placeholder="반 입력 (예: 1)" min="1" inputmode="numeric" />
+        <textarea id="excel-input" placeholder="엑셀 복사/붙여넣기 (학번, 이름, 학생전화, 학부모전화)"></textarea>
+        <button class="primary-btn" id="btn-save-list">💾 명단 등록</button>
       </div>
-      <textarea id="excel-input" placeholder="엑셀 복사/붙여넣기 (학번, 이름, 학생전화, 학부모전화)"></textarea>
-      <button class="primary-btn" id="btn-save-list">💾 명단 등록</button>
+
+      <!-- 비상연락망(교직원) 등록 -->
+      <div id="teacher-setup-area" style="display:none;">
+        <div class="label-title" style="margin-top:0;">👤 한 명씩 추가</div>
+        <div style="font-size:11.5px; color:var(--text-sub); margin:5px 0 10px; line-height:1.5;">이름과 전화번호를 각각 칸에 입력하고 <b>추가</b> 버튼을 눌러주세요. (전화번호 칸이 비어 있으면 추가되지 않습니다)</div>
+        <div class="timetable-add-row" style="margin-bottom: 4px; flex-wrap: wrap; gap:8px;">
+          <input type="text" id="teacher-contact-name" placeholder="이름 (예: 김한서)" style="flex:1; min-width:100px; margin-bottom:0;" />
+          <input type="text" id="teacher-contact-phone" placeholder="전화번호 (예: 010-1234-5678)" inputmode="tel" style="flex:1.3; min-width:150px; margin-bottom:0;" />
+          <button id="btn-add-teacher-contact" style="flex:none;">추가</button>
+        </div>
+        <div id="teacher-contact-list" style="margin: 14px 0 18px;"></div>
+
+        <div class="label-title" style="margin-top:0;">📋 여러 명 한 번에 등록 (선택 사항)</div>
+        <div style="font-size:11.5px; color:var(--text-sub); margin:5px 0 10px; line-height:1.6;">
+          엑셀에서 <b>이름, 전화번호 두 칸</b>을 함께 드래그해 복사한 뒤 아래에 붙여넣으면 자동으로 인식됩니다.<br>
+          직접 타이핑할 땐 한 줄에 <b>"이름, 전화번호"</b>처럼 쉼표(,)로 구분해서 적어주세요.
+        </div>
+        <textarea id="teacher-excel-input" placeholder="예시)&#10;김한서, 010-1234-5678&#10;이한서, 010-9876-5432"></textarea>
+        <button class="outline-btn" id="btn-save-teacher-bulk">📋 붙여넣은 내용 일괄 추가</button>
+      </div>
     </div>
     <div class="card">
       <h3 style="margin-top:0;">💬 학부모 안내 문자 템플릿</h3>
@@ -758,44 +780,121 @@
   document.getElementById('setup-type').addEventListener('change', (e) => {
     const isTeacher = e.target.value === 'teacher';
     document.getElementById('student-setup-area').style.display = isTeacher ? 'none' : 'block';
-    const excelInput = document.getElementById('excel-input');
-    if (isTeacher) {
-      excelInput.placeholder = '엑셀 복사/붙여넣기 (이름, 전화번호)\n예) 김한서[Tab]010-1234-5678';
-      const existing = safeParse('teachers_list', []);
-      if (Array.isArray(existing) && existing.length > 0) {
-        excelInput.value = existing.map(t => `${t['이름'] || ''}\t${t['전화번호'] || ''}`).join('\n');
-      }
-    } else {
-      excelInput.placeholder = '엑셀 복사/붙여넣기 (학번, 이름, 학생전화, 학부모전화)';
-      excelInput.value = '';
-    }
+    document.getElementById('teacher-setup-area').style.display = isTeacher ? 'block' : 'none';
+    if (isTeacher) renderTeacherContactList();
   });
 
   document.getElementById('btn-save-list').addEventListener('click', async () => { 
-    const type = document.getElementById('setup-type').value; 
     const raw = document.getElementById('excel-input').value; 
     if (!raw.trim()) return alert("데이터 없음"); 
-    if (type === 'student') { 
-      const g = document.getElementById('setup-grade').value.trim(); 
-      const c = document.getElementById('setup-class').value.trim(); 
-      if (!g || !c) return alert("학년과 반을 숫자로 입력해주세요."); 
-      const parsed = raw.trim().split('\n').map(line => { 
-        const t = line.split('\t').map(x=>x.trim()); 
-        return { '일련번호': t[0]||'', '이름': t[1]||'', '전화번호': t[2]||'', '추가전화번호': t[3]||'' }; 
-      }); 
-      localStorage.setItem(`students_${g}_${c}`, JSON.stringify(parsed)); 
-    } else { 
-      const parsed = raw.trim().split('\n').map(line => { 
-        const t = line.split('\t').map(x=>x.trim()); 
-        return { '이름': t[0]||'', '전화번호': t[1]||'' }; 
-      }); 
-      localStorage.setItem(`teachers_list`, JSON.stringify(parsed)); 
-    } 
+    const g = document.getElementById('setup-grade').value.trim(); 
+    const c = document.getElementById('setup-class').value.trim(); 
+    if (!g || !c) return alert("학년과 반을 숫자로 입력해주세요."); 
+    const parsed = raw.trim().split('\n').map(line => { 
+      const t = line.split('\t').map(x=>x.trim()); 
+      return { '일련번호': t[0]||'', '이름': t[1]||'', '전화번호': t[2]||'', '추가전화번호': t[3]||'' }; 
+    }); 
+    localStorage.setItem(`students_${g}_${c}`, JSON.stringify(parsed)); 
     await saveToCloud(); 
     document.getElementById('excel-input').value = ''; 
     showToast('명단 저장됨'); initHome(); 
   });
+
+  // ==========================================
+  // 📇 비상연락망(교직원) 등록 — 한 명씩 추가/삭제 + 붙여넣기 일괄 추가
+  // ==========================================
+  function getTeacherList() { return safeParse('teachers_list', []); }
+  function saveTeacherList(list) { localStorage.setItem('teachers_list', JSON.stringify(list)); saveToCloud(); }
+
+  // 붙여넣은 한 줄에서 이름/전화번호를 최대한 알아서 구분해준다.
+  // 1) 엑셀에서 그대로 복사한 경우: 진짜 Tab 문자로 구분되어 있음
+  // 2) 쉼표(,)로 구분해 직접 입력한 경우
+  // 3) 공백 2칸 이상으로 구분한 경우
+  // 4) 구분자가 없어도 줄 안에서 전화번호처럼 보이는 부분을 찾아 나머지를 이름으로 처리
+  function parseNamePhoneLine(line) {
+    line = line.trim();
+    if (!line) return null;
+    let parts = line.split('\t').map(s => s.trim()).filter(Boolean);
+    if (parts.length < 2) parts = line.split(',').map(s => s.trim()).filter(Boolean);
+    if (parts.length < 2) parts = line.split(/\s{2,}/).map(s => s.trim()).filter(Boolean);
+    if (parts.length >= 2) return { name: parts[0], phone: parts[1] };
+    const phoneMatch = line.match(/[\d][\d\-.\s]{5,}\d/);
+    if (phoneMatch) {
+      const phone = phoneMatch[0].replace(/\s+/g, '').trim();
+      const name = (line.slice(0, phoneMatch.index) + line.slice(phoneMatch.index + phoneMatch[0].length)).replace(/[,:\t]+/g, ' ').trim();
+      return { name, phone };
+    }
+    return { name: line, phone: '' };
+  }
+
+  function renderTeacherContactList() {
+    const list = getTeacherList();
+    const container = document.getElementById('teacher-contact-list');
+    if (!Array.isArray(list) || list.length === 0) {
+      container.innerHTML = '<div class="timetable-empty" style="padding:16px 0;">등록된 비상연락망이 없습니다.</div>';
+      return;
+    }
+    container.innerHTML = list.map((t, idx) => `
+      <div class="schedule-row">
+        <div style="flex:1; font-size:13px; min-width:0;">
+          <b>${t['이름'] || '(이름 없음)'}</b>
+          <span style="color:var(--text-sub); margin-left:6px;">${t['전화번호'] ? '📞 ' + t['전화번호'] : '전화번호 없음'}</span>
+        </div>
+        <button class="sch-del" data-idx="${idx}" aria-label="삭제">×</button>
+      </div>
+    `).join('');
+    container.querySelectorAll('.sch-del').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const idx = parseInt(btn.dataset.idx, 10);
+        const l = getTeacherList();
+        const target = l[idx];
+        if (!target) return;
+        if (await showConfirm(`'${target['이름'] || '이 연락처'}'를 삭제하시겠습니까?`)) {
+          l.splice(idx, 1);
+          saveTeacherList(l);
+          renderTeacherContactList();
+          showToast('삭제되었습니다.');
+        }
+      });
+    });
+  }
+
+  document.getElementById('btn-add-teacher-contact').addEventListener('click', () => {
+    const nameInput = document.getElementById('teacher-contact-name');
+    const phoneInput = document.getElementById('teacher-contact-phone');
+    const name = nameInput.value.trim();
+    const phone = phoneInput.value.trim();
+    if (!name) { alert('이름을 입력해주세요.'); nameInput.focus(); return; }
+    if (!phone) { alert('전화번호를 입력해주세요. 예: 010-1234-5678'); phoneInput.focus(); return; }
+    const list = getTeacherList();
+    list.push({ '이름': name, '전화번호': phone });
+    saveTeacherList(list);
+    nameInput.value = ''; phoneInput.value = ''; nameInput.focus();
+    renderTeacherContactList();
+    showToast(`${name} 연락처가 추가되었습니다.`);
+  });
+  document.getElementById('teacher-contact-name').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('teacher-contact-phone').focus(); }
+  });
+  document.getElementById('teacher-contact-phone').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-add-teacher-contact').click(); }
+  });
+
+  document.getElementById('btn-save-teacher-bulk').addEventListener('click', async () => {
+    const raw = document.getElementById('teacher-excel-input').value;
+    if (!raw.trim()) return alert('붙여넣은 내용이 없습니다.');
+    const rows = raw.trim().split('\n').map(parseNamePhoneLine).filter(r => r && r.name);
+    if (rows.length === 0) return alert('이름을 인식하지 못했습니다. 형식을 확인해주세요.');
+    const noPhoneCount = rows.filter(r => !r.phone).length;
+    const list = getTeacherList();
+    rows.forEach(r => list.push({ '이름': r.name, '전화번호': r.phone }));
+    saveTeacherList(list);
+    document.getElementById('teacher-excel-input').value = '';
+    renderTeacherContactList();
+    showToast(`${rows.length}명 추가됨${noPhoneCount ? ` (전화번호 없음 ${noPhoneCount}명)` : ''}`);
+  });
   
+
   document.getElementById('btn-save-template').addEventListener('click', () => { 
     localStorage.setItem('sms_template', document.getElementById('sms-template').value); 
     showToast('템플릿 저장됨'); 
