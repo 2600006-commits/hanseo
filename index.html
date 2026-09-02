@@ -52,7 +52,6 @@
       body { align-items: flex-start; }
       #app { box-shadow: var(--glass-shadow); border-radius: 0 0 28px 28px; margin-top: 0; }
       .class-grid { grid-template-columns: repeat(3, 1fr) !important; }
-      .student-grid { }
       .quick-actions { grid-template-columns: repeat(4, 1fr) !important; }
       .view { padding-left: 28px; padding-right: 28px; }
     }
@@ -437,12 +436,39 @@
   <div id="view-trip" class="view">
     <div class="card" style="margin-bottom:14px; text-align:center; padding:16px;">
       <div style="font-size:16px; font-weight:800;" id="trip-title"></div>
-      <div style="font-size:12.5px; color:var(--text-sub); margin-top:4px;" id="trip-daterange"></div>
+      <div style="font-size:12.5px; color:var(--text-sub); margin-top:4px; margin-bottom:12px;" id="trip-daterange"></div>
+      <a href="guidebook.pdf" download="2026학년도_한서고등학교_수학여행_안내책자.pdf" class="primary-btn icon-btn" style="width: auto; padding: 10px 16px; font-size: 13px; text-decoration: none; margin-bottom: 0; display: inline-flex;"><span class="ic ic-download"></span> 안내 책자 다운로드</a>
     </div>
 
     <div class="segment-control" id="trip-team-control">
       <button class="segment-btn active" data-team="teamA">A팀 일정</button>
       <button class="segment-btn" data-team="teamB">B팀 일정</button>
+    </div>
+    
+    <!-- 📢 교사 안내사항 카드 추가 -->
+    <div class="card" id="trip-notice-card" style="margin-bottom:14px; background: rgba(0, 122, 255, 0.05); border-color: rgba(0, 122, 255, 0.15);">
+      <div style="font-weight:800; margin-bottom:10px; color: var(--primary);">📢 교사 협조 및 추가 안내사항</div>
+      <div style="font-size:13px; line-height:1.6; color:var(--text-main);">
+        <div style="margin-bottom:10px;">
+          <strong>[차량 탑승 및 이동 시 협조 사항]</strong> (담임/비담임 공통)<br>
+          • <b>차량 탑승 후:</b> 학생 인원 파악 및 안전벨트 착용 여부 확인<br>
+            <span style="color:var(--text-sub); font-size:12px;">(안전요원 선생님과 함께 체크해주신 후 단톡방에 알려주시면 됩니다.)</span><br>
+          • <b>코스 이동 시:</b> 매 이동 시마다 출발/도착 상황 ➔ 단톡방 공유<br>
+          • <b>차량 탑승 배정:</b> 이예준T(A팀 5반) / 교감T(B팀 3반) / 손영헌T(B팀 8반)
+        </div>
+        <div style="margin-bottom:10px;">
+          <strong>[제주공항 도착 후 차량 확인]</strong><br>
+          • 제공해 드린 차량등록증(총 8대)의 번호판을 먼저 확인해 주세요.<br>
+          • 확인 후 '몇 반이 어느 차에 탑승했는지' 차량 번호를 단톡방에 공유 부탁드립니다.
+        </div>
+        <div>
+          <strong>[추가 안내사항]</strong><br>
+          • <b>팀 구성:</b> A팀 팀장(하지영 선생님), B팀 팀장(윤보라 선생님), 총괄 인솔자(교감 선생님)<br>
+          • 팀장은 팀 일정에 대해 책임지고 진행하며, 긴급 수정사항이 생길 경우 총괄 인솔자인 교감 선생님과 상의 후 진행합니다.<br>
+          • 교감 선생님, 이예준 선생님, 손영헌 선생님께서는 보내드린 카톡방에 입장 부탁드립니다.<br>
+          👉 <a href="https://open.kakao.com/o/gXk19cii" target="_blank" style="color:#007AFF; text-decoration:underline;">단톡방 바로가기</a> (비번: 2026)
+        </div>
+      </div>
     </div>
 
     <div class="day-tab-row" id="trip-day-tabs"></div>
@@ -652,10 +678,6 @@
       const res = await fetch(`${API_URL}?t=${Date.now()}`); 
       const data = await res.json();
       if (data) { 
-        // ⚠️ 클라우드를 기준(source of truth)으로 동기화한다.
-        // 그렇지 않으면, 이전에 삭제했지만 아직 클라우드에는 반영되지 않았던
-        // "유령" 데이터가 남아있다가 여기서 다시 덮어써지며 삭제가 무효화되는 문제가 생긴다.
-        // 클라우드 응답에 없는 키는 로컬에서도 함께 제거해준다.
         const cloudKeys = new Set(Object.keys(data)); 
         const localKeysToPrune = []; 
         for (let i = 0; i < localStorage.length; i++) { 
@@ -763,7 +785,6 @@
         } 
       } 
     } 
-    // localStorage 키 순서는 저장된 순서일 뿐 숫자 순서가 아니므로, 검색 결과도 학년 > 반 > 번호 순으로 정렬한다.
     results.sort((a, b) => 
       (parseInt(a.grade) - parseInt(b.grade)) || 
       (parseInt(a.cNum) - parseInt(b.cNum)) || 
@@ -801,16 +822,11 @@
   });
 
   // ==========================================
-  // 📇 비상연락망(교직원) 등록 — 한 명씩 추가/삭제 + 붙여넣기 일괄 추가
+  // 📇 비상연락망(교직원) 등록
   // ==========================================
   function getTeacherList() { return safeParse('teachers_list', []); }
   function saveTeacherList(list) { localStorage.setItem('teachers_list', JSON.stringify(list)); saveToCloud(); }
 
-  // 붙여넣은 한 줄에서 이름/전화번호를 최대한 알아서 구분해준다.
-  // 1) 엑셀에서 그대로 복사한 경우: 진짜 Tab 문자로 구분되어 있음
-  // 2) 쉼표(,)로 구분해 직접 입력한 경우
-  // 3) 공백 2칸 이상으로 구분한 경우
-  // 4) 구분자가 없어도 줄 안에서 전화번호처럼 보이는 부분을 찾아 나머지를 이름으로 처리
   function parseNamePhoneLine(line) {
     line = line.trim();
     if (!line) return null;
@@ -894,7 +910,6 @@
     showToast(`${rows.length}명 추가됨${noPhoneCount ? ` (전화번호 없음 ${noPhoneCount}명)` : ''}`);
   });
   
-
   document.getElementById('btn-save-template').addEventListener('click', () => { 
     localStorage.setItem('sms_template', document.getElementById('sms-template').value); 
     showToast('템플릿 저장됨'); 
@@ -1004,8 +1019,6 @@
     if (!(await showConfirm(`${grade}학년 전체(모든 반)의 명단과 출결 데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`))) return; 
     collectGradeKeys(grade).forEach(k => localStorage.removeItem(k)); 
     state.currentTab = '1'; initHome(); updateDashboard(); 
-    // saveToCloud()가 실패하면(오프라인 등) 자체적으로 실패 토스트를 띄운다.
-    // 이 경우 클라우드에는 아직 삭제 전 데이터가 남아있으므로, 인터넷이 연결되면 다시 삭제를 시도해야 한다.
     await saveToCloud(); 
   }
 
@@ -1079,8 +1092,6 @@
     } 
   }
 
-  // 🚨 버그 수정: '비상연락망' 탭을 눌러도 목록을 실제로 그려주는 함수가 없어서
-  // 등록을 해도 항상 빈 화면으로 보였던 문제를 해결.
   function renderTeacherGrid() {
     const grid = document.getElementById('teacher-grid');
     grid.innerHTML = '';
@@ -1104,7 +1115,6 @@
       grid.appendChild(btn);
     });
   }
-  
   
   function renderClassGrid() { 
     const grid = document.getElementById('class-grid'); 
@@ -1259,7 +1269,7 @@
     localStorage.setItem(`attendance_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`, JSON.stringify(state.attendance)); 
     localStorage.setItem(`memo_${state.currentGrade}_${state.currentClass}_${state.selectedDate}`, JSON.stringify(state.memos)); 
     await saveToCloud(); 
-    updateDashboard(); // 홈 화면으로 나가지 않고 이 반 화면에 그대로 머무르되, 출석경고 배지 수치는 최신화한다.
+    updateDashboard(); 
     renderAttendanceGrid(); 
   });
   
@@ -1304,7 +1314,6 @@
   
   navLeft.addEventListener('click', () => initHome()); 
   navRight.addEventListener('click', () => switchView('setup')); 
-  // 🎮 게임보이 에뮬레이터만 남겨두고, 게임 버튼을 누르면 바로 에뮬레이터 페이지로 이동한다.
   document.getElementById('btn-game-toggle').addEventListener('click', () => { window.location.href = 'gameboy-emulator.html'; }); 
   document.getElementById('btn-open-timetable-home').addEventListener('click', () => switchView('timetable'));
   document.getElementById('btn-open-trip-home').addEventListener('click', () => switchView('trip'));
@@ -1352,9 +1361,6 @@
   
   document.getElementById('overlay').addEventListener('click', closeAllPopups); 
 
-  // 일부 브라우저/인앱 브라우저/확장 프로그램에서 네이티브 window.confirm()이
-  // 아무 반응 없이 막히는 경우가 있어(예: 이전에 "이 페이지의 추가 대화상자 차단"을 선택한 경우 등),
-  // 앱 자체 UI로 만든 확인 모달을 사용한다. deleteClass/deleteGrade 등에서 사용.
   let confirmResolver = null; 
   function showConfirm(message, okLabel = '삭제') { 
     return new Promise((resolve) => { 
@@ -1541,7 +1547,6 @@
     table.innerHTML = html;
   }
 
-  // 📥 엑셀(.xlsx/.csv) 파일 업로드로 전체 교사 시간표 자동 인식
   document.getElementById('btn-import-timetable-excel').addEventListener('click', () => {
     document.getElementById('timetable-excel-input').click();
   });
@@ -1577,7 +1582,6 @@
     reader.readAsArrayBuffer(file);
   });
 
-  // 1행: 요일 헤더(월/화/수/목/금이 각 요일 블록의 첫 칸에만 존재), 2행: 교시 번호, 3행부터: 교사명 + 교시별 내용
   function parseTeacherTimetableRows(rows) {
     const dayHeaderRow = rows[0] || [];
     const periodRow = rows[1] || [];
@@ -1660,20 +1664,21 @@
   });
 
   // ==========================================
-  // 🧳 수학여행 일정 (2026 제주도 수학여행 자료 기반)
+  // 🧳 수학여행 일정 
   // ==========================================
   const TRIP_INFO = {
     title: '2026학년도 수학여행 · 제주도',
     dateRange: '2026. 09. 07(월) ~ 09. 09(수) · 2박 3일',
     gather: [
-      { team: 'A팀', place: '김포공항 국내선 1층 금호빈상 앞', time: '08:00 (시간 엄수)' },
-      { team: 'B팀', place: '김포공항 국내선 1층 금호빈상 앞', time: '09:00 (시간 엄수)' }
+      { team: '교사', place: '김포공항 국내선 1층 롯데리아 앞', time: '07:50 까지' },
+      { team: '학생 A팀', place: '김포공항 국내선 1층 롯데리아 앞', time: '08:00 까지' },
+      { team: '학생 B팀', place: '김포공항 국내선 1층 롯데리아 앞', time: '09:00 까지' }
     ],
     flights: [
-      { team: 'A팀', classes: '1·2·4반', go: '10:10 - 11:25 (9/7)', classesBack: '1·2·4·5반', back: '17:00 - 18:10 (9/9)' },
-      { team: 'B팀', classes: '3·5·6·7·8반', go: '11:10 - 12:20 (9/7)', classesBack: '3·6·7·8반', back: '18:15 - 19:30 (9/9)' }
+      { team: 'A팀', classes: '1·2·4·5반', go: '10:10 - 11:25 (9/7)', classesBack: '1·2·4·5반', back: '17:00 - 18:10 (9/9)' },
+      { team: 'B팀', classes: '3·6·7·8반', go: '11:10 - 12:20 (9/7)', classesBack: '3·6·7·8반', back: '18:15 - 19:30 (9/9)' }
     ],
-    flightNote: '항공편 사정으로 인해, 출발 편은 3개반/5개반, 도착 편은 4개반씩 나누어 탑승합니다.',
+    flightNote: '항공편 사정으로 인해, A팀 4개반, B팀 4개반으로 나누어 탑승합니다.',
     days: [
       {
         label: '1일차', date: '9/7 월',
@@ -1759,7 +1764,6 @@
       ]}
     ]
   };
-  // 2일차 · 3일차는 A팀/B팀 동선이 서로 바뀌어 진행됩니다.
   TRIP_INFO.days[1].teamA = [
     { label: '주상절리', mapQuery: '제주 주상절리' },
     { label: '제주 제트보트 체험', mapQuery: '제주 제트보트' },
@@ -1795,7 +1799,7 @@
     { label: '제주국제공항', mapQuery: '제주국제공항' },
     { label: '김포공항 도착', mapQuery: '김포공항' }
   ];
-  TRIP_INFO.days[0].teamB = TRIP_INFO.days[0].teamA; // 1일차는 A/B팀 동일 동선
+  TRIP_INFO.days[0].teamB = TRIP_INFO.days[0].teamA; 
 
   state.tripDayIndex = 0;
   state.tripTeam = 'teamA';
@@ -1903,8 +1907,6 @@
   async function initApp() { await loadFromCloud(); initHome(); }
   initApp();
 
-  // 📱 PWA: 서비스워커 등록 (홈 화면 설치 + 오프라인 지원)
-  // file:// 로 직접 연 경우나 http(s)가 아닌 환경에서는 서비스워커를 지원하지 않으므로 조용히 건너뛴다.
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js').catch((err) => {
