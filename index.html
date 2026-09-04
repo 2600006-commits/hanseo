@@ -117,12 +117,18 @@
     .weather-location .ic { width: 12px; height: 12px; }
     .weather-divider { height: 1px; background: var(--border); margin: 2px 0; }
     .weather-daily-wrap { display: flex; gap: 6px; }
-    .weather-daily-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 2px; border-radius: 12px; background: rgba(120,120,128,0.07); }
+    .weather-daily-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 2px; border-radius: 12px; background: rgba(120,120,128,0.07); border: none; cursor: pointer; font-family: inherit; transition: background 0.2s ease, transform 0.15s var(--ease); }
+    .weather-daily-item:active { transform: scale(0.96); }
+    .weather-daily-item.active { background: var(--primary); box-shadow: 0 4px 12px rgba(0,122,255,0.3); }
+    .weather-daily-item.active .weather-daily-day, .weather-daily-item.active .weather-daily-date, .weather-daily-item.active .weather-daily-temp .max { color: #fff; }
+    .weather-daily-item.active .weather-daily-temp .min { color: rgba(255,255,255,0.75); }
     .weather-daily-day { font-size: 11px; color: var(--text-sub); font-weight: 700; }
+    .weather-daily-date { font-size: 10px; color: var(--text-sub); font-weight: 600; }
     .weather-daily-icon { font-size: 19px; }
     .weather-daily-temp { font-size: 11.5px; font-weight: 700; display: flex; gap: 4px; }
     .weather-daily-temp .max { color: var(--text-main); }
     .weather-daily-temp .min { color: var(--text-sub); }
+    .weather-hourly-label { font-size: 11.5px; font-weight: 700; color: var(--text-sub); margin-bottom: -4px; }
 
     /* 📌 교사 필수 안내 아코디언 */
     .essential-item { border-bottom: 1px solid var(--border); padding: 12px 0; }
@@ -856,23 +862,39 @@
   function getWMOIcon(code) { return weatherCodeMap[code] || '☁️'; }
 
   const WEATHER_DAY_LABELS = ['일','월','화','수','목','금','토'];
+  const WEATHER_DAY_TITLES = ['오늘','내일','모레'];
+  let weatherLastData = null; // 최근에 받아온 예보 데이터를 저장해 두어, 탭 전환 시 재요청 없이 즉시 표시
+  let weatherSelectedDayIndex = 0; // 현재 선택된 날짜 탭 (0=오늘, 1=내일, 2=모레)
 
   async function reverseGeocodeName(lat, lon) {
+    // 1차: BigDataCloud 역지오코딩
     try {
       const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=ko`);
-      if (!res.ok) throw new Error('geo fail');
-      const g = await res.json();
-      const city = g.city || g.locality || g.principalSubdivision || '';
-      const district = (g.localityInfo && g.localityInfo.administrative && g.localityInfo.administrative.length)
-        ? (g.localityInfo.administrative.find(a => a.adminLevel === 8 || a.adminLevel === 9) || {}).name : '';
-      const parts = [g.principalSubdivision, city].filter(Boolean);
-      // 중복 제거 (예: "제주특별자치도 제주시")
-      let label = [...new Set(parts)].join(' ');
-      if (district && !label.includes(district)) label += ' ' + district;
-      return label || '현재 위치';
-    } catch (e) {
-      return '현재 위치';
-    }
+      if (res.ok) {
+        const g = await res.json();
+        const city = g.city || g.locality || g.principalSubdivision || '';
+        const district = (g.localityInfo && g.localityInfo.administrative && g.localityInfo.administrative.length)
+          ? (g.localityInfo.administrative.find(a => a.adminLevel === 8 || a.adminLevel === 9) || {}).name : '';
+        const parts = [g.principalSubdivision, city].filter(Boolean);
+        let label = [...new Set(parts)].join(' ');
+        if (district && !label.includes(district)) label += ' ' + district;
+        if (label) return label;
+      }
+    } catch (e) {}
+
+    // 2차: OpenStreetMap Nominatim (백업 - 1차 실패 시에만 시도)
+    try {
+      const res2 = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&accept-language=ko&zoom=12`);
+      if (res2.ok) {
+        const g2 = await res2.json();
+        const addr = g2.address || {};
+        const parts2 = [addr.state, addr.city || addr.town || addr.county, addr.borough || addr.suburb || addr.village].filter(Boolean);
+        const label2 = [...new Set(parts2)].join(' ');
+        if (label2) return label2;
+      }
+    } catch (e) {}
+
+    return '현재 위치';
   }
 
   async function initWeatherWidget() {
@@ -884,6 +906,7 @@
       try {
         const cached = JSON.parse(cachedStr);
         if (Date.now() - cached.timestamp < 3600000) {
+          weatherSelectedDayIndex = 0;
           renderWeatherWidgets(cached.data, cached.locationName);
           return;
         }
@@ -906,13 +929,14 @@
         const lon = position.coords.longitude;
         try {
           const [weatherRes, locationName] = await Promise.all([
-            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&past_days=0&forecast_days=4`),
+            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&past_days=0&forecast_days=3`),
             reverseGeocodeName(lat, lon)
           ]);
           if (!weatherRes.ok) throw new Error('Network error');
           const data = await weatherRes.json();
           
           localStorage.setItem('weather_cache', JSON.stringify({ timestamp: Date.now(), data: data, locationName: locationName }));
+          weatherSelectedDayIndex = 0;
           renderWeatherWidgets(data, locationName);
         } catch (e) {
           widgets.forEach(w => { w.innerHTML = '<div class="weather-loading">❌ 날씨 정보를 가져올 수 없습니다.</div>'; });
@@ -924,48 +948,45 @@
     );
   }
 
-  function renderWeatherWidgets(data, locationName) {
-    const current = data.current_weather;
-    const hourly = data.hourly;
-    const daily = data.daily;
-    
-    // 현재 시간과 가장 가까운 인덱스 찾기
-    const nowISO = new Date().toISOString().slice(0, 14) + "00"; // YYYY-MM-DDTHH:00
-    let currentIndex = hourly.time.findIndex(t => t >= nowISO);
-    if (currentIndex === -1) currentIndex = 0;
-
-    let hourlyHtml = '';
-    // 현재부터 24시간 동안의 날씨 렌더링
-    for (let i = currentIndex; i < Math.min(currentIndex + 24, hourly.time.length); i++) {
-      const timeStr = new Date(hourly.time[i]).getHours() + '시';
-      const icon = getWMOIcon(hourly.weathercode[i]);
-      const temp = Math.round(hourly.temperature_2m[i]);
-      hourlyHtml += `
-        <div class="weather-hourly-item">
-          <div class="weather-hourly-time">${i === currentIndex ? '지금' : timeStr}</div>
-          <div class="weather-hourly-icon">${icon}</div>
-          <div class="weather-hourly-temp">${temp}°</div>
-        </div>
-      `;
-    }
-
-    // 오늘 이후 3일간의 일별(최고/최저) 예보 렌더링
-    let dailyHtml = '';
-    if (daily && daily.time) {
-      for (let i = 0; i < Math.min(4, daily.time.length); i++) {
-        const d = new Date(daily.time[i]);
-        const dayLabel = i === 0 ? '오늘' : `${d.getMonth() + 1}/${d.getDate()}(${WEATHER_DAY_LABELS[d.getDay()]})`;
-        const icon = getWMOIcon(daily.weathercode[i]);
-        const max = Math.round(daily.temperature_2m_max[i]);
-        const min = Math.round(daily.temperature_2m_min[i]);
-        dailyHtml += `
-          <div class="weather-daily-item">
-            <div class="weather-daily-day">${dayLabel}</div>
-            <div class="weather-daily-icon">${icon}</div>
-            <div class="weather-daily-temp"><span class="max">${max}°</span><span class="min">${min}°</span></div>
-          </div>
-        `;
+  // 지정한 날짜(YYYY-MM-DD)에 해당하는 시간별 데이터만 뽑아온다
+  function weatherHourlyForDate(hourly, dateStr) {
+    const items = [];
+    for (let i = 0; i < hourly.time.length; i++) {
+      if (hourly.time[i].slice(0, 10) === dateStr) {
+        items.push({ time: hourly.time[i], code: hourly.weathercode[i], temp: hourly.temperature_2m[i] });
       }
+    }
+    return items;
+  }
+
+  function renderWeatherWidgets(data, locationName) {
+    weatherLastData = data;
+    weatherLastData._locationName = locationName;
+    const current = data.current_weather;
+    const daily = data.daily;
+
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const nowHour = new Date().getHours();
+
+    // 3일치 날짜 탭 데이터 구성
+    let dayTabHtml = '';
+    const dayCount = daily && daily.time ? Math.min(3, daily.time.length) : 0;
+    for (let i = 0; i < dayCount; i++) {
+      const dateStr = daily.time[i];
+      const d = new Date(dateStr + 'T00:00:00');
+      const max = Math.round(daily.temperature_2m_max[i]);
+      const min = Math.round(daily.temperature_2m_min[i]);
+      const icon = getWMOIcon(daily.weathercode[i]);
+      const title = WEATHER_DAY_TITLES[i] || `${i}일 후`;
+      const dateLabel = `${d.getMonth() + 1}/${d.getDate()}(${WEATHER_DAY_LABELS[d.getDay()]})`;
+      dayTabHtml += `
+        <button type="button" class="weather-daily-item${i === weatherSelectedDayIndex ? ' active' : ''}" data-day-index="${i}" data-date="${dateStr}">
+          <div class="weather-daily-day">${title}</div>
+          <div class="weather-daily-date">${dateLabel}</div>
+          <div class="weather-daily-icon">${icon}</div>
+          <div class="weather-daily-temp"><span class="max">${max}°</span><span class="min">${min}°</span></div>
+        </button>
+      `;
     }
 
     const widgetHtml = `
@@ -973,18 +994,56 @@
         <div class="weather-location"><span class="ic" style="width:12px;height:12px;">${ICONS.pin}</span>${locationName || '현재 위치'}</div>
         <div class="weather-current">${getWMOIcon(current.weathercode)} ${Math.round(current.temperature)}°</div>
       </div>
-      <div class="weather-hourly-wrap">
-        ${hourlyHtml}
+      <div class="weather-daily-wrap">
+        ${dayTabHtml}
       </div>
       <div class="weather-divider"></div>
-      <div class="weather-daily-wrap">
-        ${dailyHtml}
-      </div>
+      <div class="weather-hourly-label" id="weather-hourly-label"></div>
+      <div class="weather-hourly-wrap" id="weather-hourly-wrap"></div>
     `;
 
     document.querySelectorAll('.weather-widget').forEach(w => {
       w.style.display = 'flex';
       w.innerHTML = widgetHtml;
+      w.querySelectorAll('.weather-daily-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+          weatherSelectedDayIndex = parseInt(btn.dataset.dayIndex, 10);
+          renderWeatherWidgets(weatherLastData, weatherLastData._locationName);
+        });
+      });
+    });
+
+    renderWeatherHourlyForSelectedDay(data, todayStr, nowHour);
+  }
+
+  function renderWeatherHourlyForSelectedDay(data, todayStr, nowHour) {
+    const daily = data.daily;
+    const dateStr = daily.time[weatherSelectedDayIndex];
+    const isToday = dateStr === todayStr;
+    const items = weatherHourlyForDate(data.hourly, dateStr);
+
+    let hourlyHtml = '';
+    items.forEach(item => {
+      const hour = new Date(item.time).getHours();
+      const icon = getWMOIcon(item.code);
+      const temp = Math.round(item.temp);
+      const isNow = isToday && hour === nowHour;
+      hourlyHtml += `
+        <div class="weather-hourly-item">
+          <div class="weather-hourly-time">${isNow ? '지금' : hour + '시'}</div>
+          <div class="weather-hourly-icon">${icon}</div>
+          <div class="weather-hourly-temp">${temp}°</div>
+        </div>
+      `;
+    });
+
+    const labelText = isToday ? '오늘 시간별 날씨' : `${new Date(dateStr + 'T00:00:00').getMonth() + 1}월 ${new Date(dateStr + 'T00:00:00').getDate()}일(${WEATHER_DAY_LABELS[new Date(dateStr + 'T00:00:00').getDay()]}) 시간별 날씨`;
+
+    document.querySelectorAll('.weather-widget').forEach(w => {
+      const label = w.querySelector('#weather-hourly-label');
+      const wrap = w.querySelector('#weather-hourly-wrap');
+      if (label) label.textContent = labelText;
+      if (wrap) wrap.innerHTML = hourlyHtml;
     });
   }
 
