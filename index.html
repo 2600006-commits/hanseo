@@ -113,7 +113,56 @@
     .weather-hourly-time { font-size: 11px; color: var(--text-sub); font-weight: 600; }
     .weather-hourly-icon { font-size: 22px; }
     .weather-hourly-temp { font-size: 13px; font-weight: 700; }
-    .weather-loading { font-size: 13px; color: var(--text-sub); text-align: center; padding: 10px; font-weight: 600; }
+    .weather-loading { font-size: 13px; color: var(--text-sub); text-align: center; padding: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .weather-location .ic { width: 12px; height: 12px; }
+    .weather-divider { height: 1px; background: var(--border); margin: 2px 0; }
+    .weather-daily-wrap { display: flex; gap: 6px; }
+    .weather-daily-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 2px; border-radius: 12px; background: rgba(120,120,128,0.07); }
+    .weather-daily-day { font-size: 11px; color: var(--text-sub); font-weight: 700; }
+    .weather-daily-icon { font-size: 19px; }
+    .weather-daily-temp { font-size: 11.5px; font-weight: 700; display: flex; gap: 4px; }
+    .weather-daily-temp .max { color: var(--text-main); }
+    .weather-daily-temp .min { color: var(--text-sub); }
+
+    /* 📌 교사 필수 안내 아코디언 */
+    .essential-item { border-bottom: 1px solid var(--border); padding: 12px 0; }
+    .essential-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .essential-head { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+    .essential-icon-badge { flex-shrink: 0; width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(0,122,255,0.12); color: var(--primary); }
+    .essential-icon-badge .ic { width: 17px; height: 17px; }
+    .essential-icon-badge.danger { background: rgba(255,59,48,0.12); color: var(--danger); }
+    .essential-icon-badge.warning { background: rgba(255,159,10,0.14); color: var(--warning); }
+    .essential-body { flex: 1; }
+    .essential-title { font-size: 13.5px; font-weight: 800; margin-bottom: 3px; }
+    .essential-summary { font-size: 12px; color: var(--text-sub); line-height: 1.55; }
+    .essential-toggle-btn { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; border: none; background: var(--segment-bg); color: var(--text-sub); display: flex; align-items: center; justify-content: center; transition: transform 0.25s var(--ease), background 0.2s ease, color 0.2s ease; }
+    .essential-toggle-btn .ic { width: 13px; height: 13px; }
+    .essential-toggle-btn.open { transform: rotate(180deg); background: var(--primary); color: #fff; }
+    .essential-detail { max-height: 0; overflow: hidden; transition: max-height 0.3s var(--ease); }
+    .essential-detail-inner { font-size: 12px; line-height: 1.7; color: var(--text-main); padding: 12px 4px 2px 42px; }
+    .essential-detail-inner ul { margin: 4px 0; padding-left: 16px; }
+    .essential-detail-inner li { margin-bottom: 4px; }
+    .essential-detail-inner b { color: var(--primary); }
+
+    /* 🚨 비상연락망 팝업 */
+    .emg-group-title { font-size: 12px; font-weight: 800; color: var(--text-sub); margin: 16px 0 8px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.02em; }
+    .emg-group-title:first-child { margin-top: 0; }
+    .emg-group-title .ic { width: 13px; height: 13px; }
+    .emg-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 12px; border-radius: 12px; background: rgba(120,120,128,0.07); margin-bottom: 6px; }
+    .emg-row-name { font-size: 13px; font-weight: 700; }
+    .emg-row-sub { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+    .emg-call-btn { flex-shrink: 0; display: flex; align-items: center; gap: 4px; padding: 7px 12px; border-radius: 999px; background: var(--success); color: #fff; font-size: 12px; font-weight: 800; text-decoration: none; }
+    .emg-call-btn .ic { width: 12px; height: 12px; }
+    #emergency-sheet .sheet-body { max-height: 60vh; overflow-y: auto; }
+
+    .trip-summary-strip { display: flex; gap: 8px; margin: 12px 0 2px; }
+    .trip-summary-chip { flex: 1; text-align: center; background: rgba(120,120,128,0.07); border-radius: 12px; padding: 9px 4px; }
+    .trip-summary-chip .val { font-size: 15px; font-weight: 800; }
+    .trip-summary-chip .lbl { font-size: 10.5px; color: var(--text-sub); font-weight: 700; margin-top: 2px; }
+
+    .counter-total-edit { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 2px; }
+    .counter-total-edit input { width: 72px; text-align: center; margin-bottom: 0; padding: 8px 6px; font-size: 14px; font-weight: 700; }
+    .counter-total-edit span { font-size: 11.5px; color: var(--text-sub); font-weight: 600; }
 
     .class-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .class-btn { background: var(--card); backdrop-filter: blur(16px) saturate(160%); -webkit-backdrop-filter: blur(16px) saturate(160%); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 125px; box-sizing: border-box; box-shadow: var(--glass-shadow); transition: transform 0.18s var(--ease), box-shadow 0.18s ease; }
@@ -367,7 +416,7 @@
         <span class="qa-emoji">🕐</span><span class="qa-label">교사 시간표</span>
       </button>
       <button class="quick-action-btn" id="btn-open-trip-home">
-        <span class="qa-emoji">🧳</span><span class="qa-label">수학여행 일정</span>
+        <span class="qa-emoji ic ic-suitcase" style="width:22px; height:22px; color:var(--primary);"></span><span class="qa-label">수학여행 일정</span>
       </button>
     </div>
     <div class="segment-control" id="segment-control"></div>
@@ -459,36 +508,55 @@
       <div style="font-size:16px; font-weight:800;" id="trip-title"></div>
       <div style="font-size:12.5px; color:var(--text-sub); margin-top:4px;" id="trip-daterange"></div>
       
-      <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px;">
+      <div class="trip-summary-strip" id="trip-summary-strip"></div>
+
+      <div style="display: flex; gap: 8px; justify-content: center; margin-top: 12px;">
         <a href="guidebook.pdf" download="guidebook.pdf" class="excel-btn icon-btn" style="flex: 1; margin-bottom:0; font-size:13px; text-decoration:none; background:var(--primary); color:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,122,255,0.25);">
           <span class="ic ic-download"></span>안내 책자
         </a>
         <button id="btn-open-counter" class="excel-btn icon-btn" style="flex: 1; margin-bottom:0; font-size:13px; background:#5856D6; color:white; border-radius:12px; box-shadow:0 2px 8px rgba(88,86,214,0.25);">
-          <span style="font-size:16px;">🔢</span> 탑승 카운터
+          <span class="ic ic-hash" style="width:16px; height:16px;"></span> 탑승 카운터
+        </button>
+      </div>
+      <div style="margin-top:8px;">
+        <button id="btn-open-emergency" class="excel-btn icon-btn" style="width:100%; margin-bottom:0; font-size:13px; background:var(--danger); color:white; border-radius:12px; box-shadow:0 2px 8px rgba(255,59,48,0.25);">
+          <span class="ic ic-siren" style="width:16px; height:16px;"></span> 비상연락망 전체보기
+        </button>
+      </div>
+      <div style="margin-top:8px;">
+        <button id="btn-open-checkin" class="excel-btn icon-btn" style="width:100%; margin-bottom:0; font-size:13px; background:#FF9F0A; color:white; border-radius:12px; box-shadow:0 2px 8px rgba(255,159,10,0.25);">
+          <span class="ic ic-plane" style="width:16px; height:16px;"></span> 온라인 체크인 예약번호
         </button>
       </div>
     </div>
 
     <div class="segment-control" id="trip-team-control">
-      <button class="segment-btn active" data-team="teamA">A팀 일정</button>
-      <button class="segment-btn" data-team="teamB">B팀 일정</button>
+      <button class="segment-btn active" data-team="teamA">A팀 (1·2·4반)</button>
+      <button class="segment-btn" data-team="teamA1">A팀 (5반)</button>
+      <button class="segment-btn" data-team="teamB">B팀 (3·6·7·8반)</button>
     </div>
 
     <div class="day-tab-row" id="trip-day-tabs"></div>
     <div id="trip-timeline" style="margin-bottom: 6px;"></div>
 
     <div class="card" id="trip-gather-card">
-      <div style="font-weight:800; margin-bottom:10px;">🕗 집합 · 항공편 안내</div>
+      <div style="font-weight:800; margin-bottom:10px; display:flex; align-items:center; gap:6px;"><span class="ic ic-clockring" style="width:16px;height:16px;color:var(--primary);"></span>집합 · 항공편 안내</div>
       <div id="trip-gather-body"></div>
     </div>
 
+    <div class="card" id="trip-essential-card">
+      <div style="font-weight:800; margin-bottom:2px; display:flex; align-items:center; gap:6px;"><span class="ic ic-siren" style="width:16px;height:16px;color:var(--danger);"></span>교사 필수 안전 안내</div>
+      <div style="font-size:11.5px; color:var(--text-sub); margin-bottom:6px;">항목을 눌러 자세히 보기를 펼쳐보세요</div>
+      <div id="trip-essential-body"></div>
+    </div>
+
     <div class="card" id="trip-hotel-contacts-card">
-      <div style="font-weight:800; margin-bottom:10px;">📞 협력 숙소 연락처</div>
+      <div style="font-weight:800; margin-bottom:10px; display:flex; align-items:center; gap:6px;"><span class="ic ic-phone" style="width:15px;height:15px;color:var(--primary);"></span>숙소 · 차량 연락처</div>
       <div id="trip-hotel-contacts-body"></div>
     </div>
 
     <div class="card" id="trip-site-visit-card">
-      <div style="font-weight:800; margin-bottom:10px;">🏨 사전 답사 참고자료</div>
+      <div style="font-weight:800; margin-bottom:10px; display:flex; align-items:center; gap:6px;"><span class="ic ic-pin" style="width:15px;height:15px;color:var(--primary);"></span>여행지 안내</div>
       <div id="trip-site-visit-body"></div>
     </div>
   </div>
@@ -505,21 +573,44 @@
 
   <!-- 🔢 원터치 탑승 카운터 시트 -->
   <div class="action-sheet" id="counter-sheet">
-    <div class="sheet-header">🚌 원터치 탑승 카운터</div>
+    <div class="sheet-header" style="display:flex; align-items:center; gap:7px;"><span class="ic ic-bus" style="width:18px;height:18px;"></span>원터치 탑승 카운터</div>
     <div class="sheet-body" style="text-align: center;">
-      <select id="counter-class-select" style="font-size: 16px; font-weight: bold; text-align: center; margin-bottom: 0;">
-        <option value="">반을 선택하세요</option>
+      <select id="counter-class-select" style="font-size: 16px; font-weight: bold; text-align: center; margin-bottom: 8px;">
+        <option value="">2학년 반을 선택하세요</option>
       </select>
-      <div style="font-size: 52px; font-weight: 800; margin: 24px 0; color: var(--primary);">
+      <div class="counter-total-edit">
+        <span>총원 직접 설정</span>
+        <input type="number" id="counter-total-input" min="0" inputmode="numeric" placeholder="자동" />
+        <span>명</span>
+      </div>
+      <div style="font-size: 11.5px; color: var(--text-sub); font-weight: 600; margin-top: -4px;" id="counter-save-status">&nbsp;</div>
+      <div style="font-size: 52px; font-weight: 800; margin: 18px 0; color: var(--primary);">
         <span id="counter-current">0</span> <span style="font-size: 24px; color: var(--text-sub);">/ <span id="counter-total">?</span>명</span>
       </div>
-      <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+      <div style="display: flex; gap: 12px; margin-bottom: 12px;">
         <button id="btn-counter-minus" style="flex: 1; padding: 24px 10px; font-size: 34px; font-weight: bold; border-radius: 20px; background: rgba(255,59,48,0.1); color: var(--danger); border: none; cursor: pointer; transition: transform 0.1s;">-</button>
         <button id="btn-counter-plus" style="flex: 2; padding: 24px 10px; font-size: 40px; font-weight: bold; border-radius: 20px; background: var(--primary); color: white; border: none; cursor: pointer; box-shadow: 0 8px 20px rgba(0,122,255,0.3); transition: transform 0.1s;">+1</button>
       </div>
-      <button class="outline-btn" id="btn-counter-reset" style="margin-bottom:0;">숫자 초기화</button>
+      <button class="outline-btn" id="btn-counter-reset" style="margin-bottom:0;">숫자만 초기화 (반·총원 설정 유지)</button>
     </div>
     <div style="margin: 10px 16px 16px 16px; padding: 16px; text-align: center; font-weight: 600; color: var(--danger); cursor: pointer; border: 1px solid var(--danger); border-radius: 12px;" id="btn-close-counter-sheet">닫기</div>
+  </div>
+
+  <!-- 🚨 비상연락망 팝업 -->
+  <div class="action-sheet" id="emergency-sheet">
+    <div class="sheet-header" style="display:flex; align-items:center; gap:7px; color:var(--danger);"><span class="ic ic-siren" style="width:18px;height:18px;"></span>비상연락망 전체보기</div>
+    <div class="sheet-body" id="emergency-sheet-body"></div>
+    <div style="margin: 10px 16px 16px 16px; padding: 16px; text-align: center; font-weight: 600; color: var(--danger); cursor: pointer; border: 1px solid var(--danger); border-radius: 12px;" id="btn-close-emergency-sheet">닫기</div>
+  </div>
+
+  <!-- ✈️ 온라인 체크인 예약번호 팝업 -->
+  <div class="action-sheet" id="checkin-sheet">
+    <div class="sheet-header" style="display:flex; align-items:center; gap:7px; color:#FF9F0A;"><span class="ic ic-plane" style="width:18px;height:18px;"></span>온라인 체크인 예약번호</div>
+    <div class="sheet-body">
+      <div id="checkin-class-grid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px;"></div>
+      <div id="checkin-detail" style="display:none;"></div>
+    </div>
+    <div style="margin: 10px 16px 16px 16px; padding: 16px; text-align: center; font-weight: 600; color: var(--danger); cursor: pointer; border: 1px solid var(--danger); border-radius: 12px;" id="btn-close-checkin-sheet">닫기</div>
   </div>
 
   <div class="action-sheet" id="contact-sheet">
@@ -616,13 +707,27 @@
     check: svgWrap('<polyline points="20 6 9 17 4 12" fill="none"/>').replace('stroke-width="1.8"','stroke-width="3"'),
     x: svgWrap('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>').replace('stroke-width="1.8"','stroke-width="3"'),
     alert: svgWrap('<line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="16.5" x2="12" y2="16.51"/><circle cx="12" cy="12" r="9"/>').replace('stroke-width="1.8"','stroke-width="2.8"'),
-    exit: svgWrap('<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>').replace('stroke-width="1.8"','stroke-width="2.6"')
+    exit: svgWrap('<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>').replace('stroke-width="1.8"','stroke-width="2.6"'),
+    suitcase: svgWrap('<rect x="2" y="7" width="20" height="14" rx="2.5"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="2" y1="13" x2="22" y2="13"/><line x1="10" y1="13" x2="10" y2="15.5"/><line x1="14" y1="13" x2="14" y2="15.5"/>'),
+    calendarClock: svgWrap('<rect x="3" y="4.5" width="18" height="16" rx="3"/><line x1="16" y1="2.5" x2="16" y2="6.5"/><line x1="8" y1="2.5" x2="8" y2="6.5"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="15.5" cy="16" r="3.2"/><path d="M15.5 14.7v1.4l1 .8"/>'),
+    clockRing: svgWrap('<circle cx="12" cy="12" r="8.5"/><polyline points="12 8 12 12 15 14"/>'),
+    siren: svgWrap('<path d="M12 4a6 6 0 0 1 6 6v6H6v-6a6 6 0 0 1 6-6z"/><line x1="12" y1="1.5" x2="12" y2="3.3"/><line x1="4.5" y1="6" x2="6" y2="7.3"/><line x1="19.5" y1="6" x2="18" y2="7.3"/><line x1="4" y1="20.5" x2="20" y2="20.5"/><line x1="12" y1="16" x2="12" y2="16.01"/>'),
+    phone: svgWrap('<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.99.36 1.96.68 2.9a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.45c.94.32 1.91.55 2.9.68A2 2 0 0 1 22 16.9z"/>'),
+    hospital: svgWrap('<rect x="3" y="4" width="18" height="17" rx="2"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/>'),
+    fireExtinguisher: svgWrap('<circle cx="12" cy="12" r="9.3"/><path d="M12 7.5v5l3.2 2"/>'),
+    shieldBadge: svgWrap('<path d="M12 2.5 4 5.5v6c0 5 3.4 8.6 8 10 4.6-1.4 8-5 8-10v-6z"/><polyline points="8.5 12 11 14.5 15.5 9.5"/>'),
+    bus: svgWrap('<path d="M4 17V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v11"/><path d="M4 17h16"/><path d="M6 21v-2M18 21v-2"/><circle cx="7.5" cy="17" r="1.4"/><circle cx="16.5" cy="17" r="1.4"/><line x1="4" y1="11" x2="20" y2="11"/>'),
+    pin: svgWrap('<path d="M12 21s7-6.6 7-12a7 7 0 1 0-14 0c0 5.4 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/>'),
+    hash: svgWrap('<line x1="5" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="19" y2="15"/><line x1="10" y1="3" x2="7" y2="21"/><line x1="17" y1="3" x2="14" y2="21"/>'),
+    plane: svgWrap('<path d="M10.5 21 12 16l-6.5-.5-2-2 1.3-1.3 3.4.6L12 9l-6-4 1-1 7.5 2.5L18 3.5A1.6 1.6 0 0 1 20.3 5.8l-3 3.5 2.5 7.5-1 1-4-6-3.6 3.4.6 3.4z"/>'),
+    userGroup: svgWrap('<path d="M17 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 5 18.5V20"/><circle cx="9.5" cy="8" r="3.2"/><path d="M19 20v-1.5a3.5 3.5 0 0 0-2.4-3.3"/><path d="M14.5 5a3.2 3.2 0 0 1 0 6"/>'),
+    chevronDown: svgWrap('<polyline points="6 9 12 15 18 9"/>')
   };
   function hydrateIcons() {
     document.querySelectorAll('.ic').forEach(el => {
       const key = [...el.classList].find(c => c.startsWith('ic-'));
       if (!key) return;
-      const map = { 'ic-download':'download','ic-chart':'chart','ic-shuffle':'shuffle','ic-printer':'printer','ic-message':'message','ic-refresh':'refresh','ic-save':'save' };
+      const map = { 'ic-download':'download','ic-chart':'chart','ic-shuffle':'shuffle','ic-printer':'printer','ic-message':'message','ic-refresh':'refresh','ic-save':'save','ic-suitcase':'suitcase','ic-hash':'hash','ic-siren':'siren','ic-phone':'phone','ic-pin':'pin','ic-plane':'plane','ic-bus':'bus','ic-usergroup':'userGroup','ic-clockring':'clockRing' };
       const iconName = map[key];
       if (iconName && ICONS[iconName]) el.innerHTML = ICONS[iconName];
     });
@@ -750,6 +855,26 @@
   };
   function getWMOIcon(code) { return weatherCodeMap[code] || '☁️'; }
 
+  const WEATHER_DAY_LABELS = ['일','월','화','수','목','금','토'];
+
+  async function reverseGeocodeName(lat, lon) {
+    try {
+      const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=ko`);
+      if (!res.ok) throw new Error('geo fail');
+      const g = await res.json();
+      const city = g.city || g.locality || g.principalSubdivision || '';
+      const district = (g.localityInfo && g.localityInfo.administrative && g.localityInfo.administrative.length)
+        ? (g.localityInfo.administrative.find(a => a.adminLevel === 8 || a.adminLevel === 9) || {}).name : '';
+      const parts = [g.principalSubdivision, city].filter(Boolean);
+      // 중복 제거 (예: "제주특별자치도 제주시")
+      let label = [...new Set(parts)].join(' ');
+      if (district && !label.includes(district)) label += ' ' + district;
+      return label || '현재 위치';
+    } catch (e) {
+      return '현재 위치';
+    }
+  }
+
   async function initWeatherWidget() {
     const widgets = document.querySelectorAll('.weather-widget');
     
@@ -759,7 +884,7 @@
       try {
         const cached = JSON.parse(cachedStr);
         if (Date.now() - cached.timestamp < 3600000) {
-          renderWeatherWidgets(cached.data);
+          renderWeatherWidgets(cached.data, cached.locationName);
           return;
         }
       } catch(e) {}
@@ -772,7 +897,7 @@
 
     widgets.forEach(w => {
       w.style.display = 'flex';
-      w.innerHTML = '<div class="weather-loading">📍 위치 정보 확인 및 날씨 불러오는 중...</div>';
+      w.innerHTML = `<div class="weather-loading"><span class="ic" style="width:14px;height:14px;">${ICONS.pin}</span>위치 정보 확인 및 날씨 불러오는 중...</div>`;
     });
 
     navigator.geolocation.getCurrentPosition(
@@ -780,12 +905,15 @@
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
         try {
-          const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,weathercode&timezone=auto&past_days=0&forecast_days=3`);
-          if (!res.ok) throw new Error('Network error');
-          const data = await res.json();
+          const [weatherRes, locationName] = await Promise.all([
+            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&past_days=0&forecast_days=4`),
+            reverseGeocodeName(lat, lon)
+          ]);
+          if (!weatherRes.ok) throw new Error('Network error');
+          const data = await weatherRes.json();
           
-          localStorage.setItem('weather_cache', JSON.stringify({ timestamp: Date.now(), data: data }));
-          renderWeatherWidgets(data);
+          localStorage.setItem('weather_cache', JSON.stringify({ timestamp: Date.now(), data: data, locationName: locationName }));
+          renderWeatherWidgets(data, locationName);
         } catch (e) {
           widgets.forEach(w => { w.innerHTML = '<div class="weather-loading">❌ 날씨 정보를 가져올 수 없습니다.</div>'; });
         }
@@ -796,9 +924,10 @@
     );
   }
 
-  function renderWeatherWidgets(data) {
+  function renderWeatherWidgets(data, locationName) {
     const current = data.current_weather;
     const hourly = data.hourly;
+    const daily = data.daily;
     
     // 현재 시간과 가장 가까운 인덱스 찾기
     const nowISO = new Date().toISOString().slice(0, 14) + "00"; // YYYY-MM-DDTHH:00
@@ -820,13 +949,36 @@
       `;
     }
 
+    // 오늘 이후 3일간의 일별(최고/최저) 예보 렌더링
+    let dailyHtml = '';
+    if (daily && daily.time) {
+      for (let i = 0; i < Math.min(4, daily.time.length); i++) {
+        const d = new Date(daily.time[i]);
+        const dayLabel = i === 0 ? '오늘' : `${d.getMonth() + 1}/${d.getDate()}(${WEATHER_DAY_LABELS[d.getDay()]})`;
+        const icon = getWMOIcon(daily.weathercode[i]);
+        const max = Math.round(daily.temperature_2m_max[i]);
+        const min = Math.round(daily.temperature_2m_min[i]);
+        dailyHtml += `
+          <div class="weather-daily-item">
+            <div class="weather-daily-day">${dayLabel}</div>
+            <div class="weather-daily-icon">${icon}</div>
+            <div class="weather-daily-temp"><span class="max">${max}°</span><span class="min">${min}°</span></div>
+          </div>
+        `;
+      }
+    }
+
     const widgetHtml = `
       <div class="weather-header">
-        <div class="weather-location">📍 내 위치</div>
+        <div class="weather-location"><span class="ic" style="width:12px;height:12px;">${ICONS.pin}</span>${locationName || '현재 위치'}</div>
         <div class="weather-current">${getWMOIcon(current.weathercode)} ${Math.round(current.temperature)}°</div>
       </div>
       <div class="weather-hourly-wrap">
         ${hourlyHtml}
+      </div>
+      <div class="weather-divider"></div>
+      <div class="weather-daily-wrap">
+        ${dailyHtml}
       </div>
     `;
 
@@ -1476,6 +1628,8 @@
     document.getElementById('schedule-sheet').classList.remove('show'); 
     document.getElementById('confirm-modal').classList.remove('show'); 
     document.getElementById('counter-sheet').classList.remove('show');
+    document.getElementById('emergency-sheet').classList.remove('show');
+    document.getElementById('checkin-sheet').classList.remove('show');
     if (confirmResolver) { confirmResolver(false); confirmResolver = null; } 
     state.currentStudentId = null; 
   }
@@ -1788,110 +1942,161 @@
   // 🧳 수학여행 일정 
   // ==========================================
   const TRIP_INFO = {
-    title: '2026학년도 수학여행 · 제주도',
+    title: '2026학년도 한서고 소규모 테마형 교육여행 · 제주도',
     dateRange: '2026. 09. 07(월) ~ 09. 09(수) · 2박 3일',
+    participants: { students: 162, teachers: 11, buses: 8 },
     gather: [
-      { team: '교사', place: '김포공항 국내선 1층 롯데리아 앞', time: '07:50까지' },
-      { team: '학생 A팀', place: '김포공항 국내선 1층 롯데리아 앞', time: '08:00까지' },
-      { team: '학생 B팀', place: '김포공항 국내선 1층 롯데리아 앞', time: '09:00까지' }
+      { team: '전 교사', place: '김포공항 국내선 1층 롯데리아 앞', time: '07:50까지 (시간 엄수)' },
+      { team: 'A팀 (1·2·4반)', place: '김포공항 국내선 1층 롯데리아 앞', time: '08:00까지' },
+      { team: 'A팀 (5반)', place: '김포공항 국내선 1층 롯데리아 앞', time: '09:00까지' },
+      { team: 'B팀 (3·6·7·8반)', place: '김포공항 국내선 1층 롯데리아 앞', time: '09:00까지' }
     ],
     flights: [
-      { team: 'A팀', classes: '1·2·4·5반', go: '10:10 - 11:25 (9/7)', classesBack: '1·2·4·5반', back: '17:00 - 18:10 (9/9)' },
-      { team: 'B팀', classes: '3·6·7·8반', go: '11:10 - 12:20 (9/7)', classesBack: '3·6·7·8반', back: '18:15 - 19:30 (9/9)' }
+      { team: '1진 · 1·2·4반', go: '10:10 → 11:25 (9/7)', back: '17:00 → 18:10 (9/9)' },
+      { team: '2진 · 5반', go: '11:10 → 12:25 (9/7)', back: '17:00 → 18:10 (9/9)' },
+      { team: '3진 · 3·6·7·8반', go: '11:10 → 12:25 (9/7)', back: '18:15 → 19:30 (9/9)' }
     ],
-    flightNote: '항공편 사정으로 인해, 출발 편은 3개반/5개반, 도착 편은 4개반씩 나누어 탑승합니다.',
+    flightNote: '항공사: 대한항공 · 총 173명씩 편성. 항공편 사정으로 출발/도착 시간이 반별로 나뉘어 있으니 담임 선생님은 반드시 자기 팀의 집합·탑승 시간을 확인해 주세요.',
+    lodging: [
+      { team: 'A팀', classes: '1반 · 2반 · 4반 · 5반', name: '중문 켄싱턴리조트', addr: '서귀포시 중문관광로 72번길 29-29', tel: '064-738-9101' },
+      { team: 'B팀', classes: '3반 · 6반 · 7반 · 8반', name: '서귀포 켄싱턴리조트', addr: '서귀포시 이어도로 684', tel: '064-739-9001' }
+    ],
+    meals: [
+      { day: '1일차 중식', name: 'MH컨벤션', menu: '소불고기전골 + 셀프바', addr: '제주시 현사길 31-2', tel: '0507-1396-4575' },
+      { day: '1일차 석식', name: '제주돈돗', menu: '무한 숙성 솥뚜껑 바베큐', addr: '서귀포시 안덕면 한창로 628', tel: '0507-1346-3719' },
+      { day: '2일차 중식', name: '국수인가갈치인가', menu: '고기국수 + 삼색만두', addr: '서귀포시 성산읍 서성일로 913', tel: '0507-1414-3514' },
+      { day: '2일차 석식', name: '자유식 (올레시장)', menu: '학생 현금 15,000원 지급', addr: '서귀포 매일올레시장', tel: '' },
+      { day: '3일차 중식', name: '삼다정', menu: '5성급호텔 프리미엄 런치', addr: '제주시 노연로 80', tel: '0507-1321-8231' }
+    ],
+    buses: [
+      { no: '1호', plate: '제주79바4402', driver: '김동곤', tel: '010-3699-7982' },
+      { no: '2호', plate: '제주79바4403', driver: '강은심', tel: '010-8888-1596' },
+      { no: '3호', plate: '제주79바4400', driver: '김기중', tel: '010-7467-6610' },
+      { no: '4호 (리무진)', plate: '8883', driver: '김성철', tel: '010-6664-4445' },
+      { no: '5호', plate: '제주79바4407', driver: '원익재', tel: '010-4565-9595' },
+      { no: '6호', plate: '제주79바4473', driver: '이만섭', tel: '010-3699-9444' },
+      { no: '7호', plate: '제주79바4406', driver: '한완준', tel: '010-3656-8546' },
+      { no: '8호', plate: '제주79바4444', driver: '홍창남', tel: '010-9100-7374' }
+    ],
     notices: [
       {
-        title: '🚌 차량 탑승 및 이동 시 협조 사항 (담임/비담임 공통)',
-        content: '<ul style="margin:4px 0; padding-left:18px;"><li><b>차량 탑승 후:</b> 학생 인원 파악 및 안전벨트 착용 여부 확인 (안전요원 선생님과 함께 체크해주신 후 단톡방에 알려주시면 됩니다.)</li><li><b>코스 이동 시:</b> 매 이동 시마다 출발/도착 상황 ➔ 단톡방 공유</li><li><b>탑승 안내:</b> 이예준T(A팀 5반 차량 탑승), 교감T(B팀 3반 차량 탑승), 손영헌T(B팀 8반 차량 탑승)</li></ul>'
+        title: '🚌 차량 탑승 및 이동 시 협조 사항 (담임 · 비담임 공통)',
+        content: '<ul style="margin:4px 0; padding-left:18px;"><li><b>차량 탑승 후:</b> 학생 인원 파악 및 안전벨트 착용 여부 확인 (안전요원 선생님과 함께 체크 후 단톡방 공유)</li><li><b>코스 이동 시:</b> 매 이동마다 출발/도착 상황 ➔ 단톡방 공유</li><li><b>탑승 안내:</b> 이예준T(A팀 5반 차량 탑승), 교감T(B팀 3반 차량 탑승), 손영헌T(B팀 8반 차량 탑승)</li></ul>'
       },
       {
         title: '✅ 제주공항 도착 후 차량 확인',
-        content: '<ul style="margin:4px 0; padding-left:18px;"><li>제공해 드린 차량등록증(총 8대)의 번호판을 먼저 확인해 주세요.</li><li>확인 후 \'몇 반이 어느 차에 탑승했는지\' 차량 번호를 단톡방에 공유 부탁드립니다.</li></ul>'
+        content: '<ul style="margin:4px 0; padding-left:18px;"><li>제공된 차량등록증(총 8대)의 번호판을 먼저 확인</li><li>확인 후 \'몇 반이 어느 차에 탑승했는지\' 차량 번호를 단톡방에 공유</li></ul>'
       },
       {
-         title: '📢 추가 안내사항',
-         content: '<ul style="margin:4px 0; padding-left:18px;"><li><b>팀장 안내:</b> A팀장(하지영 선생님) / B팀장(윤보라 선생님) / 총괄 인솔자(교감 선생님)</li><li>팀장은 팀 일정에 대해 책임지고 진행하며, 긴급 수정사항이 생길 경우 총괄 인솔자인 교감 선생님과 상의 후 진행합니다.</li><li><b>수학여행 단톡방 입장:</b> 교감 선생님, 이예준 선생님, 손영헌 선생님께서는 보내드린 카톡방에 입장 부탁드립니다.<br><a href="https://open.kakao.com/o/gXk19cii" target="_blank" style="color:var(--primary); text-decoration:underline;">오픈채팅방 링크 (비번: 2026)</a></li></ul>'
+         title: '📢 팀 운영 및 단톡방 안내',
+         content: '<ul style="margin:4px 0; padding-left:18px;"><li><b>팀장:</b> A팀장(하지영 선생님) / B팀장(윤보라 선생님) / 총괄 인솔자(교감 선생님)</li><li>팀장은 팀 일정을 책임지고 진행하며, 긴급 수정사항 발생 시 총괄 인솔자(교감 선생님)와 상의 후 진행</li><li><b>단톡방 입장 대상:</b> 교감 선생님, 이예준 선생님, 손영헌 선생님<br><a href="https://open.kakao.com/o/gXk19cii" target="_blank" style="color:var(--primary); text-decoration:underline;">오픈채팅방 바로가기 (비밀번호 2026)</a></li></ul>'
       }
     ],
     days: [
       {
         label: '1일차', date: '9/7 월',
         teamA: [
-          { label: '김포공항 집결·출발', mapQuery: '김포공항' },
-          { label: '중식 - MH 컨벤션', mapQuery: '제주 MH컨벤션' },
-          { label: '아르떼 뮤지엄', mapQuery: '제주 아르떼뮤지엄' },
-          { label: '송악산', mapQuery: '제주 송악산' },
-          { label: '석식 - 제주 통돗', mapQuery: '제주 통돗' },
-          { label: '숙소 이동 · 체크인', mapQuery: null }
+          { time: '08:00', label: '김포공항 집결', mapQuery: '김포공항' },
+          { time: '08:00~10:00', label: '인원 파악 및 탑승 수속', mapQuery: null },
+          { time: '10:10~11:25', label: '✈️ 김포 → 제주', mapQuery: null },
+          { time: '11:40~12:20', label: '제주공항 도착 · 인솔자 미팅 · 버스 탑승', mapQuery: '제주국제공항' },
+          { time: '12:30~13:30', label: '중식 - MH컨벤션 (소불고기전골)', mapQuery: '제주 MH컨벤션' },
+          { time: '14:00~15:00', label: '아르떼뮤지엄', mapQuery: '제주 아르떼뮤지엄' },
+          { time: '15:30~16:30', label: '송악산', mapQuery: '제주 송악산' },
+          { time: '17:00~18:00', label: '석식 - 제주돈돗 (솥뚜껑바베큐)', mapQuery: '제주 제주돈돗' },
+          { time: '18:30~22:00', label: '숙소(중문 켄싱턴) 도착 · 객실배정 · 개인정비', mapQuery: '중문 켄싱턴리조트' },
+          { time: '22:00~', label: '취침 점호 및 취침', mapQuery: null }
+        ],
+        teamA1: [
+          { time: '09:00', label: '김포공항 집결', mapQuery: '김포공항' },
+          { time: '09:00~11:00', label: '인원 파악 및 탑승 수속', mapQuery: null },
+          { time: '11:10~12:25', label: '✈️ 김포 → 제주', mapQuery: null },
+          { time: '12:30~13:00', label: '제주공항 도착 · 인솔자 미팅 · 버스 탑승', mapQuery: '제주국제공항' },
+          { time: '13:30~14:30', label: '중식 - MH컨벤션 (소불고기전골)', mapQuery: '제주 MH컨벤션' },
+          { time: '15:00~16:00', label: '아르떼뮤지엄', mapQuery: '제주 아르떼뮤지엄' },
+          { time: '16:30~17:30', label: '송악산', mapQuery: '제주 송악산' },
+          { time: '18:00~19:00', label: '석식 - 제주돈돗 (솥뚜껑바베큐)', mapQuery: '제주 제주돈돗' },
+          { time: '19:30~22:00', label: '숙소(중문 켄싱턴) 도착 · 객실배정 · 개인정비', mapQuery: '중문 켄싱턴리조트' },
+          { time: '22:00~', label: '취침 점호 및 취침', mapQuery: null }
+        ],
+        teamB: [
+          { time: '09:00', label: '김포공항 집결', mapQuery: '김포공항' },
+          { time: '09:00~11:00', label: '인원 파악 및 탑승 수속', mapQuery: null },
+          { time: '11:10~12:25', label: '✈️ 김포 → 제주', mapQuery: null },
+          { time: '12:30~13:00', label: '제주공항 도착 · 인솔자 미팅 · 버스 탑승', mapQuery: '제주국제공항' },
+          { time: '13:30~14:30', label: '중식 - MH컨벤션 (소불고기전골)', mapQuery: '제주 MH컨벤션' },
+          { time: '15:00~16:00', label: '아르떼뮤지엄', mapQuery: '제주 아르떼뮤지엄' },
+          { time: '16:30~17:30', label: '송악산', mapQuery: '제주 송악산' },
+          { time: '18:00~19:00', label: '석식 - 제주돈돗 (솥뚜껑바베큐)', mapQuery: '제주 제주돈돗' },
+          { time: '19:30~22:00', label: '숙소(서귀포 켄싱턴) 도착 · 객실배정 · 개인정비', mapQuery: '서귀포 켄싱턴리조트' },
+          { time: '22:00~', label: '취침 점호 및 취침', mapQuery: null }
         ]
       },
-      { label: '2일차', date: '9/8 화' },
-      { label: '3일차', date: '9/9 수' }
+      {
+        label: '2일차', date: '9/8 화',
+        teamA: [
+          { time: '06:30~08:30', label: '기상 및 아침식사 (숙소식)', mapQuery: null },
+          { time: '08:40', label: '숙소 출발', mapQuery: null },
+          { time: '09:00~10:00', label: '주상절리', mapQuery: '제주 주상절리' },
+          { time: '10:20~11:20', label: '제주제트 (제트보트)', mapQuery: '제주 제트보트' },
+          { time: '12:20~13:20', label: '중식 - 국수인가갈치인가 (고기국수+삼색만두)', mapQuery: '제주 국수인가갈치인가' },
+          { time: '13:30~14:30', label: '성산일출봉', mapQuery: '성산일출봉' },
+          { time: '15:30~16:30', label: '윈드1947 카트체험', mapQuery: '제주 윈드1947카트' },
+          { time: '16:50~17:50', label: '올레길 7코스 (외돌개)', mapQuery: '제주 올레길 7코스' },
+          { time: '18:10~19:10', label: '석식 - 자유식 (올레시장, 현금 1.5만원 지급)', mapQuery: '서귀포 매일올레시장' },
+          { time: '19:30~21:00', label: '레크리에이션 (서귀포 켄싱턴 연회장)', mapQuery: null },
+          { time: '22:00~', label: '숙소 도착 · 취침 점호 및 취침', mapQuery: null }
+        ],
+        teamB: [
+          { time: '06:30~08:20', label: '기상 및 아침식사 (숙소식)', mapQuery: null },
+          { time: '08:30', label: '숙소 출발', mapQuery: null },
+          { time: '09:00~10:00', label: '윈드1947 카트체험', mapQuery: '제주 윈드1947카트' },
+          { time: '11:20~12:20', label: '중식 - 국수인가갈치인가 (고기국수+삼색만두)', mapQuery: '제주 국수인가갈치인가' },
+          { time: '12:40~13:40', label: '성산일출봉', mapQuery: '성산일출봉' },
+          { time: '14:10~15:10', label: '제주라프 짚라인', mapQuery: '제주 짚라인' },
+          { time: '16:10~17:10', label: '올레길 7코스 (외돌개)', mapQuery: '제주 올레길 7코스' },
+          { time: '17:30~18:30', label: '석식 - 자유식 (올레시장, 현금 1.5만원 지급)', mapQuery: '서귀포 매일올레시장' },
+          { time: '19:30~21:00', label: '레크리에이션 (서귀포 켄싱턴 연회장)', mapQuery: null },
+          { time: '22:00~', label: '취침 점호 및 취침', mapQuery: null }
+        ]
+      },
+      {
+        label: '3일차', date: '9/9 수',
+        teamA: [
+          { time: '06:30~08:30', label: '기상 · 아침식사 · 체크아웃', mapQuery: null },
+          { time: '09:00', label: '숙소 출발', mapQuery: null },
+          { time: '10:00~11:00', label: '제주라프 짚라인', mapQuery: '제주 짚라인' },
+          { time: '11:20~12:20', label: '4.3 평화공원', mapQuery: '제주4.3평화공원' },
+          { time: '13:00~14:00', label: '중식 - 삼다정 (5성급호텔 프리미엄 런치)', mapQuery: '메종글래드 제주 삼다정' },
+          { time: '14:40~16:40', label: '제주공항 도착 · 탑승 수속', mapQuery: '제주국제공항' },
+          { time: '17:00~18:15', label: '✈️ 제주 → 김포', mapQuery: null },
+          { time: '18:30~', label: '김포공항 도착 · 귀가', mapQuery: '김포공항' }
+        ],
+        teamB: [
+          { time: '06:30~08:00', label: '기상 · 아침식사 · 체크아웃', mapQuery: null },
+          { time: '08:30', label: '숙소 출발', mapQuery: null },
+          { time: '09:00~10:00', label: '주상절리', mapQuery: '제주 주상절리' },
+          { time: '10:20~11:20', label: '제주제트 (제트보트)', mapQuery: '제주 제트보트' },
+          { time: '12:30~13:30', label: '중식 - 삼다정 (5성급호텔 프리미엄 런치)', mapQuery: '메종글래드 제주 삼다정' },
+          { time: '14:10~15:10', label: '4.3 평화공원', mapQuery: '제주4.3평화공원' },
+          { time: '15:40~16:40', label: '제주공항 도착 · 탑승 수속', mapQuery: '제주국제공항' },
+          { time: '18:15~19:30', label: '✈️ 제주 → 김포', mapQuery: null },
+          { time: '19:40~', label: '김포공항 도착 · 귀가', mapQuery: '김포공항' }
+        ]
+      }
     ],
-    hotelContacts: [
-      { name: 'WE 호텔', addr: '서귀포시 1100로 453-95', tel: '064-730-1200' },
-      { name: '캠퍼트리 호텔 & 리조트', addr: '제주시 해암마을 4길 100', tel: '064-795-8888' },
-      { name: '켄싱턴 리조트 중문점', addr: '서귀포시 중문관광로 72번길', tel: '1588-9337' },
-      { name: '켄싱턴 리조트 서귀포점', addr: '서귀포시 이어도로 684', tel: '064-739-9001' },
-      { name: '제주 신화월드 랜딩관', addr: '서귀포시 안덕면 신화역사로 304번길 38', tel: '064-731-6000' },
-      { name: '제주 신화월드 신화관', addr: '서귀포시 안덕면 신화역사로 304번길 38', tel: '1670-8800' },
-      { name: '빠레브 호텔', addr: '서귀포시 감정문화로 15', tel: '0507-1374-8905' },
-      { name: '스위트메이 호텔', addr: '서귀포시 감정문화로 27번길 9-1', tel: '0507-1374-5757' },
-      { name: '서귀포 JS 호텔', addr: '서귀포시 감정문화로 51', tel: '064-802-3000' },
-      { name: '히든클리프 호텔 & 네이처', addr: '서귀포시 여래해안로 542', tel: '064-752-7777' },
-      { name: '파크선샤인호텔', addr: '서귀포시 남성중로 135', tel: '064-766-1011' },
-      { name: '벨룸리조트', addr: '서귀포시 516로 277번길 45', tel: '064-732-5700' },
-      { name: '야크마을', addr: '서귀포시 색달중앙로 162', tel: '064-760-1950' }
-    ],
-    siteVisits: [
-      { name: 'WE 호텔', addr: '서귀포시 1100로 453-95', tel: '064-730-1200', notes: [
-        '더블베드1+싱글베드1 (3인 1실), 마루·카펫 혼합',
-        '화장실: 변기+샤워실 한 공간에 함께 위치',
-        '저층 우선 배정 / 발코니 없음, 창문 15cm만 개방',
-        '무인 편의점 (주류는 잠금 처리)',
-        '조식 아침 7시~ (일반 투숙객과 함께 사용)',
-        '연회장 층고 높고 전 인원 수용 가능',
-        '힐링 프로그램·별 보는 장소 등 부대시설 다양, 의사 3명 상시 거주'
-      ]}
+    places: [
+      { name: '아르떼뮤지엄', addr: '제주시 애월읍', desc: '스피커 제조 공장을 업사이클링한 몰입형 미디어아트 전시관. 섬(ISLAND)을 컨셉으로 빛과 소리가 만드는 16개의 전시를 관람합니다.' },
+      { name: '송악산 둘레길', addr: '서귀포시 대정읍', desc: '해안 절벽을 따라 걷는 산책로. 용암석 바닥과 해안 절경, 야생화와 억새가 어우러지는 걷기 명소입니다.' },
+      { name: '주상절리', addr: '서귀포시 중문', desc: '용암이 식으며 형성된 4~6각형 기둥 모양의 암석 지대. 해안 절경과 함께 지질학적 형성 과정을 볼 수 있습니다.' },
+      { name: '제트보트', addr: '서귀포시 중문', desc: '국내 최초 검증된 제트보트 체험. 주상절리 인근 해안을 스릴 있게 즐길 수 있습니다. 안전조끼 착용 필수, 안전요원 통제 준수.' },
+      { name: '성산일출봉', addr: '서귀포시 성산읍', desc: '높이 180m의 화산체로, 99개의 바위 봉우리가 분화구를 둘러싼 유네스코 세계자연유산. 해돋이 명소로도 유명합니다.' },
+      { name: '윈드1947 카트', addr: '서귀포시 안덕면', desc: '한라산 높이(1,947m)와 동일한 길이의 국내 최장 레이싱 코스. 총 3코스로 구성되어 있습니다.' },
+      { name: '올레길 7코스 (외돌개)', addr: '서귀포시', desc: '제주 올레 여행자센터~월평마을을 잇는 17.7km 해안길. 시작점인 외돌개는 바다 위 20m 높이의 돌기둥입니다.' },
+      { name: '제주라프 (짚라인)', addr: '제주시 조천읍', desc: '거문오름과 녹차밭 위를 가로지르는 짚라인. 총 4개 코스로 구성되어 제주 자연을 입체적으로 감상할 수 있습니다.' },
+      { name: '4.3 평화공원', addr: '제주시 명림로', desc: '제주 4.3사건 희생자를 기리는 평화·인권 기념공원. 영상과 전시를 통해 역사적 의미를 배울 수 있는 공간입니다.' }
     ]
   };
-  TRIP_INFO.days[1].teamA = [
-    { label: '주상절리', mapQuery: '제주 주상절리' },
-    { label: '제주 제트보트 체험', mapQuery: '제주 제트보트' },
-    { label: '성산일출봉', mapQuery: '성산일출봉' },
-    { label: '중식 - 국수인가 갈치인가', mapQuery: '제주 국수인가갈치인가' },
-    { label: '윈드카트 1947', mapQuery: '제주 윈드카트1947' },
-    { label: '올레길 7코스', mapQuery: '제주 올레길 7코스' },
-    { label: '서귀포 매일올레시장 (석식, 자유식)', mapQuery: '서귀포 매일올레시장' },
-    { label: '레크레이션 및 장기자랑', mapQuery: null },
-    { label: '간식타임', mapQuery: null }
-  ];
-  TRIP_INFO.days[1].teamB = [
-    { label: '윈드카트 1947', mapQuery: '제주 윈드카트1947' },
-    { label: '성산일출봉', mapQuery: '성산일출봉' },
-    { label: '중식 - 국수인가 갈치인가', mapQuery: '제주 국수인가갈치인가' },
-    { label: '제주라프 짚라인', mapQuery: '제주 짚라인' },
-    { label: '올레길 7코스', mapQuery: '제주 올레길 7코스' },
-    { label: '서귀포 매일올레시장 (석식, 자유식)', mapQuery: '서귀포 매일올레시장' },
-    { label: '레크레이션 및 장기자랑', mapQuery: null },
-    { label: '간식타임', mapQuery: null }
-  ];
-  TRIP_INFO.days[2].teamA = [
-    { label: '제주라프 짚라인', mapQuery: '제주 짚라인' },
-    { label: '4.3 평화공원', mapQuery: '제주4.3평화공원' },
-    { label: '중식 - 메종글래드 삼다정', mapQuery: '메종글래드 제주 삼다정' },
-    { label: '제주국제공항', mapQuery: '제주국제공항' },
-    { label: '김포공항 도착', mapQuery: '김포공항' }
-  ];
-  TRIP_INFO.days[2].teamB = [
-    { label: '주상절리', mapQuery: '제주 주상절리' },
-    { label: '제주 제트보트 체험', mapQuery: '제주 제트보트' },
-    { label: '4.3 평화공원', mapQuery: '제주4.3평화공원' },
-    { label: '제주국제공항', mapQuery: '제주국제공항' },
-    { label: '김포공항 도착', mapQuery: '김포공항' }
-  ];
-  TRIP_INFO.days[0].teamB = TRIP_INFO.days[0].teamA; 
 
   state.tripDayIndex = 0;
   state.tripTeam = 'teamA';
@@ -1909,9 +2114,11 @@
     document.getElementById('trip-title').textContent = TRIP_INFO.title;
     document.getElementById('trip-daterange').textContent = TRIP_INFO.dateRange;
     document.querySelectorAll('#trip-team-control .segment-btn').forEach(b => b.classList.toggle('active', b.dataset.team === state.tripTeam));
+    renderTripSummaryStrip();
     renderTripDayTabs();
     renderTripTimeline();
     renderTripGather();
+    renderTripEssentials();
     renderTripHotelContacts();
     renderTripSiteVisits();
   }
@@ -1923,6 +2130,15 @@
       renderTripTimeline();
     });
   });
+
+  function renderTripSummaryStrip() {
+    const p = TRIP_INFO.participants;
+    document.getElementById('trip-summary-strip').innerHTML = `
+      <div class="trip-summary-chip"><div class="val">${p.students}명</div><div class="lbl">참가 학생</div></div>
+      <div class="trip-summary-chip"><div class="val">${p.teachers}명</div><div class="lbl">인솔 교사</div></div>
+      <div class="trip-summary-chip"><div class="val">${p.buses}대</div><div class="lbl">전세버스</div></div>
+    `;
+  }
 
   function renderTripDayTabs() {
     const wrap = document.getElementById('trip-day-tabs'); wrap.innerHTML = '';
@@ -1939,12 +2155,13 @@
   function renderTripTimeline() {
     const container = document.getElementById('trip-timeline');
     const day = TRIP_INFO.days[state.tripDayIndex];
-    const stops = day[state.tripTeam] || [];
+    // A팀(5반)은 2·3일차에 A팀(1·2·4반)과 동일 일정을 따릅니다.
+    const stops = day[state.tripTeam] || day.teamA || [];
     container.innerHTML = stops.map((s, i) => `
       <div class="trip-stop">
         <div class="ts-marker"><div class="ts-dot"></div><div class="ts-line"></div></div>
         <div class="ts-body">
-          <div class="ts-index">STOP ${i + 1}</div>
+          <div class="ts-index">STOP ${i + 1}${s.time ? ' · ' + s.time : ''}</div>
           <div class="ts-name">${s.label}</div>
           ${tripMapLinks(s.mapQuery)}
         </div>
@@ -1958,10 +2175,10 @@
       html += `<div><b>${item.team}</b> 집합 : ${item.place} — <span class="text-primary" style="font-weight:800;">${item.time}</span></div>`;
     });
     html += tripMapLinks('김포공항 롯데리아');
-    html += '<div style="margin:14px 0 6px; font-weight:800; font-size:12.5px;">✈️ 반별 항공편 탑승 시간</div>';
-    html += '<table class="trip-flight-table"><thead><tr><th>구분</th><th>반</th><th>서울→제주 (9/7)</th><th>반</th><th>제주→서울 (9/9)</th></tr></thead><tbody>';
+    html += '<div style="margin:14px 0 6px; font-weight:800; font-size:12.5px; display:flex; align-items:center; gap:5px;"><span class="ic ic-plane" style="width:13px;height:13px;"></span>반별 항공편 탑승 시간</div>';
+    html += '<table class="trip-flight-table"><thead><tr><th>구분</th><th>서울→제주 (9/7)</th><th>제주→서울 (9/9)</th></tr></thead><tbody>';
     TRIP_INFO.flights.forEach(item => {
-      html += `<tr><td>${item.team}</td><td>${item.classes}</td><td>${item.go}</td><td>${item.classesBack}</td><td>${item.back}</td></tr>`;
+      html += `<tr><td>${item.team}</td><td>${item.go}</td><td>${item.back}</td></tr>`;
     });
     html += '</tbody></table>';
     html += `<div style="font-size:11.5px; color:var(--text-sub); margin-top:9px;">* ${TRIP_INFO.flightNote}</div>`;
@@ -1981,11 +2198,12 @@
   }
 
   function renderTripHotelContacts() {
-    document.getElementById('trip-hotel-contacts-body').innerHTML = TRIP_INFO.hotelContacts.map(h => `
+    let html = '<div class="emg-group-title"><span class="ic">' + ICONS.hospital + '</span>숙소</div>';
+    html += TRIP_INFO.lodging.map(h => `
       <div class="trip-contact-row-wrap">
         <div class="trip-contact-row">
           <div>
-            <div class="trip-contact-name">${h.name}</div>
+            <div class="trip-contact-name">${h.name} <span style="font-weight:600; color:var(--text-sub); font-size:11px;">(${h.team} · ${h.classes})</span></div>
             <div class="trip-contact-addr">${h.addr}</div>
           </div>
           <a class="trip-tel-btn" href="tel:${h.tel.replace(/[^0-9]/g, '')}">📞 전화</a>
@@ -1993,71 +2211,391 @@
         ${tripMapLinks(h.addr)}
       </div>
     `).join('');
+    html += '<div class="emg-group-title"><span class="ic">' + ICONS.bus + '</span>전세버스 기사님</div>';
+    html += '<div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:7px;">' + TRIP_INFO.buses.map(b => `
+      <a href="tel:${b.tel.replace(/[^0-9]/g,'')}" style="text-decoration:none; display:block; background:rgba(120,120,128,0.07); border-radius:12px; padding:9px 10px;">
+        <div style="font-size:11px; color:var(--text-sub); font-weight:700;">${b.no} · ${b.plate}</div>
+        <div style="font-size:12.5px; font-weight:800; color:var(--text-main); display:flex; align-items:center; justify-content:space-between;">${b.driver}<span style="color:var(--success); font-size:11px;">${b.tel}</span></div>
+      </a>
+    `).join('') + '</div>';
+    document.getElementById('trip-hotel-contacts-body').innerHTML = html;
   }
 
   function renderTripSiteVisits() {
-    document.getElementById('trip-site-visit-body').innerHTML = TRIP_INFO.siteVisits.map(v => `
+    document.getElementById('trip-site-visit-body').innerHTML = TRIP_INFO.places.map(v => `
       <div class="trip-visit-item">
-        <h4>🏨 ${v.name}</h4>
-        <div class="tv-addr">${v.addr}${v.tel ? ' · ' + v.tel : ''}</div>
-        <ul>${v.notes.map(n => `<li>${n}</li>`).join('')}</ul>
-        ${tripMapLinks(v.addr)}
+        <h4>📍 ${v.name}</h4>
+        <div class="tv-addr">${v.addr}</div>
+        <div style="font-size:12px; color:var(--text-main); line-height:1.6; margin-top:4px;">${v.desc}</div>
+        ${tripMapLinks(v.name + ' ' + v.addr)}
       </div>
     `).join('');
   }
 
   // ==========================================
-  // 🔢 원터치 탑승 카운터 기능
+  // 📌 교사 필수 안전 안내 (아코디언)
+  // ==========================================
+  const TEACHER_ESSENTIALS = [
+    {
+      icon: 'siren', level: 'danger',
+      title: '단체생활 · 개인행동 금지',
+      summary: '모든 활동은 인솔 교사 통솔에 따르며, 개인행동 절대 금지. 위반 시 귀교 후 엄중 처벌 대상입니다.',
+      detail: '<ul><li>집합·해산·식사·취침 시간 엄수, 항상 단체의 일원임을 자각</li><li><b>휴대금지품:</b> 담배·술·만화책·성인용서적·인화성물질(라이터 등)·화투·카드 등 — 불시 소지품 검사 실시</li><li>도박·음주·흡연·폭행·금품갈취 등은 귀교 후 엄중 처벌</li><li>귀중품(고가 카메라·전자기기)·과다 현금은 담임에게 맡기도록 지도</li><li>타교 학생·외부인과의 마찰 시 물리적 대응 금지, 즉시 교사에게 알리도록 지도 (항상 단체행동, 혼자 다니지 않기)</li></ul>'
+    },
+    {
+      icon: 'plane', level: 'primary',
+      title: '항공기 탑승 · 기내 안전',
+      summary: '탑승권·항공권 분실 시 탑승 거절될 수 있으니 개별 소지 지도. 이착륙 시 안전벨트 착용 필수.',
+      detail: '<ul><li>항공권은 각자 소지(분실 시 탑승 거절 가능), GATE 앞 집결시간 엄수</li><li>이·착륙 시 안전벨트 착용, 테이블·등받이 원위치, 전자기기 사용 금지</li><li>비상시 충격방지자세: 두 손을 포개 앞좌석에 대고 팔 사이로 머리를 감싸 웅크리기</li><li>비상탈출 슬라이드 이용 시 굽 높은 신발·목도리 등은 벗고 지체없이 탈출</li><li>화장실은 이륙 후 안전벨트 사인 소등 후 이용 가능</li></ul>'
+    },
+    {
+      icon: 'siren', level: 'warning',
+      title: '기내 반입금지 · 보조배터리 규정 (2026.4 강화)',
+      summary: '폭발물·가스류·인화성 물질 등 반입 절대 금지. 보조배터리는 160Wh 이하 1인 최대 2개, 단락조치 필수.',
+      detail: '<ul><li><b>반입금지:</b> 탄약·폭죽 등 폭발물, 가스라이터·캠핑가스 등 가스류, 페인트·신나 등 인화성 액체/고체, 표백제 등 산화성 물질, 방사성 물질 등</li><li><b>보조배터리:</b> 100Wh 이하 1~2개(승인 불필요), 101~160Wh 1~2개(항공사 승인·스티커 필요), 160Wh 초과 또는 3개 이상은 반입 불가</li><li>단락조치: 1개씩 비닐봉투/파우치에 분리 보관, 단자에 테이프 또는 캡 부착</li><li>기내선반 보관 금지, 좌석 앞주머니에 보관하고 충전 금지</li><li>발열 제품인 리튬배터리 내장 고데기·다리미 등은 휴대/위탁 모두 운송 불가</li></ul>'
+    },
+    {
+      icon: 'bus', level: 'primary',
+      title: '버스 이용 안전수칙',
+      summary: '승하차 시 정해진 자리, 안전벨트 반드시 착용. 사고 시 비상탈출용 망치로 창문을 깨고 탈출.',
+      detail: '<ul><li>임의 좌석 이동 금지, 안전벨트 반드시 착용</li><li>손·얼굴 창밖으로 내밀지 않기, 통로에 서 있지 않기</li><li>이동마다 학급회장이 승차 인원 점검 후 담임에게 보고</li><li>사고 시 문으로 하차 어려우면 비상탈출용 망치로 창문을 깨고 탈출, 화재 상황 외에는 부상자를 함부로 건드리지 않기</li></ul>'
+    },
+    {
+      icon: 'hospital', level: 'primary',
+      title: '숙소 이용 안전수칙',
+      summary: '입실 후 무단외출 금지, 남·여 학생 간 야간 방 이동 절대 금지, 베란다 출입 금지.',
+      detail: '<ul><li>실내 정숙·공중도덕 준수, 무단외출은 담임 허락 필요</li><li>음주·흡연·음식 배달 반입 절대 금지</li><li>견학 시 방 정리정돈·문단속 철저 (분실사고 예방)</li><li>실내 기물 파손 시 본인 보상 원칙 안내</li><li>야간 취침 시간 중 타 방 출입 금지, 특히 남·여 학생 간 이동 절대 금지</li><li>복도에서 뛰지 않기, 베란다 장난·매달리기 금지(출입금지)</li><li>각 객실 방장은 화재 피난 계획을 급우들에게 사전교육</li></ul>'
+    },
+    {
+      icon: 'shieldBadge', level: 'danger',
+      title: '(성)폭력 예방교육 핵심',
+      summary: '힘의 차이를 이용한 모든 성적 언동은 성폭력입니다. 피해 발생 시 즉시 교사·부모에게 알리고 117 신고.',
+      detail: '<ul><li><b>유형 예시:</b> 외모 비하성 성적 놀림, 신체변화(생리·몸무게 등)로 놀리기, 기습뽀뽀·포옹 등 원치 않는 신체접촉, 동의 없는 사진 촬영·유포, 음란물 노출, 스킨십 강요 등</li><li>피해 발생 시 흥분하지 말고 침착하게 대응하도록 지도, 목격자·도구·횟수 등 상황을 정확히 기록</li><li>신체·정신적 이상 시 즉시 전문의 진료</li><li>사안 발생 시 즉시 선생님·부모님께 알리고 <b>117</b> 신고전화 이용</li><li>해결 과정에서 협박이 있을 경우 반드시 교사·부모에게 알리기</li></ul>'
+    },
+    {
+      icon: 'siren', level: 'danger',
+      title: '응급상황 대응',
+      summary: '위험요소·응급환자 발생 시 즉시 담임 및 총괄 인솔자에게 보고. 하단 "비상연락망 전체보기"에서 병원·소방·경찰 연락처 확인.',
+      detail: '<ul><li>사고 발생 시 선생님이나 주변 어른에게 즉시 도움 요청</li><li>학교 폭력·성폭력 사안 발생 시 지체 없이 보고</li><li>응급상황 시 아래 <b>비상연락망 전체보기</b> 버튼으로 병원·소방서·경찰서 연락처를 바로 확인해 전화할 수 있습니다.</li></ul>'
+    }
+  ];
+
+  function renderTripEssentials() {
+    const wrap = document.getElementById('trip-essential-body');
+    wrap.innerHTML = TEACHER_ESSENTIALS.map((e, i) => `
+      <div class="essential-item">
+        <div class="essential-head" data-idx="${i}">
+          <div class="essential-icon-badge ${e.level}"><span class="ic">${ICONS[e.icon]}</span></div>
+          <div class="essential-body">
+            <div class="essential-title">${e.title}</div>
+            <div class="essential-summary">${e.summary}</div>
+          </div>
+          <button class="essential-toggle-btn" data-idx="${i}"><span class="ic">${ICONS.chevronDown}</span></button>
+        </div>
+        <div class="essential-detail" id="essential-detail-${i}"><div class="essential-detail-inner">${e.detail}</div></div>
+      </div>
+    `).join('');
+    wrap.querySelectorAll('.essential-head').forEach(head => {
+      head.addEventListener('click', () => {
+        const idx = head.dataset.idx;
+        const detail = document.getElementById(`essential-detail-${idx}`);
+        const btn = wrap.querySelector(`.essential-toggle-btn[data-idx="${idx}"]`);
+        const isOpen = detail.style.maxHeight && detail.style.maxHeight !== '0px';
+        if (isOpen) {
+          detail.style.maxHeight = '0px';
+          btn.classList.remove('open');
+        } else {
+          detail.style.maxHeight = detail.scrollHeight + 'px';
+          btn.classList.add('open');
+        }
+      });
+    });
+  }
+
+  // ==========================================
+  // 🚨 비상연락망 데이터 및 팝업
+  // ==========================================
+  const EMERGENCY_INFO = {
+    hospitals: [
+      { name: '서귀포의료원', tel: '064-730-3000' },
+      { name: '제주대학교병원', tel: '064-717-1114' },
+      { name: '제주한라병원', tel: '064-740-5000' },
+      { name: '새론의원', tel: '064-738-8119' }
+    ],
+    fire: [
+      { name: '제주서부소방서', tel: '064-795-0130' },
+      { name: '제주소방서', tel: '0507-1413-0134' },
+      { name: '제주동부소방서', tel: '064-780-9134' },
+      { name: '서귀포소방서', tel: '064-730-7134' }
+    ],
+    police: [
+      { name: '제주서부경찰서', tel: '182' },
+      { name: '제주서귀포경찰서', tel: '182' },
+      { name: '남원파출소', tel: '064-764-0112' },
+      { name: '효돈파출소', tel: '064-767-0112' }
+    ],
+    leaders: [
+      { name: 'A팀장 · 하지영 선생님', tel: '010-8227-1207', sub: '1반 담임 겸 A팀 총괄' },
+      { name: 'B팀장 · 윤보라 선생님', tel: '010-9609-0106', sub: '5반 담임 겸 B팀 총괄' },
+      { name: '총괄 인솔자 · 교감 선생님', tel: '010-5288-3472', sub: '전체 일정 최종 책임' }
+    ]
+  };
+
+  function emgRow(name, tel, sub) {
+    const telClean = (tel || '').replace(/[^0-9]/g, '');
+    const callable = telClean.length >= 3;
+    return `
+      <div class="emg-row">
+        <div>
+          <div class="emg-row-name">${name}</div>
+          ${sub ? `<div class="emg-row-sub">${sub}</div>` : ''}
+        </div>
+        ${callable ? `<a class="emg-call-btn" href="tel:${telClean}"><span class="ic">${ICONS.phone}</span>${tel}</a>` : (tel ? `<span class="emg-row-sub">${tel}</span>` : '')}
+      </div>
+    `;
+  }
+
+  function renderEmergencySheet() {
+    let html = '';
+    html += `<div class="emg-group-title"><span class="ic">${ICONS.hospital}</span>병원</div>` + EMERGENCY_INFO.hospitals.map(h => emgRow(h.name, h.tel)).join('');
+    html += `<div class="emg-group-title"><span class="ic">${ICONS.fireExtinguisher}</span>소방서</div>` + EMERGENCY_INFO.fire.map(h => emgRow(h.name, h.tel)).join('');
+    html += `<div class="emg-group-title"><span class="ic">${ICONS.shieldBadge}</span>경찰서</div>` + EMERGENCY_INFO.police.map(h => emgRow(h.name, h.tel)).join('');
+    html += `<div class="emg-group-title"><span class="ic">${ICONS.hospital}</span>숙소</div>` + TRIP_INFO.lodging.map(h => emgRow(h.name, h.tel, `${h.team} · ${h.classes}`)).join('');
+    html += `<div class="emg-group-title"><span class="ic">${ICONS.bus}</span>전세버스 기사님</div>` + TRIP_INFO.buses.map(b => emgRow(`${b.no} · ${b.driver}`, b.tel, b.plate)).join('');
+    html += `<div class="emg-group-title"><span class="ic">${ICONS.userGroup}</span>팀장 · 총괄 인솔자</div>` + EMERGENCY_INFO.leaders.map(l => emgRow(l.name, l.tel, l.sub)).join('');
+    document.getElementById('emergency-sheet-body').innerHTML = html;
+  }
+
+  document.getElementById('btn-open-emergency').addEventListener('click', () => {
+    renderEmergencySheet();
+    document.getElementById('overlay').classList.add('show');
+    document.getElementById('emergency-sheet').classList.add('show');
+  });
+  document.getElementById('btn-close-emergency-sheet').addEventListener('click', closeAllPopups);
+
+  // ==========================================
+  // ✈️ 온라인 체크인 예약번호(PNR) 데이터 및 팝업
+  // ==========================================
+  const CHECKIN_INFO = {
+    1: {
+      flight: '대한항공 1진 · 김포 10:10 → 제주 17:00',
+      pnr: 'DU3AB8',
+      staff: [{ name: '하지영 (담임)' }],
+      notes: []
+    },
+    2: {
+      flight: '대한항공 1진 · 김포 10:10 → 제주 17:00',
+      pnr: 'DKFK8O',
+      staff: [{ name: '김다나 (담임)' }],
+      notes: []
+    },
+    4: {
+      flight: '대한항공 1진 · 김포 10:10 → 제주 17:00',
+      pnr: 'DKG97I',
+      staff: [
+        { name: '김형자 (담임)' },
+        { name: '배주환 (여행사 인솔)', pnr: 'EINJCS' }
+      ],
+      notes: ['윤수영 학생: PNR FD9MTP (개별 발권)', '조은성 학생: PNR FBWTA2 (개별 발권)']
+    },
+    5: {
+      flight: '대한항공 2진 · 김포 11:10 → 제주 17:00',
+      pnr: 'EZSVMP',
+      staff: [
+        { name: '홍영민 (담임)' },
+        { name: '장만진 (교감)' }
+      ],
+      notes: ['김윤하 학생: PNR D72Z5O (개별 발권)']
+    },
+    3: {
+      flight: '대한항공 3진 · 김포 11:10 → 제주 18:15',
+      pnr: 'DU3TWL',
+      staff: [
+        { name: '윤보라 (담임)' },
+        { name: '손영헌 (인솔교사)' }
+      ],
+      notes: ['이현성 학생: 8/27자 불참 처리']
+    },
+    6: {
+      flight: '대한항공 3진 · 김포 11:10 → 제주 18:15',
+      pnr: 'DU2QB8',
+      staff: [
+        { name: '이하린 (담임)' },
+        { name: '이예준 (인솔교사)' }
+      ],
+      notes: []
+    },
+    7: {
+      flight: '대한항공 3진 · 김포 11:10 → 제주 18:15',
+      pnr: 'DKFO8V',
+      staff: [{ name: '한지수 (담임)' }],
+      notes: []
+    },
+    8: {
+      flight: '대한항공 3진 · 김포 11:10 → 제주 18:15',
+      pnr: 'DKG7CY',
+      staff: [{ name: '박성우 (담임)' }],
+      notes: []
+    }
+  };
+
+  function renderCheckinGrid() {
+    const grid = document.getElementById('checkin-class-grid');
+    grid.innerHTML = '';
+    for (let i = 1; i <= 8; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'outline-btn';
+      btn.style.marginBottom = '0';
+      btn.style.padding = '16px 4px';
+      btn.textContent = `${i}반`;
+      btn.addEventListener('click', () => renderCheckinDetail(i));
+      grid.appendChild(btn);
+    }
+    grid.style.display = 'grid';
+    document.getElementById('checkin-detail').style.display = 'none';
+  }
+
+  function renderCheckinDetail(cNum) {
+    const info = CHECKIN_INFO[cNum];
+    const detail = document.getElementById('checkin-detail');
+    if (!info) { detail.innerHTML = '<div style="text-align:center; color:var(--text-sub); padding:20px 0;">등록된 정보가 없습니다.</div>'; }
+    else {
+      let html = `
+        <div style="text-align:center; font-weight:800; font-size:17px; margin-bottom:4px;">2학년 ${cNum}반</div>
+        <div style="text-align:center; font-size:12.5px; color:var(--text-sub); margin-bottom:14px;">${info.flight}</div>
+        <div style="text-align:center; background:var(--card); border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:14px;">
+          <div style="font-size:12px; color:var(--text-sub); font-weight:700; margin-bottom:6px;">대표 예약번호 (PNR)</div>
+          <div style="font-size:32px; font-weight:800; letter-spacing:2px; color:#FF9F0A;">${info.pnr}</div>
+        </div>
+        <div class="emg-group-title" style="margin-top:0;"><span class="ic">${ICONS.userGroup}</span>인솔 · 담임</div>
+        ${info.staff.map(s => `<div class="emg-row"><div><div class="emg-row-name">${s.name}</div></div>${s.pnr ? `<span class="emg-row-sub">PNR ${s.pnr}</span>` : ''}</div>`).join('')}
+      `;
+      if (info.notes.length) {
+        html += `<div class="emg-group-title"><span class="ic">${ICONS.siren || ''}</span>개별 확인 필요</div>` +
+          `<ul style="margin:4px 0 0; padding-left:18px; font-size:13px; line-height:1.7; color:var(--text-main);">` +
+          info.notes.map(n => `<li>${n}</li>`).join('') + `</ul>`;
+      }
+      detail.innerHTML = html;
+    }
+    const backBtn = document.createElement('button');
+    backBtn.className = 'outline-btn';
+    backBtn.style.marginTop = '14px';
+    backBtn.textContent = '← 반 다시 선택';
+    backBtn.addEventListener('click', renderCheckinGrid);
+    detail.appendChild(backBtn);
+
+    document.getElementById('checkin-class-grid').style.display = 'none';
+    detail.style.display = 'block';
+  }
+
+  document.getElementById('btn-open-checkin').addEventListener('click', () => {
+    renderCheckinGrid();
+    document.getElementById('overlay').classList.add('show');
+    document.getElementById('checkin-sheet').classList.add('show');
+  });
+  document.getElementById('btn-close-checkin-sheet').addEventListener('click', closeAllPopups);
+
+  // ==========================================
+  // 🔢 원터치 탑승 카운터 기능 (반·총원 설정 자동 저장)
   // ==========================================
   let counterValue = 0;
   let counterTotal = 0;
+  let counterManualTotal = null; // 사용자가 직접 설정한 총원 (null이면 자동 계산 사용)
+  const TRIP_GRADE = 2; // 수학여행 대상 학년 (2학년)
+  const COUNTER_STORE_KEY = 'counter_settings_v1'; // { "<반번호>": { manualTotal: number|null, value: number } }
+  const COUNTER_LAST_CLASS_KEY = 'counter_last_class';
+
+  function counterAutoTotal(cNum) {
+    if (!cNum) return 0;
+    const stds = safeParse(`students_${TRIP_GRADE}_${cNum}`, null);
+    return stds ? stds.length : 0;
+  }
+
+  function getCounterStore() { return safeParse(COUNTER_STORE_KEY, {}) || {}; }
+
+  function saveCounterState(cNum) {
+    if (!cNum) return;
+    const store = getCounterStore();
+    store[cNum] = { manualTotal: counterManualTotal, value: counterValue };
+    localStorage.setItem(COUNTER_STORE_KEY, JSON.stringify(store));
+    localStorage.setItem(COUNTER_LAST_CLASS_KEY, cNum);
+    flashCounterSaveStatus();
+  }
+
+  let counterSaveStatusTimer = null;
+  function flashCounterSaveStatus() {
+    const el = document.getElementById('counter-save-status');
+    if (!el) return;
+    el.textContent = '반 · 총원 설정이 저장되었습니다';
+    el.style.color = 'var(--success)';
+    clearTimeout(counterSaveStatusTimer);
+    counterSaveStatusTimer = setTimeout(() => { el.textContent = '\u00a0'; }, 1500);
+  }
+
+  function loadCounterStateFor(cNum) {
+    const store = getCounterStore();
+    const saved = cNum ? store[cNum] : null;
+    if (saved) {
+      counterManualTotal = (typeof saved.manualTotal === 'number') ? saved.manualTotal : null;
+      counterValue = saved.value || 0;
+    } else {
+      counterManualTotal = null;
+      counterValue = 0;
+    }
+    document.getElementById('counter-total-input').value = (counterManualTotal !== null) ? counterManualTotal : '';
+    counterTotal = counterManualTotal !== null ? counterManualTotal : counterAutoTotal(cNum);
+    updateCounterUI();
+  }
 
   document.getElementById('btn-open-counter').addEventListener('click', () => {
     const select = document.getElementById('counter-class-select');
-    select.innerHTML = '<option value="">반을 선택하세요</option>';
+    select.innerHTML = '<option value="">2학년 반을 선택하세요</option>';
     
-    // 현재 학년의 등록된 반 불러오기
-    const classes = getGradeClasses(state.currentGrade);
-    if (classes.length === 0) {
-      // 엑셀에 미등록 시 기본적으로 1~8반 옵션 제공
-      for(let i=1; i<=8; i++) select.innerHTML += `<option value="${i}">${i}반</option>`;
-    } else {
-      classes.forEach(c => { select.innerHTML += `<option value="${c}">${c}반</option>`; });
-    }
-    
-    counterValue = 0;
-    counterTotal = 0;
-    updateCounterUI();
-    
+    // 수학여행 대상인 2학년 1~8반 고정 제공
+    for (let i = 1; i <= 8; i++) select.innerHTML += `<option value="${i}">2학년 ${i}반</option>`;
+
+    // 마지막으로 사용한 반과 저장된 총원 설정을 그대로 불러온다
+    const lastClass = localStorage.getItem(COUNTER_LAST_CLASS_KEY) || '';
+    if (lastClass) select.value = lastClass;
+    loadCounterStateFor(select.value);
+    document.getElementById('counter-save-status').textContent = '\u00a0';
+
     document.getElementById('overlay').classList.add('show');
     document.getElementById('counter-sheet').classList.add('show');
   });
 
   document.getElementById('counter-class-select').addEventListener('change', (e) => {
     const cNum = e.target.value;
-    if (!cNum) {
-       counterTotal = 0;
-    } else {
-       const stds = safeParse(`students_${state.currentGrade}_${cNum}`, null);
-       counterTotal = stds ? stds.length : 0;
-    }
-    counterValue = 0;
+    loadCounterStateFor(cNum);
+    if (cNum) saveCounterState(cNum);
+  });
+
+  document.getElementById('counter-total-input').addEventListener('input', (e) => {
+    const v = parseInt(e.target.value, 10);
+    counterManualTotal = (e.target.value === '' || isNaN(v)) ? null : v;
+    const cNum = document.getElementById('counter-class-select').value;
+    counterTotal = counterManualTotal !== null ? counterManualTotal : counterAutoTotal(cNum);
     updateCounterUI();
+    saveCounterState(cNum);
   });
 
   document.getElementById('btn-counter-plus').addEventListener('click', () => {
     counterValue++;
     updateCounterUI();
+    saveCounterState(document.getElementById('counter-class-select').value);
   });
 
   document.getElementById('btn-counter-minus').addEventListener('click', () => {
     if(counterValue > 0) counterValue--;
     updateCounterUI();
+    saveCounterState(document.getElementById('counter-class-select').value);
   });
 
   document.getElementById('btn-counter-reset').addEventListener('click', () => {
+    // 숫자(카운트)만 0으로 초기화하고, 선택된 반과 총원 설정은 그대로 유지한다
     counterValue = 0;
     updateCounterUI();
+    saveCounterState(document.getElementById('counter-class-select').value);
   });
 
   function updateCounterUI() {
